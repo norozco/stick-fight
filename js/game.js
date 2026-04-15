@@ -623,12 +623,15 @@ function loop(now) {
     shakeMag *= 0.92;
   }
 
-  // Apply camera
+  // Smooth camera angle (used by fatal-blow for dutch tilt + whip rotations)
+  cameraAngle = lerp(cameraAngle, cameraTargetAngle, 0.14);
+
+  // Apply camera: translate to screen center, scale, ROTATE, then re-translate
   ctx.save();
-  // Translate to screen center, scale, then translate back relative to camera target
   const cx = W / 2, cy = H / 2;
   ctx.translate(cx + sx - cameraPanX, cy + sy - cameraPanY);
   ctx.scale(cameraZoom, cameraZoom);
+  if(Math.abs(cameraAngle) > 0.001) ctx.rotate(cameraAngle);
   ctx.translate(-cx - (cameraX - cx) * (cameraZoom - 1) / cameraZoom,
                 -cy - (cameraY - cy) * (cameraZoom - 1) / cameraZoom);
 
@@ -636,6 +639,7 @@ function loop(now) {
     drawReplay();
   } else {
     drawScene();
+    drawGroundCracks();
     if(state === 'ringout' || cameraPanY > 2) drawPit();
   }
 
