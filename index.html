@@ -3265,7 +3265,15 @@ function endRound(winner) {
   } else {
     roundsWon[winner - 1]++;
     updateRoundDots();
-    announce(winner === 1 ? 'PLAYER 1 WINS' : (mode === 'cpu' ? 'CPU WINS' : 'PLAYER 2 WINS'), 120);
+    // Achievement: PERFECT (winner took no damage) — bonus pop-up before main announce
+    const winFighter = winner === 1 ? p1 : p2;
+    if(winFighter && winFighter.hp >= winFighter.maxHp) {
+      announce('PERFECT!', 70);
+      setTimeout(() => Audio.say('Perfect!', { interrupt: true }), 200);
+      setTimeout(() => announce(winner === 1 ? 'PLAYER 1 WINS' : (mode === 'cpu' ? 'CPU WINS' : 'PLAYER 2 WINS'), 120), 1100);
+    } else {
+      announce(winner === 1 ? 'PLAYER 1 WINS' : (mode === 'cpu' ? 'CPU WINS' : 'PLAYER 2 WINS'), 120);
+    }
     setTimeout(() => Audio.say('K O!', { interrupt: true }), 80);
     // "Finish him!" line if winner has 1 round, loser has 0 (about to clinch)
     if(roundsWon[winner - 1] === 1 && roundsWon[winner === 1 ? 1 : 0] === 0) {
