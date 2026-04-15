@@ -88,17 +88,12 @@ class Fighter {
     this.limbDragX = 0; this.lastVx = 0;
     this.smoothPose = null;
     this.walkPhase = 0;
-    // Ring-out state from any prior round MUST be cleared, otherwise
-    // ringoutFinalized=true leaks and blocks the front-view camera trigger
-    // on the next ring-out (the guard is `!f.ringoutFinalized`).
+    // Ring-out state from any prior round MUST be cleared
     this.ringoutFinalized = false;
-    this.ringoutFrontView = false;
-    this.ringoutFrontViewStart = 0;
-    this.ringoutBounces = 0;
-    this.ringoutRestTime = 0;
     this.ringoutSpin = 0;
-    this.ringoutSpinSpeed = 0;
-    this.ringoutTrail = [];
+    this.ringoutAnchorX = 0;
+    this.ringoutAnchorY = 0;
+    this.ringoutLaunchDir = 0;
   }
 
   addUlt(amount) { this.ult = Math.min(this.maxUlt, this.ult + amount); }
