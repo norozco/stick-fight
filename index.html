@@ -812,24 +812,25 @@ const Audio = (() => {
       setTimeout(() => beep(330, 0.2, 'square', 0.14, 82), 150);
       setTimeout(() => beep(180, 0.5, 'sawtooth', 0.16, 50), 320);
     },
-    // Voice announcer — Street Fighter arcade style
-    // Tries Japanese voices first for that authentic SF II announcer flavor,
-    // then any energetic feminine voice, with high pitch + slight slow rate.
+    // Voice announcer — natural, clear, slightly energetic.
+    // High pitch was making it sound demonic/chipmunk; back to natural.
     say: (text, opts = {}) => {
       if(muted) return;
       try {
         if(window.speechSynthesis) {
           if(opts.interrupt) speechSynthesis.cancel();
           const u = new SpeechSynthesisUtterance(text);
-          u.pitch = opts.pitch != null ? opts.pitch : 1.55;   // high, hyped
-          u.rate  = opts.rate  != null ? opts.rate  : 0.86;   // slightly slow → dramatic
-          u.volume= opts.volume!= null ? opts.volume: 1.0;    // max
+          u.pitch = opts.pitch != null ? opts.pitch : 1.05;   // very slightly above neutral
+          u.rate  = opts.rate  != null ? opts.rate  : 1.0;    // natural speed
+          u.volume= opts.volume!= null ? opts.volume: 1.0;
           const voices = speechSynthesis.getVoices();
-          const jp = voices.find(v => /^ja/i.test(v.lang))
-                  || voices.find(v => /haruka|mizuki|kyoko|sayaka|ayumi|otoya/i.test(v.name));
-          const fem = voices.find(v => /(female|woman|girl)/i.test(v.name) && /en/i.test(v.lang))
-                  || voices.find(v => /(samantha|victoria|zira|aria|allison|joanna|kendra|salli|kimberly|amy|emma|fiona|tessa|moira|karen)/i.test(v.name));
-          u.voice = jp || fem || voices.find(v => /en/i.test(v.lang)) || voices[0];
+          // Prefer well-known clean energetic English voices
+          const preferred = voices.find(v => /(zira|aria|samantha|google us english)/i.test(v.name))
+                         || voices.find(v => /en-us/i.test(v.lang) && /(female|woman)/i.test(v.name))
+                         || voices.find(v => /en-us/i.test(v.lang))
+                         || voices.find(v => /^en/i.test(v.lang))
+                         || voices[0];
+          if(preferred) u.voice = preferred;
           speechSynthesis.speak(u);
         } else {
           beep(720, 0.12, 'square', 0.14, 540);
