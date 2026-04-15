@@ -1275,7 +1275,15 @@ class Fighter {
 
     // Apply attacker's character damage multiplier
     const dmgMult = (attacker && attacker.dmgMult) || 1;
-    box = { ...box, dmg: box.dmg * dmgMult };
+    // Combo damage scaling — long combos hit for less so single touches can't 100%
+    const comboCount = (attacker && attacker.combo) || 0;
+    const scaling = comboCount < 3 ? 1.0
+                  : comboCount < 5 ? 0.80
+                  : comboCount < 7 ? 0.60
+                  : 0.40;
+    // Ult and finishers ignore scaling
+    const finalScale = (box.type === 'ult') ? 1.0 : scaling;
+    box = { ...box, dmg: box.dmg * dmgMult * finalScale };
 
     // Counter-hit detection — receiver was caught during startup of their own attack
     if(box.type !== 'ult' && box.type !== 'throw' &&
