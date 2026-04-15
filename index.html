@@ -1628,11 +1628,37 @@ class Fighter {
       lockVictimToUlt(this, opponent);
       this.vx = 0; this.vy = 0;
       this.knockback = 0; this.knockUp = 0;
-      // Keep hurt pose active so they look stunned through the whole combo
       if(this.state !== 'hurt') { this.state = 'hurt'; this.stateTimeF = 0; }
       this.hitStun = Math.max(this.hitStun, 4);
       return;
     }
+
+    // Being thrown — locked to the attacker's grab choreography
+    if(this.beingThrown > 0 && opponent &&
+       opponent.state === 'attack' && opponent.attackType === 'throw' &&
+       opponent.stateTime < 42) {
+      lockVictimToThrow(this, opponent);
+      // Apply damage + final knockback at the slam frame
+      if(opponent.stateTime === 40 && !this.throwDamageApplied) {
+        this.throwDamageApplied = true;
+        const dmgMult = (opponent.dmgMult) || 1;
+        const dmg = 22 * dmgMult;
+        this.hp = Math.max(0, this.hp - dmg);
+        this.hurtFlash = 16;
+        this.hitStun = 26;
+        this.knockback = -opponent.facing * 18;
+        this.knockUp = -4;
+        spawnDamageNumber(this.x, this.y - 110, dmg, '#ff6600', true);
+        spawnHitSpark(this.x, this.y - 30, '#ffaa44', 24, 2.0);
+        for(let i = 0; i < 18; i++) spawnDust(this.x + (Math.random()-0.5)*60, GROUND + 2, -opponent.facing);
+        shake(12, 16);
+        hitstop = 8;
+        Audio.heavy();
+        if(opponent) opponent.addUlt(14);
+      }
+      return;
+    }
+    if(this.throwDamageApplied && this.beingThrown === 0) this.throwDamageApplied = false;
 
     // Face opponent when idle/dash
     if(opponent && (this.state === 'idle' || this.state === 'dash')) {
