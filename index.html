@@ -308,6 +308,10 @@ let cameraX = 0, cameraY = 0;
 let cameraTargetX = 0, cameraTargetY = 0;
 let cameraPanX = 0, cameraPanY = 0;           // extra pan for ring-out cinematic
 let cameraPanTargetX = 0, cameraPanTargetY = 0;
+let cameraAngle = 0, cameraTargetAngle = 0;   // rotation for fatal-blow cinematic
+
+// Persistent ground cracks left by fatal-blow slams; cleared each round
+let groundCracks = [];
 
 // Ring-out cinematic state
 let ringoutFighter = null;
