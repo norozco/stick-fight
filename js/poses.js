@@ -598,17 +598,17 @@ function frontFacingFlailPose(f) {
 }
 
 function drawFighter(f) {
-  // Ring-out: render the fighter as a clean tumbling silhouette, no trail/glow.
-  // KI-style additions: afterimage echo, distance-based scale shrink.
+  // Ring-out: phase-driven rendering. The cinematic uses HARD CUTS between
+  // distinct camera/pose moments — see RINGOUT_PHASES in ringout.js.
   if(f.state === 'ringout') {
-    // Cinematic front-facing view mid-fall: the fighter wails its arms in
-    // distress straight at the camera. No tumble rotation, no afterimages —
-    // this is the "angle change" part of the shot.
-    if(f.ringoutFrontView) {
+    const phName = (typeof RINGOUT_PHASES !== 'undefined' && RINGOUT_PHASES[ringoutPhaseIdx])
+                   ? RINGOUT_PHASES[ringoutPhaseIdx].name : null;
+
+    // FREEFALL phase — front-facing flailing pose, slight dramatic scale-up
+    if(phName === 'FREEFALL') {
       const pose = frontFacingFlailPose(f);
       ctx.save();
-      // Slight dramatic scale-up so the flailing reads clearly on screen.
-      const scale = 1.25;
+      const scale = 1.4;
       ctx.translate(f.x, f.y - 55);
       ctx.scale(scale, scale);
       ctx.translate(-f.x, -(f.y - 55));
@@ -617,34 +617,41 @@ function drawFighter(f) {
       return;
     }
 
+    // CRASH phase — flat splayed pose, body flush with the ground
+    if(phName === 'CRASH' || phName === 'SETTLE') {
+      const x = f.x, y = f.y;
+      const splayed = {
+        head:   { x, y: y - 18 },
+        neck:   { x, y: y - 14 },
+        pelvis: { x, y: y - 4 },
+        lFoot:  { x: x - 26, y: y - 2 },
+        rFoot:  { x: x + 26, y: y - 2 },
+        lKnee:  { x: x - 14, y: y - 6 },
+        rKnee:  { x: x + 14, y: y - 6 },
+        lHand:  { x: x - 32, y: y - 12 },
+        rHand:  { x: x + 32, y: y - 12 },
+        lElbow: { x: x - 16, y: y - 14 },
+        rElbow: { x: x + 16, y: y - 14 },
+        bodyLean: 0,
+        headTilt: 0,
+        facing: 0,
+      };
+      ctx.save();
+      const scale = phName === 'CRASH' ? 1.2 : 1.0;
+      ctx.translate(f.x, f.y - 10);
+      ctx.scale(scale, scale);
+      ctx.translate(-f.x, -(f.y - 10));
+      renderStoredPose(splayed, f.color);
+      ctx.restore();
+      return;
+    }
+
+    // IMPACT / LAUNCH / APPROACH — tumbling side-view with rotation
     const target = computeTargetPose(f);
     if(!f.smoothPose) f.smoothPose = clonePose(target);
     smoothPose(f.smoothPose, target, 0.4);
-
-    // Perspective shrink — farther into the pit = smaller on screen
-    const pitProgress = Math.max(0, Math.min(1, (f.y - GROUND) / 900));
-    const scale = 1 - pitProgress * 0.28;
-
-    // Afterimage trail — draw oldest → newest, each slightly transparent.
-    if(f.ringoutTrail && f.ringoutTrail.length) {
-      for(const s of f.ringoutTrail) {
-        const a = (s.life / 18) * 0.35;
-        if(a < 0.02) continue;
-        ctx.save();
-        ctx.globalAlpha = a;
-        const sScale = 1 - Math.max(0, Math.min(1, (s.y - GROUND) / 900)) * 0.28;
-        ctx.translate(s.x, s.y - 55);
-        ctx.scale(sScale, sScale);
-        ctx.rotate(s.spin || 0);
-        ctx.translate(-s.x, -(s.y - 55));
-        renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
-        ctx.restore();
-      }
-    }
-
     ctx.save();
     ctx.translate(f.x, f.y - 55);
-    ctx.scale(scale, scale);
     ctx.rotate(f.ringoutSpin || 0);
     ctx.translate(-f.x, -(f.y - 55));
     renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
