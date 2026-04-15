@@ -3393,6 +3393,7 @@ function loop(now) {
   if(slowMo > 0) slowMo--;
 
   if(hitstop > 0) {
+    if(hitstop > 5 && globalTime % 12 === 0) Audio.musicDuck(0.18, 0.18);   // periodic duck during long hitstops
     hitstop--;
   } else if(state === 'playing' && doUpdate) {
     if(now - lastSecond >= 1000) {
