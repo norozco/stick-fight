@@ -167,6 +167,24 @@
     background-clip: text;
     color: transparent;
   }
+  /* Character / stage cards */
+  .card {
+    width: 150px;
+    background: rgba(0,0,0,0.45);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 10px 8px;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+    text-align: center;
+  }
+  .card:hover { transform: translateY(-4px); border-color: var(--card-glow,#ff3860); box-shadow: 0 6px 24px var(--card-glow,#ff3860); }
+  .card.picked-p1 { border-color: #3bf0ff; box-shadow: 0 0 18px #3bf0ff; }
+  .card.picked-p2 { border-color: #ff3860; box-shadow: 0 0 18px #ff3860; }
+  .card-name { font-weight: 900; letter-spacing: 2px; font-size: 13px; margin-top: 6px; color: #fff; }
+  .card-stats { font-size: 10px; color: rgba(255,255,255,0.55); letter-spacing: 1px; margin-top: 4px; line-height: 1.6; }
+  .stage-card { width: 200px; }
+  .card svg { display: block; margin: 0 auto; }
 </style>
 </head>
 <body>
