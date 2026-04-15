@@ -1263,8 +1263,10 @@ class Fighter {
       return { start: 10, active: 14, total: 40, dmg: 14, kb: 14, up: -5, reach: 78, boxH: 36, boxY: -65, ult: 12, canCombo: false };
     }
     if(this.attackType === 'throw') {
-      // Reach must beat the 50-px pushback so it can actually land at touching range
-      return { start: 6, active: 8, total: 32, dmg: 16, kb: 14, up: -4, reach: 78, boxH: 90, boxY: -95, ult: 10, canCombo: false, beatsBlock: true };
+      // Grab window at start; full choreography plays out once contact is made.
+      // The sequence is 55 frames total: 6 startup, 10 grab-active, then a
+      // 24-frame swing & slam choreography (handled separately), then recovery.
+      return { start: 4, active: 10, total: 55, dmg: 22, kb: 20, up: -4, reach: 82, boxH: 100, boxY: -100, ult: 14, canCombo: false, beatsBlock: true, isGrab: true };
     }
     return null;
   }
