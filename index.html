@@ -318,6 +318,9 @@ let ringoutFighter = null;
 let ringoutWinner = 0;
 let ringoutTime = 0;
 let ringoutAnnounced = false;
+let ringoutPhaseIdx = 0;          // index into RINGOUT_PHASES (in ringout.js)
+let ringoutPhaseFrame = 0;        // frame within current phase
+let ringoutXrayFlashTime = 0;     // counts down while X-ray skeleton flashes
 
 const keys = {};
 const keyPressed = {};
