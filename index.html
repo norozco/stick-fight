@@ -3478,7 +3478,16 @@ function loop(now) {
   if(hitstop > 0) {
     hitstop--;
   } else if(state === 'playing' && doUpdate) {
-    if(now - lastSecond >= 1000) {
+    if(mode === 'training') {
+      // Training: regen HP, no timer, no KO
+      if(p1.hp < p1.maxHp) p1.hp = Math.min(p1.maxHp, p1.hp + 0.5);
+      if(p2.hp < p2.maxHp) p2.hp = Math.min(p2.maxHp, p2.hp + 0.5);
+      // Refill ult at moderate rate too
+      if(p1.ult < p1.maxUlt) p1.ult = Math.min(p1.maxUlt, p1.ult + 0.4);
+      if(p2.ult < p2.maxUlt) p2.ult = Math.min(p2.maxUlt, p2.ult + 0.4);
+      // Hide timer display
+      document.getElementById('timer').textContent = '∞';
+    } else if(now - lastSecond >= 1000) {
       roundTime--;
       lastSecond = now;
       // Timer warning ticks at the final 10 seconds
