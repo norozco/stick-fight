@@ -3152,11 +3152,14 @@ function resetRound() {
   ultTargetDarken = 0;
   cameraTargetZoom = 1;
   cameraZoom = 1;
-  // Voice announcer: ROUND N → FIGHT
+  // Voice + text: ROUND N appears first, then FIGHT! after a beat
   const roundNum = roundsWon[0] + roundsWon[1] + 1;
+  announce('ROUND ' + roundNum, 80);
   setTimeout(() => Audio.say('Round ' + roundNum, { interrupt: true }), 100);
-  setTimeout(() => Audio.say('Fight!'), 850);
-  announce('FIGHT!', 45);
+  setTimeout(() => {
+    announce('FIGHT!', 60);
+    Audio.say('Fight!', { interrupt: true });
+  }, 1300);
 }
 
 function startGame(m) {
