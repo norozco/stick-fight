@@ -1432,6 +1432,7 @@ class Fighter {
 
     if(input.lightPressed) this.startAttack('light');
     if(input.heavyPressed) this.startAttack('heavy');
+    if(input.throwPressed) this.startAttack('throw');
     if(input.ultPressed && this.ult >= this.maxUlt && this.state === 'idle') this.startAttack('ult');
     if(input.dashPressed) this.startDash(this.facing);
 
