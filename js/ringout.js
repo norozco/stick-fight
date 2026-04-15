@@ -200,11 +200,19 @@ function updateRingout() {
   f.y += f.vy;
   f.ringoutSpin = (f.ringoutSpin || 0) + f.ringoutSpinSpeed;
 
-  // Afterimage trail — capture a position snapshot every other frame while the
-  // fighter is still moving significantly (drop them once we're basically at rest).
+  // Cinematic camera swap: once the fighter has actually cleared the stage
+  // (falling past ~80 px below the ground), cut to a front-facing "flailing"
+  // view. The finalizer turns it back off so we see the crash impact.
+  if(!f.ringoutFinalized && f.y > GROUND + 80 && !f.ringoutFrontView) {
+    f.ringoutFrontView = true;
+    f.ringoutFrontViewStart = ringoutTime;
+  }
+
+  // Afterimage trail — only during the side-view phase; in front-view the
+  // trail would be a stack of flailing copies which reads as clutter.
   if(!f.ringoutTrail) f.ringoutTrail = [];
   const speed = Math.abs(f.vx) + Math.abs(f.vy) + Math.abs(f.ringoutSpinSpeed) * 20;
-  if(ringoutTime % 2 === 0 && speed > 1.2) {
+  if(!f.ringoutFrontView && ringoutTime % 2 === 0 && speed > 1.2) {
     f.ringoutTrail.push({ x: f.x, y: f.y, spin: f.ringoutSpin, life: 18 });
     if(f.ringoutTrail.length > 8) f.ringoutTrail.shift();
   }
@@ -266,6 +274,8 @@ function updateRingout() {
       // --- Killer-Instinct finalizer: fires once when the ragdoll lands ---
       if(!f.ringoutFinalized) {
         f.ringoutFinalized = true;
+        f.ringoutFrontView = false;   // cut back to side view for the crash impact
+        f.ringoutTrail = [];          // clear any stale snapshots
         // Dramatic freeze-frame on impact
         hitstop = 14;
         shake(22, 30);

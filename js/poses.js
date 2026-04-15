@@ -567,10 +567,56 @@ function drawLimb(a, b) {
   ctx.stroke();
 }
 
+// Front-facing stick figure flailing in distress — used mid-ringout for the
+// cinematic camera cut. All limbs driven by sine/cosine of globalTime so it
+// reads as panicked waving, not animation-locked.
+function frontFacingFlailPose(f) {
+  const x = f.x, y = f.y;
+  const t = globalTime;
+  const s1 = Math.sin(t * 0.36);
+  const s2 = Math.sin(t * 0.29 + 1.7);
+  const s3 = Math.sin(t * 0.43 + 0.6);
+  const s4 = Math.sin(t * 0.31 + 2.4);
+  return {
+    head:   { x, y: y - 98 },
+    neck:   { x, y: y - 80 },
+    pelvis: { x, y: y - 42 },
+    // Legs kicking outward — feet splay
+    lFoot:  { x: x - 14 - s3 * 6, y: y - Math.abs(s1) * 4 },
+    rFoot:  { x: x + 14 + s4 * 6, y: y - Math.abs(s2) * 4 },
+    lKnee:  { x: x - 9 + s3 * 3,  y: y - 22 },
+    rKnee:  { x: x + 9 - s4 * 3,  y: y - 22 },
+    // Arms waving overhead — elbows out, hands up and flailing
+    lElbow: { x: x - 18 + s1 * 8,  y: y - 92 + s2 * 5 },
+    lHand:  { x: x - 34 + s1 * 18, y: y - 116 - Math.abs(s1) * 10 },
+    rElbow: { x: x + 18 - s2 * 8,  y: y - 92 + s1 * 5 },
+    rHand:  { x: x + 34 - s2 * 18, y: y - 116 - Math.abs(s2) * 10 },
+    bodyLean: s1 * 4,
+    headTilt: s3 * 0.35,
+    facing: 0,   // face camera — no eye-dot side indicator
+  };
+}
+
 function drawFighter(f) {
   // Ring-out: render the fighter as a clean tumbling silhouette, no trail/glow.
   // KI-style additions: afterimage echo, distance-based scale shrink.
   if(f.state === 'ringout') {
+    // Cinematic front-facing view mid-fall: the fighter wails its arms in
+    // distress straight at the camera. No tumble rotation, no afterimages —
+    // this is the "angle change" part of the shot.
+    if(f.ringoutFrontView) {
+      const pose = frontFacingFlailPose(f);
+      ctx.save();
+      // Slight dramatic scale-up so the flailing reads clearly on screen.
+      const scale = 1.25;
+      ctx.translate(f.x, f.y - 55);
+      ctx.scale(scale, scale);
+      ctx.translate(-f.x, -(f.y - 55));
+      renderStoredPose(pose, f.color);
+      ctx.restore();
+      return;
+    }
+
     const target = computeTargetPose(f);
     if(!f.smoothPose) f.smoothPose = clonePose(target);
     smoothPose(f.smoothPose, target, 0.4);
