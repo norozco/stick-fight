@@ -3607,8 +3607,10 @@ function loop(now) {
     }
   }
 
-  if(p1) drawFighter(p1);
-  if(p2) drawFighter(p2);
+  if(state !== 'replay') {
+    if(p1) drawFighter(p1);
+    if(p2) drawFighter(p2);
+  }
   drawParticles();
 
   ctx.restore();
