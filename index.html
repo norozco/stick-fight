@@ -2033,20 +2033,62 @@ function triggerRingOut(loser, winningPlayer) {
   spawnCombo(loser.x, loser.y - 140, 'RING OUT', '#ff3860');
 }
 
+const PIT_FLOOR = GROUND + 1200;   // where the ragdoll bounces
+const MAX_BOUNCES = 2;
+
 function updateRingout() {
   if(!ringoutFighter) return;
   const f = ringoutFighter;
   ringoutTime++;
 
-  // Custom physics — exaggerated, no bounds clamp
-  f.vy += 0.55;
-  f.vx *= 0.995;
+  // Custom physics — stronger gravity, terminal velocity
+  f.vy = Math.min(f.vy + 0.7, 34);
+  f.vx *= 0.997;
   f.x += f.vx;
   f.y += f.vy;
   f.ringoutSpin = (f.ringoutSpin || 0) + (f.ringoutSpinSpeed || 0.2);
 
+  // Bounce off the pit floor
+  f.ringoutBounces = f.ringoutBounces || 0;
+  f.ringoutRestTime = f.ringoutRestTime || 0;
+  if(f.y >= PIT_FLOOR && f.vy > 0) {
+    f.y = PIT_FLOOR;
+    if(f.ringoutBounces < MAX_BOUNCES) {
+      const dampen = f.ringoutBounces === 0 ? 0.6 : 0.35;
+      f.vy = -Math.abs(f.vy) * dampen;
+      f.vx *= 0.55;
+      f.ringoutSpinSpeed = (f.ringoutSpinSpeed || 0.2) * -0.75;
+      f.ringoutBounces++;
+
+      // Impact dust & sparks
+      for(let i = 0; i < 22; i++) {
+        spawnParticle({
+          type: 'dust',
+          x: f.x + (Math.random() - 0.5) * 60,
+          y: PIT_FLOOR + 2,
+          vx: (Math.random() - 0.5) * 10,
+          vy: -Math.random() * 7 - 2,
+          life: 45, maxLife: 45,
+          size: Math.random() * 5 + 4,
+          color: 'rgba(255,150,80,0.7)',
+          grav: 0.25,
+        });
+      }
+      spawnHitSpark(f.x, PIT_FLOOR - 10, '#ff6600', 18, 2);
+      shake(16 - f.ringoutBounces * 4, 22);
+      hitstop = f.ringoutBounces === 1 ? 8 : 4;
+      Audio.heavy();
+    } else {
+      // Final rest — stop
+      f.vy = 0;
+      f.vx = 0;
+      f.ringoutSpinSpeed = 0;
+      f.ringoutRestTime++;
+    }
+  }
+
   // Trailing sparks so you can follow the fall
-  if(ringoutTime % 2 === 0) {
+  if(f.vy > 4 && ringoutTime % 2 === 0) {
     spawnParticle({
       type: 'spark',
       x: f.x + (Math.random() - 0.5) * 20,
@@ -2069,9 +2111,9 @@ function updateRingout() {
     flashColor = '255,200,60';
   }
 
-  // Finish after fighter falls well below and animation settles
-  if(ringoutTime > 160) {
-    state = 'playing';              // allow endRound to run
+  // Finish once the ragdoll has settled after the final bounce
+  if(f.ringoutRestTime > 60) {
+    state = 'playing';
     ringoutFighter = null;
     cameraTargetZoom = 1;
     ultTargetDarken = 0;
