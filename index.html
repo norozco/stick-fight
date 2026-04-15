@@ -611,31 +611,46 @@ const Audio = (() => {
       setTimeout(() => beep(330, 0.2, 'square', 0.14, 82), 150);
       setTimeout(() => beep(180, 0.5, 'sawtooth', 0.16, 50), 320);
     },
-    // Voice announcer — uses browser TTS with deep voice settings,
-    // falls back to a dramatic sting if speech synthesis is unavailable.
+    // Voice announcer — Street Fighter arcade style
+    // Tries Japanese voices first for that authentic SF II announcer flavor,
+    // then any energetic feminine voice, with high pitch + slight slow rate.
     say: (text, opts = {}) => {
       if(muted) return;
       try {
         if(window.speechSynthesis) {
-          // Cancel any pending speech so calls don't queue indefinitely
           if(opts.interrupt) speechSynthesis.cancel();
           const u = new SpeechSynthesisUtterance(text);
-          u.pitch = opts.pitch != null ? opts.pitch : 0.3;   // very deep
-          u.rate  = opts.rate  != null ? opts.rate  : 0.9;
-          u.volume= opts.volume!= null ? opts.volume: 0.95;
+          u.pitch = opts.pitch != null ? opts.pitch : 1.55;   // high, hyped
+          u.rate  = opts.rate  != null ? opts.rate  : 0.86;   // slightly slow → dramatic
+          u.volume= opts.volume!= null ? opts.volume: 1.0;    // max
           const voices = speechSynthesis.getVoices();
-          // Prefer a deep male English voice
-          const deep = voices.find(v => /david|mark|guy|male|deep/i.test(v.name) && /en/i.test(v.lang))
-                    || voices.find(v => /en/i.test(v.lang))
-                    || voices[0];
-          if(deep) u.voice = deep;
+          const jp = voices.find(v => /^ja/i.test(v.lang))
+                  || voices.find(v => /haruka|mizuki|kyoko|sayaka|ayumi|otoya/i.test(v.name));
+          const fem = voices.find(v => /(female|woman|girl)/i.test(v.name) && /en/i.test(v.lang))
+                  || voices.find(v => /(samantha|victoria|zira|aria|allison|joanna|kendra|salli|kimberly|amy|emma|fiona|tessa|moira|karen)/i.test(v.name));
+          u.voice = jp || fem || voices.find(v => /en/i.test(v.lang)) || voices[0];
           speechSynthesis.speak(u);
         } else {
-          // Fallback dramatic sting
-          beep(180, 0.18, 'sawtooth', 0.18, 90);
-          setTimeout(() => beep(120, 0.25, 'sawtooth', 0.16, 60), 100);
+          beep(720, 0.12, 'square', 0.14, 540);
+          setTimeout(() => beep(900, 0.15, 'square', 0.14, 720), 100);
         }
       } catch(e){}
+    },
+    // Triumphant "you win" fanfare (plays alongside the voice)
+    youWin: () => {
+      // Major-chord ascending arpeggio, then sustained
+      beep(523, 0.13, 'square', 0.18);                              // C5
+      setTimeout(() => beep(659, 0.13, 'square', 0.18), 110);       // E5
+      setTimeout(() => beep(784, 0.13, 'square', 0.18), 220);       // G5
+      setTimeout(() => beep(1047, 0.45, 'square', 0.24), 330);      // C6 hold
+      setTimeout(() => beep(1319, 0.5, 'square', 0.20), 380);       // E6 layer
+      setTimeout(() => beep(1568, 0.5, 'sawtooth', 0.10, 1568), 380);
+    },
+    // Defeat sting
+    youLose: () => {
+      beep(330, 0.25, 'sawtooth', 0.18, 220);
+      setTimeout(() => beep(247, 0.30, 'sawtooth', 0.18, 165), 200);
+      setTimeout(() => beep(165, 0.50, 'sawtooth', 0.20, 110), 420);
     },
     // Killer-Instinct-style falling scream
     fallYell: () => {
