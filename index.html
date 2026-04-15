@@ -2440,12 +2440,37 @@ function endRound(winner) {
       const w = roundsWon[0] >= 2 ? 'PLAYER 1' : (mode === 'cpu' ? 'CPU' : 'PLAYER 2');
       document.getElementById('winner').textContent = w + ' WINS';
       document.getElementById('over').classList.remove('hidden');
+      Audio.musicStart(true);   // play-again / win-screen music — intense variant
     } else {
       resetRound();
       state = 'playing';
+      Audio.musicStart(false);   // resume music for the next round
     }
   }, 2500);
 }
+
+// ============================================================
+// PLAY AGAIN / MENU
+// ============================================================
+function playAgain() {
+  Audio.musicStop();
+  document.getElementById('over').classList.add('hidden');
+  startGame(mode);
+}
+function backToMenu() {
+  Audio.musicStop();
+  document.getElementById('over').classList.add('hidden');
+  document.getElementById('menu').classList.remove('hidden');
+  state = 'menu';
+}
+function toggleMute() {
+  const m = !Audio.isMuted();
+  Audio.setMute(m);
+  document.getElementById('muteBtn').textContent = m ? 'SOUND OFF' : 'SOUND ON';
+}
+addEventListener('keydown', e => {
+  if(e.key === 'm' || e.key === 'M') toggleMute();
+});
 
 // ============================================================
 // MAIN LOOP
