@@ -2336,6 +2336,8 @@ function triggerRingOut(loser, winningPlayer) {
   cameraZoom = 1;                // snap immediately so the lerp doesn't fight the pan
   hitstop = 12;
   Audio.ultFinisher();
+  Audio.fallYell();
+  Audio.musicStop();              // music drops out for the cinematic fall
 
   // Spawn a big burst at the loser's current position
   spawnHitSpark(loser.x, loser.y - 60, '#ff3860', 36, 3);
