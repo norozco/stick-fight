@@ -617,7 +617,23 @@ function drawFighter(f) {
       return;
     }
 
-    // CRASH phase — flat splayed pose, body flush with the ground
+    // CRASH phase — transition smoothly:
+    //   frames 0-3: still use the falling/tumbling pose (body just hit floor,
+    //               limbs still in motion from the impact)
+    //   frames 4+ : splayed flat pose (body settled)
+    // This eliminates the "jump cut to flat-on-ground" that felt like a frame skip.
+    if(phName === 'CRASH' && ringoutPhaseFrame < 4) {
+      const target = computeTargetPose(f);
+      if(!f.smoothPose) f.smoothPose = clonePose(target);
+      smoothPose(f.smoothPose, target, 0.6);
+      ctx.save();
+      ctx.translate(f.x, f.y - 55);
+      ctx.rotate(f.ringoutSpin || 0);
+      ctx.translate(-f.x, -(f.y - 55));
+      renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
+      ctx.restore();
+      return;
+    }
     if(phName === 'CRASH' || phName === 'SETTLE') {
       const x = f.x, y = f.y;
       const splayed = {
