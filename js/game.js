@@ -130,14 +130,23 @@ const FATAL_TAUNTS = {
 function handleKO(loser, winner, winnerIdx) {
   if(canRingOut(loser, winnerIdx)) { triggerRingOut(loser, winnerIdx); return; }
 
-  const wasUlt = winner.state === 'attack' && winner.attackType === 'ult';
-  const wasLongCombo = (winner.combo || 0) >= 5;
+  // Fatal-blow triggers (any one of these qualifies). Thresholds picked so
+  // this actually fires in normal play instead of only on perfect combos:
+  //   - Winner is mid-ult (sequence finisher)
+  //   - Combo of 3+ on the KO hit
+  //   - The KO hit was a heavy attack
+  //   - The KO wins the entire match (last-round clincher)
+  const wasUlt      = winner.state === 'attack' && winner.attackType === 'ult';
+  const wasCombo    = (winner.combo || 0) >= 3;
+  const wasHeavy    = winner.state === 'attack' && winner.attackType === 'heavy';
+  const wasMatchEnd = roundsWon[winnerIdx - 1] + 1 >= 2;
 
-  if(!(wasUlt || wasLongCombo)) {
+  if(!(wasUlt || wasCombo || wasHeavy || wasMatchEnd)) {
     startReplay(winnerIdx);
     return;
   }
-  runFatalBlow(winner, loser, winnerIdx, wasUlt ? 'ult' : 'combo');
+  runFatalBlow(winner, loser, winnerIdx,
+    wasUlt ? 'ult' : wasMatchEnd ? 'match' : wasHeavy ? 'heavy' : 'combo');
 }
 
 // Spawn a ring of warm particles around a fighter for the finisher glow.
