@@ -10,6 +10,71 @@ function shake(mag, time) {
   shakeTime = Math.max(shakeTime, time);
 }
 
+// ============================================================
+// EPIC FINISH — cinematic zoom + slow-mo for ults & long combos
+// ============================================================
+// Called when the hit that ends a round was either (a) the ult finisher
+// or (b) the capstone of a combo ≥ 5 hits. Adds a longer slow-mo window,
+// a zoom-in on the winner, and a big announcement before the normal KO
+// flow (replay / ring-out) fires. Non-epic KOs skip this and go straight
+// to the existing replay system.
+function handleKO(loser, winner, winnerIdx) {
+  if(canRingOut(loser, winnerIdx)) { triggerRingOut(loser, winnerIdx); return; }
+
+  // Detect epic finish conditions
+  const wasUlt = winner.state === 'attack' && winner.attackType === 'ult';
+  const wasLongCombo = (winner.combo || 0) >= 5;
+
+  if(!(wasUlt || wasLongCombo)) {
+    // Normal KO → slow-mo + replay path
+    startReplay(winnerIdx);
+    return;
+  }
+
+  // ----- EPIC FINISH -----
+  triggerEpicFinish(winner, loser, wasUlt ? 'ult' : 'combo');
+
+  // After the cinematic, fall into the replay system.
+  // ~2s of real time gives ~1.2s of "game time" thanks to slow-mo.
+  const cinematicMs = wasUlt ? 2400 : 1900;
+  setTimeout(() => {
+    // The cinematic reset: drop zoom + darken back to normal before replay.
+    cameraTargetZoom = 1;
+    ultTargetDarken = 0;
+    if(state === 'playing') startReplay(winnerIdx);
+  }, cinematicMs);
+}
+
+function triggerEpicFinish(winner, loser, reason) {
+  // Extend slow-mo & freeze so the final blow lands like a cutscene.
+  slowMo = Math.max(slowMo, reason === 'ult' ? 180 : 130);
+  hitstop = Math.max(hitstop, reason === 'ult' ? 26 : 18);
+  shake(reason === 'ult' ? 22 : 16, reason === 'ult' ? 40 : 28);
+
+  // Zoom the camera on a point between the two fighters, biased toward winner
+  const focusX = winner.x * 0.65 + loser.x * 0.35;
+  const focusY = (winner.y + loser.y) / 2 - 40;
+  cameraTargetZoom = reason === 'ult' ? 1.75 : 1.55;
+  cameraTargetX = focusX;
+  cameraTargetY = focusY;
+  // Snap panning so it locks in instead of lagging behind the freeze
+  cameraX = focusX;
+  cameraY = focusY;
+
+  // Visual flash + dramatic darken behind the fighters
+  flashTime = 40;
+  flashAlpha = 0.85;
+  flashColor = reason === 'ult' ? '255,220,80' : '255,80,120';
+  ultTargetDarken = 0.55;
+
+  // Announce + voice + sound after a short beat so the flash reads first
+  setTimeout(() => {
+    announce(reason === 'ult' ? 'FINISHED!' : 'DEVASTATING!', 100);
+    try { Audio.ultFinisher(); } catch(e){}
+    try { Audio.say(reason === 'ult' ? 'Finished!' : 'Devastating!', { interrupt: true }); } catch(e){}
+  }, 220);
+}
+
 
 // Input helpers
 // GAME LOGIC
