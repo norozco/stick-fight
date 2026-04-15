@@ -772,13 +772,13 @@ const Audio = (() => {
     musicSetIntense(intense) { music.intense = intense; },
     musicSetStage(stageId) { currentStageId = stageId || 'twilight'; },
     // Briefly drop music volume for impact (hit-pause ducking)
-    musicDuck(amount = 0.25, dur = 0.15) {
+    musicDuck(amount = 0.18, dur = 0.15) {
       if(!music.musicGain || muted) return;
       try {
         const now = ctx.currentTime;
         music.musicGain.gain.cancelScheduledValues(now);
         music.musicGain.gain.setValueAtTime(amount, now);
-        music.musicGain.gain.linearRampToValueAtTime(0.5, now + dur);
+        music.musicGain.gain.linearRampToValueAtTime(0.35, now + dur);
       } catch(e){}
     },
 
