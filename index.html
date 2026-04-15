@@ -1262,6 +1262,24 @@ class Fighter {
     const dmgMult = (attacker && attacker.dmgMult) || 1;
     box = { ...box, dmg: box.dmg * dmgMult };
 
+    // Counter-hit detection — receiver was caught during startup of their own attack
+    if(box.type !== 'ult' && box.type !== 'throw' &&
+       this.state === 'attack' && this.attackType && this.attackType !== 'ult') {
+      const d = this.attackData();
+      if(d && this.stateTime < d.start) {
+        box = { ...box, dmg: box.dmg * 1.5, kb: box.kb * 1.2 };
+        spawnCombo(this.x, this.y - 150, 'COUNTER!', '#ffcc00');
+        if(attacker) {
+          attacker.combo = Math.max(attacker.combo, 1);
+          attacker.addUlt(8);
+        }
+        Audio.parry();
+        flashTime = 8;
+        flashAlpha = 0.4;
+        flashColor = '255,200,40';
+      }
+    }
+
     // Ult hits always connect
     if(box.type === 'ult') {
       const ulHit = box.ultHit;
