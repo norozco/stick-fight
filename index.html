@@ -563,6 +563,32 @@ const Audio = (() => {
       setTimeout(() => beep(330, 0.2, 'square', 0.14, 82), 150);
       setTimeout(() => beep(180, 0.5, 'sawtooth', 0.16, 50), 320);
     },
+    // Voice announcer — uses browser TTS with deep voice settings,
+    // falls back to a dramatic sting if speech synthesis is unavailable.
+    say: (text, opts = {}) => {
+      if(muted) return;
+      try {
+        if(window.speechSynthesis) {
+          // Cancel any pending speech so calls don't queue indefinitely
+          if(opts.interrupt) speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.pitch = opts.pitch != null ? opts.pitch : 0.3;   // very deep
+          u.rate  = opts.rate  != null ? opts.rate  : 0.9;
+          u.volume= opts.volume!= null ? opts.volume: 0.95;
+          const voices = speechSynthesis.getVoices();
+          // Prefer a deep male English voice
+          const deep = voices.find(v => /david|mark|guy|male|deep/i.test(v.name) && /en/i.test(v.lang))
+                    || voices.find(v => /en/i.test(v.lang))
+                    || voices[0];
+          if(deep) u.voice = deep;
+          speechSynthesis.speak(u);
+        } else {
+          // Fallback dramatic sting
+          beep(180, 0.18, 'sawtooth', 0.18, 90);
+          setTimeout(() => beep(120, 0.25, 'sawtooth', 0.16, 60), 100);
+        }
+      } catch(e){}
+    },
     // Killer-Instinct-style falling scream
     fallYell: () => {
       if(muted) return;
