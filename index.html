@@ -3520,6 +3520,8 @@ function loop(now) {
   if(p1 && p2) {
     document.getElementById('p1bar').style.width = (p1.hp / p1.maxHp * 100) + '%';
     document.getElementById('p2bar').style.width = (p2.hp / p2.maxHp * 100) + '%';
+    document.getElementById('p1bar').classList.toggle('low', p1.hp / p1.maxHp <= 0.25);
+    document.getElementById('p2bar').classList.toggle('low', p2.hp / p2.maxHp <= 0.25);
     document.getElementById('p1ult').style.width = (p1.ult / p1.maxUlt * 100) + '%';
     document.getElementById('p2ult').style.width = (p2.ult / p2.maxUlt * 100) + '%';
     document.getElementById('p1ult').classList.toggle('ready', p1.ult >= p1.maxUlt);
