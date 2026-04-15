@@ -1829,6 +1829,38 @@ function computeTargetPose(f) {
       pose.lFoot.x = x - fc * 14;
       pose.head.x += fc * 2;
     }
+    else if(f.attackType === 'throw') {
+      // Lunge forward with both arms extended — grab + slam motion
+      const data = f.attackData();
+      const phase = t < data.start ? 'startup'
+                  : t < data.start + data.active ? 'active'
+                  : 'recovery';
+      let reach = 0, slam = 0;
+      if(phase === 'startup') {
+        const p = t / data.start;
+        reach = easeOutCubic(p) * 30;
+        pose.bodyLean = fc * 6;
+      } else if(phase === 'active') {
+        const at = (t - data.start) / data.active;
+        reach = lerp(30, 50, easeOutCubic(at));
+        pose.bodyLean = fc * (10 - at * 4);
+      } else {
+        const rt = (t - data.start - data.active) / (data.total - data.start - data.active);
+        // Slam — arms come down, body twists
+        slam = easeOutCubic(rt) * 80;
+        reach = lerp(50, 20, rt);
+        pose.bodyLean = fc * (6 - rt * 30);
+      }
+      pose.rHand.x = x + fc * reach;
+      pose.rHand.y = y - 80 + slam;
+      pose.lHand.x = x + fc * (reach - 4);
+      pose.lHand.y = y - 70 + slam;
+      pose.rElbow.x = x + fc * reach * 0.5;
+      pose.rElbow.y = y - 78;
+      pose.lElbow.x = x + fc * (reach - 6) * 0.5;
+      pose.lElbow.y = y - 72;
+      pose.head.x += fc * 4;
+    }
     else if(f.attackType === 'ult') {
       computeUltPose(f, pose, t);
     }
