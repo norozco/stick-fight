@@ -300,12 +300,20 @@ function getP1Input() {
   i.left = !!keys['a'];
   i.right = !!keys['d'];
   i.jumpPressed = !!keyPressed['w'];
-  i.block = !!keys['s'];
-  i.lightPressed = !!keyPressed['f'];
-  i.heavyPressed = !!keyPressed['g'];
-  i.throwPressed = !!keyPressed['t'];
   i.dashPressed = !!keyPressed['q'];
   i.ultPressed = !!keyPressed['r'];
+  if(p1Layout === 'alt') {
+    // Alt layout (single-player opt-in): J/K/H/I cluster instead of F/G/T/S
+    i.block = !!keys['i'];
+    i.lightPressed = !!keyPressed['j'];
+    i.heavyPressed = !!keyPressed['k'];
+    i.throwPressed = !!keyPressed['h'];
+  } else {
+    i.block = !!keys['s'];
+    i.lightPressed = !!keyPressed['f'];
+    i.heavyPressed = !!keyPressed['g'];
+    i.throwPressed = !!keyPressed['t'];
+  }
   return i;
 }
 function getP2Input() {
@@ -383,6 +391,19 @@ function startGame(m) {
   if(mode === '2p') document.getElementById('p2name').textContent = 'PLAYER 2';
   document.getElementById('menu').classList.add('hidden');
   document.getElementById('over').classList.add('hidden');
+  // Single-player modes let the user pick a button layout before fighter select.
+  // 2P uses fixed keys (WASD + F/G/T/S for P1; arrow keys + K/L/'/; for P2).
+  if(mode === 'cpu' || mode === 'training') {
+    document.getElementById('layout').classList.remove('hidden');
+  } else {
+    showSetup();
+  }
+}
+
+// Called from the Controls overlay buttons
+function pickLayout(name) {
+  p1Layout = (name === 'alt') ? 'alt' : 'default';
+  document.getElementById('layout').classList.add('hidden');
   showSetup();
 }
 
@@ -602,6 +623,8 @@ function playAgain() {
 function backToMenu() {
   Audio.musicStop();
   document.getElementById('over').classList.add('hidden');
+  document.getElementById('layout').classList.add('hidden');
+  document.getElementById('setup').classList.add('hidden');
   document.getElementById('menu').classList.remove('hidden');
   state = 'menu';
 }
