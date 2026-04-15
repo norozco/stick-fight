@@ -2053,14 +2053,15 @@ function triggerRingOut(loser, winningPlayer) {
   flashAlpha = 0.9;
   flashColor = '255,60,60';
   ultTargetDarken = 0.45;
-  cameraTargetZoom = 1.25;
+  cameraTargetZoom = 1;          // no zoom — pan must do all the camera work cleanly
+  cameraZoom = 1;                // snap immediately so the lerp doesn't fight the pan
   hitstop = 12;
   Audio.ultFinisher();
 
   // Spawn a big burst at the loser's current position
   spawnHitSpark(loser.x, loser.y - 60, '#ff3860', 36, 3);
   spawnStar(loser.x, loser.y - 60, '#ffcc00', 3);
-  spawnCombo(loser.x, loser.y - 140, 'RING OUT', '#ff3860');
+  spawnCombo(loser.x, loser.y - 140, 'K.O.', '#ff3860');
 }
 
 const PIT_FLOOR = GROUND + 1200;   // where the ragdoll bounces
