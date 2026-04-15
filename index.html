@@ -240,6 +240,16 @@
   <div style="margin-top:24px;"><button class="ghost" onclick="backToMenu()">CANCEL</button></div>
 </div>
 
+<div id="pause" class="overlay hidden">
+  <h1 style="font-size:48px;letter-spacing:8px;">PAUSED</h1>
+  <div style="margin-top:24px;">
+    <button onclick="resumeGame()">RESUME</button>
+    <button class="ghost" onclick="restartMatch()">RESTART</button>
+    <button class="ghost" onclick="quitToMenu()">MAIN MENU</button>
+  </div>
+  <div style="margin-top:24px;color:rgba(255,255,255,0.5);font-size:12px;letter-spacing:2px;">PRESS ESC TO RESUME</div>
+</div>
+
 <div id="loading" class="overlay hidden">
   <div id="loadtext" style="font-size:42px;font-weight:900;letter-spacing:8px;color:#ffcc00;text-shadow:0 0 20px rgba(255,204,0,0.5);">LOADING</div>
   <div style="width:380px;height:14px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);border-radius:3px;overflow:hidden;margin-top:24px;">
