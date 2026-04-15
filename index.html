@@ -2102,7 +2102,7 @@ function updateRingout() {
       spawnHitSpark(f.x, PIT_FLOOR - 10, '#ff6600', 18, 2);
       shake(16 - f.ringoutBounces * 4, 22);
       hitstop = f.ringoutBounces === 1 ? 8 : 4;
-      Audio.heavy();
+      Audio.bounce();
     } else {
       // Final rest — stop
       f.vy = 0;
