@@ -407,10 +407,21 @@ const Audio = (() => {
       if(muted) return;
       try {
         if(window.speechSynthesis) {
+          if(!_voices.length) _loadVoices();
+          // Chrome loads voices asynchronously. If the very first say() fires before
+          // voices populate (common for P1's character pick), defer briefly so we
+          // actually get to apply the right voice instead of a browser default.
+          if(!_voices.length && !opts._retry) {
+            const retry = () => Audio.say(text, Object.assign({}, opts, { _retry: true }));
+            if(speechSynthesis.addEventListener) {
+              speechSynthesis.addEventListener('voiceschanged', retry, { once: true });
+            }
+            // Hard timeout fallback so we still speak even if voiceschanged never fires.
+            setTimeout(retry, 250);
+            return;
+          }
           if(opts.interrupt) speechSynthesis.cancel();
           const u = new SpeechSynthesisUtterance(text);
-          // Make sure we have an up-to-date voice list (Chrome loads async).
-          if(!_voices.length) _loadVoices();
           const voices = _voices;
           const isAurora = opts.character === 'aurora' || /\baurora\b/i.test(text || '');
           let preferred = null;
