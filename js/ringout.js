@@ -313,9 +313,10 @@ function updateRingout() {
             grav: 0.35,
           });
         }
-        // KI-style text overlay
+        // KI-style text overlay + announcer voice line
         announce('ULTRA K.O.!', 120);
         Audio.ultFinisher();
+        try { Audio.say('Ultra K O!', { interrupt: true }); } catch(e){}
       }
     }
   }
