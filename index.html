@@ -2342,6 +2342,24 @@ function loop(now) {
   ctx.fillStyle = vg;
   ctx.fillRect(0, 0, W, H);
 
+  // Killer-Instinct void: radial speed lines + dark overlay during ring-out
+  if(state === 'ringout' && ringoutFighter) {
+    // Fade speed lines in over first 10 frames, ramp down after final bounce
+    const f = ringoutFighter;
+    let intensity = Math.min(1, ringoutTime / 10);
+    if(f.ringoutBounces >= MAX_BOUNCES) {
+      intensity *= Math.max(0, 1 - (f.ringoutRestTime || 0) / 30);
+    } else if(f.vy < 4) {
+      intensity *= Math.max(0.2, Math.min(1, f.vy / 4));
+    }
+    if(intensity > 0.02) {
+      // Heavy darken so the lines pop like the screenshot
+      ctx.fillStyle = `rgba(0,0,0,${0.55 * intensity})`;
+      ctx.fillRect(0, 0, W, H);
+      drawFallSpeedLines(intensity);
+    }
+  }
+
   if(p1 && p2) {
     document.getElementById('p1bar').style.width = (p1.hp / p1.maxHp * 100) + '%';
     document.getElementById('p2bar').style.width = (p2.hp / p2.maxHp * 100) + '%';
