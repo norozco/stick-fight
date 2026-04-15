@@ -2326,6 +2326,10 @@ function resetRound() {
   ultTargetDarken = 0;
   cameraTargetZoom = 1;
   cameraZoom = 1;
+  // Voice announcer: ROUND N → FIGHT
+  const roundNum = roundsWon[0] + roundsWon[1] + 1;
+  setTimeout(() => Audio.say('Round ' + roundNum, { interrupt: true }), 100);
+  setTimeout(() => Audio.say('Fight!'), 850);
   announce('FIGHT!', 45);
 }
 
