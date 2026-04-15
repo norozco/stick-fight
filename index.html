@@ -1151,6 +1151,32 @@ class Fighter {
     if(this.beingThrown > 0) this.beingThrown--;
     if(this.juggleWindow > 0) this.juggleWindow--;
 
+    // ---- Secondary physics integration ----
+    // Impact impulses decay toward zero
+    this.impactVx *= 0.82;
+    this.impactVy *= 0.82;
+    if(Math.abs(this.impactVx) < 0.05) this.impactVx = 0;
+    if(Math.abs(this.impactVy) < 0.05) this.impactVy = 0;
+
+    // Landing squash: spring back up (damped harmonic)
+    if(this.squashY !== 0) {
+      const springK = 0.35;
+      const damping = 0.65;
+      this.squashVel += -this.squashY * springK;
+      this.squashVel *= damping;
+      this.squashY += this.squashVel;
+      if(Math.abs(this.squashY) < 0.1 && Math.abs(this.squashVel) < 0.1) {
+        this.squashY = 0; this.squashVel = 0;
+      }
+    }
+
+    // Limb drag — arms trail when horizontal velocity changes
+    const vxDelta = this.vx - this.lastVx;
+    this.limbDragX += -vxDelta * 0.8;       // kick back on acceleration
+    this.limbDragX *= 0.78;
+    if(Math.abs(this.limbDragX) < 0.08) this.limbDragX = 0;
+    this.lastVx = this.vx;
+
     this.stateTime++;
 
     // If being ulted by opponent — freeze own physics and let attacker control position
