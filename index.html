@@ -2057,9 +2057,12 @@ function drawFighter(f) {
   if(f.state === 'dash') factor = 0.6;
   if(f.state === 'hurt') factor = 0.5;
   if(f.state === 'stagger') factor = 0.4;
-  // During ultimate, use higher factor at phase transitions (but still smooth)
   if(f.state === 'attack' && f.attackType === 'ult') factor = 0.45;
   smoothPose(f.smoothPose, target, factor);
+
+  // ---- Apply secondary physics to the rendered pose ----
+  // We mutate smoothPose directly; next frame the lerp rebuilds toward target.
+  applyPosePhysics(f, f.smoothPose);
 
   // Shadow
   const airFactor = Math.max(0, 1 - (GROUND - f.y) / 250);
