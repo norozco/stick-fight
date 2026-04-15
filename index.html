@@ -751,7 +751,7 @@ const Audio = (() => {
       ensure();
       if(music.playing) { music.intense = intense; return; }
       music.musicGain = ctx.createGain();
-      music.musicGain.gain.value = muted ? 0 : 0.5;
+      music.musicGain.gain.value = muted ? 0 : 0.35;
       music.musicGain.connect(ctx.destination);
       music.playing = true;
       music.step = 0;
