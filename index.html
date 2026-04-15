@@ -2236,8 +2236,9 @@ function loop(now) {
   ultDarken = lerp(ultDarken, ultTargetDarken, 0.08);
   cameraZoom = lerp(cameraZoom, cameraTargetZoom, 0.05);
 
-  // Focus camera on midpoint during ult
-  if(p1 && p2) {
+  // Focus camera on midpoint during ult — frozen during ring-out so its
+  // zoom-centering math doesn't fight the ring-out pan
+  if(p1 && p2 && state !== 'ringout') {
     const mid = (p1.x + p2.x) / 2;
     cameraTargetX = (p1.state === 'attack' && p1.attackType === 'ult') ? p1.x
                   : (p2.state === 'attack' && p2.attackType === 'ult') ? p2.x
@@ -2247,16 +2248,17 @@ function loop(now) {
     cameraY = lerp(cameraY, cameraTargetY, 0.06);
   }
 
-  // Ring-out pan: follow the falling fighter (locked, no lag)
+  // Ring-out pan: lock screen to the falling fighter
+  // Math: world point (fx, fy) renders at screen (fx - cameraPanX, fy - cameraPanY)
+  // when cameraZoom == 1 (which we force during ring-out).
+  // We want fighter ~150 px from top of screen so we can see ground below them.
   if(state === 'ringout' && ringoutFighter) {
     cameraPanTargetX = ringoutFighter.x - W / 2;
-    cameraPanTargetY = Math.max(0, ringoutFighter.y - GROUND + 60);
+    cameraPanTargetY = ringoutFighter.y - 180;
     if(ringoutTime < 14) {
-      // Brief easing in so the pan doesn't jump
-      cameraPanX = lerp(cameraPanX, cameraPanTargetX, 0.25);
-      cameraPanY = lerp(cameraPanY, cameraPanTargetY, 0.25);
+      cameraPanX = lerp(cameraPanX, cameraPanTargetX, 0.28);
+      cameraPanY = lerp(cameraPanY, cameraPanTargetY, 0.28);
     } else {
-      // Locked to the fighter — guaranteed to follow all the way down
       cameraPanX = cameraPanTargetX;
       cameraPanY = cameraPanTargetY;
     }
