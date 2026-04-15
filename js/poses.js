@@ -80,18 +80,21 @@ function computeTargetPose(f) {
     pose.head.x += -fc * 3;
   }
 
-  // Dash
+  // Dash — lean in the direction of travel, not the facing direction.
+  // (Backdash keeps the fighter facing the opponent but sliding backward, so
+  // the body should lean and the trailing leg drag in the dashDir.)
   if(f.state === 'dash') {
-    pose.bodyLean = fc * 18;
-    pose.head.x += fc * 4;
-    pose.lFoot.x = x - fc * 22; pose.lFoot.y = y - 6;
-    pose.rFoot.x = x + fc * 12; pose.rFoot.y = y;
-    pose.lKnee.x = x - fc * 14; pose.lKnee.y = y - 18;
-    pose.rKnee.x = x + fc * 8;  pose.rKnee.y = y - 22;
-    pose.lHand.x = x - fc * 24; pose.lHand.y = y - 62;
-    pose.rHand.x = x + fc * 10; pose.rHand.y = y - 58;
-    pose.lElbow.x = x - fc * 14; pose.lElbow.y = y - 68;
-    pose.rElbow.x = x + fc * 4; pose.rElbow.y = y - 68;
+    const dc = f.dashDir || fc;
+    pose.bodyLean = dc * 18;
+    pose.head.x += dc * 4;
+    pose.lFoot.x = x - dc * 22; pose.lFoot.y = y - 6;
+    pose.rFoot.x = x + dc * 12; pose.rFoot.y = y;
+    pose.lKnee.x = x - dc * 14; pose.lKnee.y = y - 18;
+    pose.rKnee.x = x + dc * 8;  pose.rKnee.y = y - 22;
+    pose.lHand.x = x - dc * 24; pose.lHand.y = y - 62;
+    pose.rHand.x = x + dc * 10; pose.rHand.y = y - 58;
+    pose.lElbow.x = x - dc * 14; pose.lElbow.y = y - 68;
+    pose.rElbow.x = x + dc * 4; pose.rElbow.y = y - 68;
   }
 
   // Hurt
