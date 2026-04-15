@@ -1480,6 +1480,28 @@ class Fighter {
     // Throws beat blocks and parries entirely
     const isThrow = box.type === 'throw';
 
+    // Throw hit — grab and slam choreography
+    if(isThrow) {
+      this.beingThrown = 48;          // locks physics while being carried
+      this.state = 'hurt';
+      this.stateTime = 0;
+      this.stateTimeF = 0;
+      this.attackType = null;
+      this.hitStun = 48;              // full throw duration
+      this.combo = 0;
+      this.hurtFlash = 8;
+      this.vx = 0; this.vy = 0;
+      this.knockback = 0;
+      this.onGround = false;
+      this.facing = -fromFacing;       // face the attacker during throw
+      // Ult meter gain for victim
+      this.addUlt(box.dmg * 0.6);
+      // Attacker marks their throw as connected
+      if(attacker) attacker.throwConnected = true;
+      Audio.whoosh();
+      return 'hit';                    // damage is applied at the slam frame
+    }
+
     if(!isThrow && this.blocking && this.blockTime < 6 && this.facing === -fromFacing) {
       attacker.hitStun = 24;
       attacker.state = 'stagger';
