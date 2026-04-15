@@ -1164,6 +1164,7 @@ class Fighter {
 
   startAttack(type) {
     if(this.hitStun > 0) return false;
+    // Light combo chaining (existing 3-hit combo)
     if(type === 'light' && this.state === 'attack' && this.comboWindow > 0 && this.attackType === 'light' && this.comboStep < 2) {
       this.comboStep++;
       this.state = 'attack';
@@ -1172,6 +1173,20 @@ class Fighter {
       this.attackType = 'light';
       this.attackHit = false;
       this.comboWindow = 0;
+      Audio.whoosh();
+      return true;
+    }
+    // Air combo cancel: if last hit launched the opponent, allow canceling
+    // recovery into another attack (juggle window)
+    if(this.state === 'attack' && this.juggleWindow > 0 && (type === 'light' || type === 'heavy')) {
+      this.state = 'attack';
+      this.stateTime = 0;
+      this.stateTimeF = 0;
+      this.attackType = type;
+      this.attackHit = false;
+      this.comboStep = 0;
+      this.comboWindow = 0;
+      this.juggleWindow = 0;
       Audio.whoosh();
       return true;
     }
