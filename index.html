@@ -889,7 +889,7 @@ class Fighter {
       const ultName = this.character && this.character.ultName;
       if(ultName) {
         announce(ultName + '!', 90);
-        Audio.say(ultName.toLowerCase() + '!', { interrupt: true });
+        Audio.say(ultName.toLowerCase() + '!', { interrupt: true, character: this.character && this.character.id });
       }
     } else {
       Audio.whoosh();
@@ -2292,7 +2292,7 @@ function pickCharacter(c, card) {
     p1Char = c;
     document.querySelectorAll('#charGrid .card').forEach(el => el.classList.remove('picked-p1'));
     card.classList.add('picked-p1');
-    Audio.say(c.name, { interrupt: true });
+    Audio.say(c.name, { interrupt: true, character: c.id });
     if(mode === 'cpu') {
       // CPU picks a random different character
       const others = CHARACTERS.filter(x => x.id !== c.id);
@@ -2307,7 +2307,7 @@ function pickCharacter(c, card) {
     p2Char = c;
     document.querySelectorAll('#charGrid .card').forEach(el => el.classList.remove('picked-p2'));
     card.classList.add('picked-p2');
-    Audio.say(c.name, { interrupt: true });
+    Audio.say(c.name, { interrupt: true, character: c.id });
     setupPhase = 'stage';
   }
 
