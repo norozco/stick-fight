@@ -211,6 +211,17 @@
   <button class="ghost" onclick="backToMenu()">MAIN MENU</button>
 </div>
 
+<div id="setup" class="overlay hidden">
+  <h1 style="font-size:42px;letter-spacing:6px;margin-bottom:6px;">SELECT FIGHTER</h1>
+  <div id="setupSubtitle" class="subtitle" style="margin-bottom:16px;">PLAYER 1</div>
+  <div id="charGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;"></div>
+  <div id="stageRow" style="display:none;text-align:center;">
+    <div class="subtitle" style="margin-bottom:14px;">PICK STAGE</div>
+    <div id="stageGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;"></div>
+  </div>
+  <div style="margin-top:24px;"><button class="ghost" onclick="backToMenu()">CANCEL</button></div>
+</div>
+
 <div id="loading" class="overlay hidden">
   <div id="loadtext" style="font-size:42px;font-weight:900;letter-spacing:8px;color:#ffcc00;text-shadow:0 0 20px rgba(255,204,0,0.5);">LOADING</div>
   <div style="width:380px;height:14px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);border-radius:3px;overflow:hidden;margin-top:24px;">
