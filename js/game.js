@@ -900,16 +900,17 @@ function loop(now) {
   ctx.fillStyle = vg;
   ctx.fillRect(0, 0, W, H);
 
-  // Killer-Instinct void: radial speed lines + dark overlay during ring-out
+  // Killer-Instinct void: radial speed lines + dark overlay during ring-out.
+  // Intensity is driven by the ring-out PHASE (no more bounce-count physics).
   if(state === 'ringout' && ringoutFighter) {
-    // Fade speed lines in over first 10 frames, ramp down after final bounce
-    const f = ringoutFighter;
-    let intensity = Math.min(1, ringoutTime / 10);
-    if(f.ringoutBounces >= MAX_BOUNCES) {
-      intensity *= Math.max(0, 1 - (f.ringoutRestTime || 0) / 30);
-    } else if(f.vy < 4) {
-      intensity *= Math.max(0.2, Math.min(1, f.vy / 4));
-    }
+    const phName = (RINGOUT_PHASES[ringoutPhaseIdx] || {}).name;
+    let intensity = 0;
+    if(phName === 'LAUNCH')        intensity = Math.min(1, ringoutPhaseFrame / 6);
+    else if(phName === 'APPROACH') intensity = 1;
+    else if(phName === 'FREEFALL') intensity = 0.35;   // FREEFALL has its own backdrop lines
+    else if(phName === 'CRASH')    intensity = Math.max(0, 1 - ringoutPhaseFrame / 10);
+    else if(phName === 'SETTLE')   intensity = 0;
+    else                           intensity = Math.min(1, ringoutTime / 10);
     if(intensity > 0.02) {
       // Heavy darken so the lines pop like the screenshot
       ctx.fillStyle = `rgba(0,0,0,${0.55 * intensity})`;
