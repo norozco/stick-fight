@@ -350,6 +350,12 @@ function resetRound() {
   cameraZoom = 1;
   cameraAngle = 0; cameraTargetAngle = 0;
   groundCracks.length = 0;            // fresh stage each round
+  ringoutFighter = null;
+  ringoutAnnounced = false;
+  ringoutTime = 0;
+  ringoutPhaseIdx = 0;
+  ringoutPhaseFrame = 0;
+  ringoutXrayFlashTime = 0;
   // Voice + text: ROUND N appears first, then FIGHT! after a beat
   const roundNum = roundsWon[0] + roundsWon[1] + 1;
   announce('ROUND ' + roundNum, 80);
