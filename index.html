@@ -1264,8 +1264,8 @@ class Fighter {
       return { start: 10, active: 14, total: 40, dmg: 14, kb: 14, up: -5, reach: 78, boxH: 36, boxY: -65, ult: 12, canCombo: false };
     }
     if(this.attackType === 'throw') {
-      // Short reach, fast active, big damage on connect, beats blocks
-      return { start: 6, active: 6, total: 32, dmg: 16, kb: 16, up: -3, reach: 50, boxH: 80, boxY: -85, ult: 10, canCombo: false, beatsBlock: true };
+      // Reach must beat the 50-px pushback so it can actually land at touching range
+      return { start: 6, active: 8, total: 32, dmg: 16, kb: 14, up: -4, reach: 78, boxH: 90, boxY: -95, ult: 10, canCombo: false, beatsBlock: true };
     }
     return null;
   }
