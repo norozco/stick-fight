@@ -2357,12 +2357,18 @@ function getP2Input() {
 
 function resetRound() {
   if(!p1) {
-    p1 = new Fighter(280, '#e8f4ff', 1, false, '#3bf0ff');
-    p2 = new Fighter(720, '#ffe0e8', -1, true, '#ff3860');
+    p1 = new Fighter(280, p1Char.color, 1, false, p1Char.glow);
+    p2 = new Fighter(720, p2Char.color, -1, true, p2Char.glow);
+    p1.character = p1Char; p2.character = p2Char;
+    p1.maxHp = p1Char.hp; p2.maxHp = p2Char.hp;
+    p1.speedMult = p1Char.speed; p2.speedMult = p2Char.speed;
+    p1.dmgMult = p1Char.dmg; p2.dmgMult = p2Char.dmg;
   } else {
     p1.reset(280, 1);
     p2.reset(720, -1);
   }
+  p1.hp = p1.maxHp;
+  p2.hp = p2.maxHp;
   roundTime = 99;
   lastSecond = performance.now();
   particles.length = 0;
