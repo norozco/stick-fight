@@ -2106,6 +2106,17 @@ function loop(now) {
     cameraY = lerp(cameraY, cameraTargetY, 0.06);
   }
 
+  // Ring-out pan: follow the falling fighter
+  if(state === 'ringout' && ringoutFighter) {
+    cameraPanTargetX = ringoutFighter.x - W / 2;
+    cameraPanTargetY = ringoutFighter.y - GROUND + 80;
+  } else {
+    cameraPanTargetX = 0;
+    cameraPanTargetY = 0;
+  }
+  cameraPanX = lerp(cameraPanX, cameraPanTargetX, 0.09);
+  cameraPanY = lerp(cameraPanY, cameraPanTargetY, 0.09);
+
   let sx = 0, sy = 0;
   if(shakeTime > 0) {
     sx = (Math.random() - 0.5) * shakeMag;
@@ -2119,12 +2130,13 @@ function loop(now) {
   ctx.save();
   // Translate to screen center, scale, then translate back relative to camera target
   const cx = W / 2, cy = H / 2;
-  ctx.translate(cx + sx, cy + sy);
+  ctx.translate(cx + sx - cameraPanX, cy + sy - cameraPanY);
   ctx.scale(cameraZoom, cameraZoom);
   ctx.translate(-cx - (cameraX - cx) * (cameraZoom - 1) / cameraZoom,
                 -cy - (cameraY - cy) * (cameraZoom - 1) / cameraZoom);
 
   drawScene();
+  if(state === 'ringout' || cameraPanY > 2) drawPit();
 
   // Dark overlay during ultimate for cinematic look
   if(ultDarken > 0.02) {
