@@ -2424,6 +2424,7 @@ function endRound(winner) {
   if(state !== 'playing') return;
   state = 'roundover';
   Audio.ko();
+  Audio.musicStop();
   slowMo = 50;
   shake(14, 22);
 
