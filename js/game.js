@@ -11,6 +11,107 @@ function shake(mag, time) {
 }
 
 // ============================================================
+// GROUND CRACKS — terrain damage left by fatal-blow slams
+// ============================================================
+// Cracks are radial break-lines at the impact point. They stay until
+// the next round resets (resetRound clears the groundCracks array).
+function spawnGroundCrack(x, strength = 1) {
+  const crack = {
+    x, y: GROUND,
+    born: globalTime,
+    strength,                    // scales size & branch count
+    lines: [],
+  };
+  const branchCount = 6 + Math.floor(strength * 4);
+  for(let i = 0; i < branchCount; i++) {
+    const baseAng = (Math.random() * 0.8 - 0.4) + (i % 2 === 0 ? -Math.PI/2 : -Math.PI/2 + (Math.random()*0.6 - 0.3));
+    // Spread roughly left/right along the ground with some downward bias
+    const ang = (Math.random() * Math.PI) - Math.PI/2;    // -90° .. +90° on horizontal
+    const len = (30 + Math.random() * 70) * strength;
+    const segs = [];
+    let cx = 0, cy = 0;
+    let a = ang;
+    const steps = 4 + Math.floor(Math.random() * 3);
+    for(let s = 0; s < steps; s++) {
+      const segLen = len / steps;
+      a += (Math.random() * 0.6 - 0.3);
+      cx += Math.cos(a) * segLen;
+      cy += Math.sin(a) * segLen * 0.15; // keep mostly horizontal at ground
+      segs.push({ x: cx, y: cy });
+    }
+    crack.lines.push(segs);
+  }
+  groundCracks.push(crack);
+
+  // Debris particles flying up from the crack
+  for(let i = 0; i < 24 * strength; i++) {
+    const a = -Math.PI/2 + (Math.random() - 0.5) * Math.PI * 0.9;
+    const v = Math.random() * 8 + 4;
+    spawnParticle({
+      type: 'dust',
+      x: x + (Math.random() - 0.5) * 30,
+      y: GROUND,
+      vx: Math.cos(a) * v,
+      vy: Math.sin(a) * v,
+      life: 45, maxLife: 45,
+      size: Math.random() * 5 + 3,
+      color: 'rgba(80,50,40,0.8)',
+      grav: 0.35,
+    });
+  }
+  // Orange sparks for heat
+  for(let i = 0; i < 14 * strength; i++) {
+    const a = -Math.PI/2 + (Math.random() - 0.5) * Math.PI * 0.7;
+    const v = Math.random() * 10 + 5;
+    spawnParticle({
+      type: 'spark',
+      x, y: GROUND - 2,
+      vx: Math.cos(a) * v,
+      vy: Math.sin(a) * v,
+      life: 30, maxLife: 30,
+      size: Math.random() * 3 + 2,
+      color: '#ff8840',
+      grav: 0.3,
+    });
+  }
+}
+
+function drawGroundCracks() {
+  if(!groundCracks || groundCracks.length === 0) return;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  for(const c of groundCracks) {
+    const age = globalTime - c.born;
+    // Cracks glow warm for the first ~60 frames, then fade to flat dark lines
+    const glow = Math.max(0, 1 - age / 60);
+    // Dark base
+    ctx.strokeStyle = '#0a0408';
+    ctx.lineWidth = 3 * c.strength;
+    ctx.translate(c.x, c.y);
+    for(const segs of c.lines) {
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      for(const p of segs) ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    }
+    // Warm glow on top (fades)
+    if(glow > 0.02) {
+      ctx.strokeStyle = `rgba(255,140,40,${glow * 0.9})`;
+      ctx.lineWidth = 1.6 * c.strength;
+      for(const segs of c.lines) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        for(const p of segs) ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+    }
+    ctx.translate(-c.x, -c.y);
+  }
+  ctx.restore();
+}
+
+// ============================================================
 // FATAL BLOW — MK-style multi-phase cinematic finisher
 // ============================================================
 // Triggered when the hit that ends a round was (a) the ult finisher or
