@@ -1313,7 +1313,13 @@ class Fighter {
         this.jumpsLeft = 2;
         this.coyote = 0;
         spawnDust(this.x, GROUND + 2);
-        if(!prevOnGround) Audio.land();
+        if(!prevOnGround) {
+          Audio.land();
+          // Trigger a spring-squash proportional to fall speed
+          const fallSpeed = Math.max(0, this.vy || 0);
+          this.squashY = Math.min(14, fallSpeed * 0.7 + 4);
+          this.squashVel = 0;
+        }
       }
     } else {
       this.coyote = 6;
