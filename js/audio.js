@@ -432,16 +432,38 @@ const Audio = (() => {
           let preferred = null;
           let defPitch = 1.25, defRate = 1.02;
           if(isAurora) {
-            // Mature/older female tone — clearly female, distinctly lower & slower.
-            defPitch = 0.80;
-            defRate  = 0.90;
-            preferred = voices.find(v => /(hazel|susan|serena|moira|tessa|fiona|karen|catherine|veena|kate|libby|sonia)/i.test(v.name))
+            // Prefer voices that already *sound* mature, so we don't have to
+            // lower pitch much (pitch shifting neural voices sounds unnatural).
+            // Priority: mature Microsoft British > mature Apple > neural Google UK
+            // > any en-GB female > any en-AU female > generic female fallback.
+            preferred = voices.find(v => /(hazel|susan|catherine|libby|sonia)/i.test(v.name))
+                     || voices.find(v => /(serena|moira|tessa|fiona|karen|kate|veena)/i.test(v.name))
                      || voices.find(v => /google uk english female/i.test(v.name))
                      || voices.find(v => /en-gb/i.test(v.lang) && /(female|woman)/i.test(v.name))
                      || voices.find(v => /en-gb/i.test(v.lang))
                      || voices.find(v => /en-au/i.test(v.lang) && /(female|woman)/i.test(v.name))
-                     // Last resort — any female-sounding English voice, we'll lower its pitch.
                      || voices.find(v => /^en/i.test(v.lang) && /(female|woman|zira|aria|samantha)/i.test(v.name));
+
+            // Per-voice pitch/rate tuning. Neural/online voices distort when
+            // pitch is shifted; basic voices (Zira, Microsoft David-class) need
+            // a bigger shift to actually sound older.
+            const name = (preferred && preferred.name) || '';
+            const isNeuralGoogle = /^google\s/i.test(name);
+            const isMatureMs     = /(hazel|susan|catherine|libby|sonia)/i.test(name);
+            const isMatureApple  = /(serena|moira|tessa|fiona|karen|kate|veena)/i.test(name);
+            if(isMatureMs || isMatureApple) {
+              // Voice already sounds mature — barely touch it.
+              defPitch = 0.98;
+              defRate  = 0.95;
+            } else if(isNeuralGoogle) {
+              // Neural voice: small nudge keeps it natural.
+              defPitch = 0.92;
+              defRate  = 0.93;
+            } else {
+              // Basic en-US/fallback female (e.g. Zira): heavier shift for effect.
+              defPitch = 0.82;
+              defRate  = 0.92;
+            }
           }
           if(!preferred) {
             preferred = voices.find(v => /(zira|aria|samantha|google us english)/i.test(v.name))
