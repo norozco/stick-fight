@@ -1179,12 +1179,13 @@ class Fighter {
       return;
     }
 
-    // Being thrown — locked to the attacker's grab choreography
+    // Being thrown — locked to the attacker's grab choreography up through the slam
+    // Lock ends at stateTime > 40 so normal physics can apply the release knockback.
     if(this.beingThrown > 0 && opponent &&
        opponent.state === 'attack' && opponent.attackType === 'throw' &&
-       opponent.stateTime < 42) {
+       opponent.stateTime <= 40) {
       lockVictimToThrow(this, opponent);
-      // Apply damage + final knockback at the slam frame
+      // Apply damage + queued knockback at the slam frame (40)
       if(opponent.stateTime === 40 && !this.throwDamageApplied) {
         this.throwDamageApplied = true;
         const dmgMult = (opponent.dmgMult) || 1;
@@ -1192,8 +1193,9 @@ class Fighter {
         this.hp = Math.max(0, this.hp - dmg);
         this.hurtFlash = 16;
         this.hitStun = 26;
-        this.knockback = -opponent.facing * 18;
-        this.knockUp = -4;
+        // Stash the impulse — next frame (lock released) physics will launch them
+        this._throwReleaseKb = -opponent.facing * 18;
+        this._throwReleaseUp = -6;
         spawnDamageNumber(this.x, this.y - 110, dmg, '#ff6600', true);
         spawnHitSpark(this.x, this.y - 30, '#ffaa44', 24, 2.0);
         for(let i = 0; i < 18; i++) spawnDust(this.x + (Math.random()-0.5)*60, GROUND + 2, -opponent.facing);
@@ -1204,6 +1206,15 @@ class Fighter {
       }
       return;
     }
+    // Apply the queued throw-release impulse the frame after the lock ends
+    if(this._throwReleaseKb !== undefined) {
+      this.knockback = this._throwReleaseKb;
+      this.knockUp = this._throwReleaseUp;
+      this.onGround = false;
+      this._throwReleaseKb = undefined;
+      this._throwReleaseUp = undefined;
+    }
+    if(this.throwDamageApplied && this.beingThrown === 0) this.throwDamageApplied = false;
     if(this.throwDamageApplied && this.beingThrown === 0) this.throwDamageApplied = false;
 
     // Face opponent when idle/dash
