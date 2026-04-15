@@ -287,6 +287,25 @@ let ringoutWinner = 0;
 let ringoutTime = 0;
 let ringoutAnnounced = false;
 
+// ============================================================
+// CHARACTER & STAGE ROSTERS
+// ============================================================
+const CHARACTERS = [
+  { id: 'aurora',  name: 'AURORA',  color: '#e8f4ff', glow: '#3bf0ff', hp: 100, speed: 1.00, dmg: 1.00, desc: 'BALANCED' },
+  { id: 'crimson', name: 'CRIMSON', color: '#ffe0e8', glow: '#ff3860', hp:  92, speed: 1.10, dmg: 1.08, desc: 'GLASS · QUICK' },
+  { id: 'jade',    name: 'JADE',    color: '#dfffe0', glow: '#44ff88', hp: 125, speed: 0.88, dmg: 0.95, desc: 'TANK · SLOW' },
+  { id: 'noir',    name: 'NOIR',    color: '#fff0c0', glow: '#ffcc00', hp:  88, speed: 1.18, dmg: 1.12, desc: 'BERSERKER' },
+];
+const STAGES = [
+  { id: 'twilight', name: 'TWILIGHT TOWER' },
+  { id: 'dojo',     name: 'OLD DOJO' },
+  { id: 'inferno',  name: 'INFERNO PIT' },
+];
+let p1Char = CHARACTERS[0];
+let p2Char = CHARACTERS[1];
+let currentStage = STAGES[0];
+let setupPhase = 'p1';   // 'p1' | 'p2' | 'stage'
+
 const keys = {};
 const keyPressed = {};
 addEventListener('keydown', e => {
