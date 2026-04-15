@@ -421,7 +421,12 @@ const Audio = (() => {
             return;
           }
           if(opts.interrupt) speechSynthesis.cancel();
-          const u = new SpeechSynthesisUtterance(text);
+          // Normalize ALL-CAPS words (length>=2) to Title Case so voices don't
+          // spell them out letter-by-letter (e.g. "AURORA" -> "Aurora").
+          const spokenText = String(text || '').replace(/\b[A-Z]{2,}\b/g, w =>
+            w.charAt(0) + w.slice(1).toLowerCase()
+          );
+          const u = new SpeechSynthesisUtterance(spokenText);
           const voices = _voices;
           const isAurora = opts.character === 'aurora' || /\baurora\b/i.test(text || '');
           let preferred = null;
