@@ -278,6 +278,10 @@
 <script src="js/stages.js"></script>
 
 <script>
+// Diagnostic: surface any uncaught error on-canvas so a freeze shows WHY.
+window.__lastErr = null;
+window.addEventListener('error', (e) => { window.__lastErr = (e.error && e.error.stack) || e.message; });
+window.addEventListener('unhandledrejection', (e) => { window.__lastErr = String(e.reason && e.reason.stack || e.reason); });
 // ============================================================
 //  STICK FIGHT ARENA — Smooth Edition
 // ============================================================

@@ -952,5 +952,20 @@ function loop(now) {
     ctx.restore();
   }
 
+  // Diagnostic overlay — show the last uncaught error on-canvas so a freeze is visible.
+  if(window.__lastErr) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.78)';
+    ctx.fillRect(10, 10, W - 20, 160);
+    ctx.fillStyle = '#ffdd55';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText('UNCAUGHT ERROR:', 20, 30);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '12px monospace';
+    const lines = String(window.__lastErr).split('\n').slice(0, 8);
+    lines.forEach((line, i) => ctx.fillText(line.slice(0, 140), 20, 50 + i * 14));
+    ctx.restore();
+  }
+
   requestAnimationFrame(loop);
 }
