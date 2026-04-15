@@ -1318,7 +1318,10 @@ class Fighter {
       return 'hit';
     }
 
-    if(this.blocking && this.blockTime < 6 && this.facing === -fromFacing) {
+    // Throws beat blocks and parries entirely
+    const isThrow = box.type === 'throw';
+
+    if(!isThrow && this.blocking && this.blockTime < 6 && this.facing === -fromFacing) {
       attacker.hitStun = 24;
       attacker.state = 'stagger';
       attacker.stateTime = 0;
@@ -1336,7 +1339,7 @@ class Fighter {
       return 'parry';
     }
 
-    if(this.blocking && this.facing === -fromFacing) {
+    if(!isThrow && this.blocking && this.facing === -fromFacing) {
       this.hp -= box.dmg * 0.15;
       this.knockback = fromFacing * 3;
       this.hurtFlash = 4;
