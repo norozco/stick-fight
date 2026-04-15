@@ -3392,8 +3392,13 @@ function loop(now) {
   const doUpdate = !inSlow || (globalTime % 2 === 0);
   if(slowMo > 0) slowMo--;
 
+  // Duck music at the moment hitstop begins (impact emphasis)
+  if(hitstop > 0 && lastHitstop === 0) {
+    const intensity = hitstop > 10 ? 0.10 : hitstop > 6 ? 0.20 : 0.30;
+    Audio.musicDuck(intensity, hitstop * 0.012);
+  }
+  lastHitstop = hitstop;
   if(hitstop > 0) {
-    if(hitstop > 5 && globalTime % 12 === 0) Audio.musicDuck(0.18, 0.18);   // periodic duck during long hitstops
     hitstop--;
   } else if(state === 'playing' && doUpdate) {
     if(now - lastSecond >= 1000) {
