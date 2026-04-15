@@ -298,6 +298,7 @@ const Audio = (() => {
     heavy: () => { beep(120, 0.18, 'sawtooth', 0.14, 40); noise(0.15, 0.1); },
     ultHit: () => { beep(240, 0.12, 'square', 0.14, 80); noise(0.1, 0.08); },
     ultFinisher: () => { beep(90, 0.4, 'sawtooth', 0.18, 30); noise(0.3, 0.14); },
+    bounce: () => { beep(70, 0.35, 'sine', 0.22, 22); beep(140, 0.18, 'sine', 0.12, 50); noise(0.18, 0.12); },
     block: () => { beep(800, 0.05, 'square', 0.05); },
     parry: () => { beep(1200, 0.08, 'triangle', 0.1); beep(1800, 0.08, 'triangle', 0.08); },
     whoosh: () => { noise(0.1, 0.04); },
