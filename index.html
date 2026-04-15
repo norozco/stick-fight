@@ -2216,16 +2216,25 @@ function loop(now) {
     cameraY = lerp(cameraY, cameraTargetY, 0.06);
   }
 
-  // Ring-out pan: follow the falling fighter
+  // Ring-out pan: follow the falling fighter (locked, no lag)
   if(state === 'ringout' && ringoutFighter) {
     cameraPanTargetX = ringoutFighter.x - W / 2;
-    cameraPanTargetY = ringoutFighter.y - GROUND + 80;
+    cameraPanTargetY = Math.max(0, ringoutFighter.y - GROUND + 60);
+    if(ringoutTime < 14) {
+      // Brief easing in so the pan doesn't jump
+      cameraPanX = lerp(cameraPanX, cameraPanTargetX, 0.25);
+      cameraPanY = lerp(cameraPanY, cameraPanTargetY, 0.25);
+    } else {
+      // Locked to the fighter — guaranteed to follow all the way down
+      cameraPanX = cameraPanTargetX;
+      cameraPanY = cameraPanTargetY;
+    }
   } else {
     cameraPanTargetX = 0;
     cameraPanTargetY = 0;
+    cameraPanX = lerp(cameraPanX, 0, 0.12);
+    cameraPanY = lerp(cameraPanY, 0, 0.12);
   }
-  cameraPanX = lerp(cameraPanX, cameraPanTargetX, 0.09);
-  cameraPanY = lerp(cameraPanY, cameraPanTargetY, 0.09);
 
   let sx = 0, sy = 0;
   if(shakeTime > 0) {
