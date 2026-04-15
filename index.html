@@ -2030,6 +2030,21 @@ function drawFighter(f) {
     return;
   }
 
+  // Being thrown — tumble head-over-heels through the over-the-shoulder arc
+  if(f.beingThrown > 0 && f.throwSpin !== undefined && f.throwSpin !== 0) {
+    ctx.save();
+    const pivotY = f.y - 50;
+    ctx.translate(f.x, pivotY);
+    ctx.rotate(f.throwSpin);
+    ctx.translate(-f.x, -pivotY);
+    const target = computeTargetPose(f);
+    if(!f.smoothPose) f.smoothPose = clonePose(target);
+    smoothPose(f.smoothPose, target, 0.4);
+    renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
+    ctx.restore();
+    return;
+  }
+
   const target = computeTargetPose(f);
   if(!f.smoothPose) f.smoothPose = clonePose(target);
 
