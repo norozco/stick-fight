@@ -728,14 +728,13 @@ const Audio = (() => {
       if(P.hat[s])   pHat(t);
       if(P.bass[s])  pNote(midiToFreq(P.bass[s]), t, stepDur * 1.8, 'sawtooth', 0.20);
       if(P.lead[s])  {
-        // Lead — octave up, slightly detuned chorus for thickness
-        pNote(midiToFreq(P.lead[s] + 12), t, stepDur * 2.4, 'square', 0.08);
-        pNote(midiToFreq(P.lead[s] + 12) * 1.006, t, stepDur * 2.4, 'square', 0.06);
-        pNote(midiToFreq(P.lead[s]), t, stepDur * 2.4, 'triangle', 0.05);
+        // Lead — single triangle voice with light square layer for body
+        pNote(midiToFreq(P.lead[s] + 12), t, stepDur * 2.0, 'triangle', 0.10);
+        pNote(midiToFreq(P.lead[s] + 12) * 1.005, t, stepDur * 2.0, 'square', 0.04);
       }
       if(P.pad && P.pad[s]) {
-        // Pad note holds for a full bar
-        pPad(midiToFreq(P.pad[s] + 12), t, stepDur * 16);
+        // Pad — softer + shorter so it doesn't muddy the mix
+        pPad(midiToFreq(P.pad[s] + 12), t, stepDur * 12);
       }
       music.nextNoteTime += stepDur;
       music.step++;
