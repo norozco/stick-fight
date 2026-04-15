@@ -387,22 +387,36 @@ const Audio = (() => {
       setTimeout(() => beep(330, 0.2, 'square', 0.14, 82), 150);
       setTimeout(() => beep(180, 0.5, 'sawtooth', 0.16, 50), 320);
     },
-    // Voice announcer — energetic but clear
+    // Voice announcer — energetic but clear. Pass opts.character for per-fighter voice.
     say: (text, opts = {}) => {
       if(muted) return;
       try {
         if(window.speechSynthesis) {
           if(opts.interrupt) speechSynthesis.cancel();
           const u = new SpeechSynthesisUtterance(text);
-          u.pitch = opts.pitch != null ? opts.pitch : 1.25;
-          u.rate  = opts.rate  != null ? opts.rate  : 1.02;
-          u.volume= opts.volume!= null ? opts.volume: 1.0;
+          // Per-character voice profile
           const voices = speechSynthesis.getVoices();
-          const preferred = voices.find(v => /(zira|aria|samantha|google us english)/i.test(v.name))
-                         || voices.find(v => /en-us/i.test(v.lang) && /(female|woman)/i.test(v.name))
-                         || voices.find(v => /en-us/i.test(v.lang))
-                         || voices.find(v => /^en/i.test(v.lang))
-                         || voices[0];
+          let preferred = null;
+          let defPitch = 1.25, defRate = 1.02;
+          if(opts.character === 'aurora') {
+            // Mature/older female tone — still clearly female, just lower and slower.
+            defPitch = 0.88;
+            defRate  = 0.93;
+            preferred = voices.find(v => /(hazel|susan|serena|moira|tessa|fiona|karen|catherine|veena)/i.test(v.name))
+                     || voices.find(v => /en-gb/i.test(v.lang) && /(female|woman)/i.test(v.name))
+                     || voices.find(v => /google uk english female/i.test(v.name))
+                     || voices.find(v => /en-gb/i.test(v.lang));
+          }
+          if(!preferred) {
+            preferred = voices.find(v => /(zira|aria|samantha|google us english)/i.test(v.name))
+                     || voices.find(v => /en-us/i.test(v.lang) && /(female|woman)/i.test(v.name))
+                     || voices.find(v => /en-us/i.test(v.lang))
+                     || voices.find(v => /^en/i.test(v.lang))
+                     || voices[0];
+          }
+          u.pitch = opts.pitch != null ? opts.pitch : defPitch;
+          u.rate  = opts.rate  != null ? opts.rate  : defRate;
+          u.volume= opts.volume!= null ? opts.volume: 1.0;
           if(preferred) u.voice = preferred;
           speechSynthesis.speak(u);
         } else {
