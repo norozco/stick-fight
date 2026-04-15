@@ -2829,7 +2829,13 @@ function endRound(winner) {
     if(roundsWon[winner - 1] === 1 && roundsWon[winner === 1 ? 1 : 0] === 0) {
       setTimeout(() => Audio.say('One more round!'), 1100);
     } else if(roundsWon[winner - 1] >= 2) {
-      setTimeout(() => Audio.say(winner === 1 ? 'Player one wins!' : (mode === 'cpu' ? 'C P U wins!' : 'Player two wins!')), 1100);
+      // Match-winning round — fanfare + voice
+      setTimeout(() => {
+        if(mode === 'cpu' && winner === 2) Audio.youLose();
+        else Audio.youWin();
+      }, 900);
+      setTimeout(() => Audio.say('You win!', { interrupt: true }), 1500);
+      setTimeout(() => Audio.say(winner === 1 ? 'Player one!' : (mode === 'cpu' ? 'C P U!' : 'Player two!')), 2200);
     }
   }
   setTimeout(() => {
