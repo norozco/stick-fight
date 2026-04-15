@@ -3502,14 +3502,17 @@ function loop(now) {
     const lowHp = (p1.hp / p1.maxHp < 0.3) || (p2.hp / p2.maxHp < 0.3);
     Audio.musicSetIntense(lowHp);
 
+    // Capture replay frame after both fighters update
+    replaySnapshot();
+
     if(p1.hp <= 0 && p2.hp <= 0) {
       endRound(0);
     } else if(p1.hp <= 0) {
       if(canRingOut(p1, 2)) triggerRingOut(p1, 2);
-      else endRound(2);
+      else startReplay(2);
     } else if(p2.hp <= 0) {
       if(canRingOut(p2, 1)) triggerRingOut(p2, 1);
-      else endRound(1);
+      else startReplay(1);
     }
   } else if(state === 'ringout' && doUpdate) {
     if(hitstop === 0) updateRingout();
