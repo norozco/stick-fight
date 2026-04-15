@@ -122,54 +122,72 @@ function canRingOut(loser, winningPlayer) {
   return loser.x < EDGE_THRESHOLD || loser.x > W - EDGE_THRESHOLD;
 }
 
+// ============================================================
+// RING-OUT CINEMATIC — phase-driven, hard-cut MK-style sequence
+// ============================================================
+// Six phases, total ~240 frames (~4s wall-clock, ~6-8s perceived through slow-mo).
+// Hard cuts between phases (snap zoom + position, no lerp). Loser's position is
+// CHOREOGRAPHED per phase, not physics-driven, so the cinematic looks identical
+// every time. Camera in game.js reads ringoutPhaseIdx and applies phase-specific
+// values — see updateRingout() below for the per-phase camera intent.
+const RINGOUT_PHASES = [
+  { name: 'IMPACT',   duration: 18 },   // frozen close-up on hit point
+  { name: 'LAUNCH',   duration: 22 },   // arcs out off-screen, speed lines
+  { name: 'FREEFALL', duration: 90 },   // FRONT VIEW — flailing, parallax behind
+  { name: 'APPROACH', duration: 22 },   // looking up at loser plummeting in
+  { name: 'CRASH',    duration: 32 },   // top-down impact, cracks, X-ray
+  { name: 'SETTLE',   duration: 60 },   // wide pull-back, embers, then endRound
+];
+const PIT_FLOOR = GROUND + 1200;        // visual depth — used by stages.js pits
+
+function ringoutPhase(t) {
+  let acc = 0;
+  for(let i = 0; i < RINGOUT_PHASES.length; i++) {
+    const next = acc + RINGOUT_PHASES[i].duration;
+    if(t < next) return { idx: i, name: RINGOUT_PHASES[i].name, frame: t - acc, total: RINGOUT_PHASES[i].duration };
+    acc = next;
+  }
+  return { idx: RINGOUT_PHASES.length, name: 'DONE', frame: 0, total: 0 };
+}
+
 function triggerRingOut(loser, winningPlayer) {
   ringoutFighter = loser;
   ringoutWinner = winningPlayer;
   ringoutTime = 0;
   ringoutAnnounced = false;
+  ringoutPhaseIdx = 0;
+  ringoutPhaseFrame = 0;
+  ringoutXrayFlashTime = 0;
   state = 'ringout';
 
-  // Flick them off whichever side they were closer to.
-  // Kick velocities are built up over the first few frames (see updateRingout)
-  // so the launch has a visible wind-up rather than snapping to full speed.
+  // Direction the loser will be launched — toward whichever edge they're closer to
   const dir = loser.x < W / 2 ? -1 : 1;
-  loser.vx = dir * 6;             // starting nudge — ramped up in update
-  loser.vy = -8;
   loser.ringoutLaunchDir = dir;
-  loser.ringoutLaunchFrames = 0;
+  loser.ringoutAnchorX = loser.x;       // remember the hit point for choreography
+  loser.ringoutAnchorY = loser.y;
   loser.onGround = false;
   loser.hitStun = 999;
   loser.state = 'ringout';
   loser.stateTime = 0;
   loser.ringoutSpin = 0;
-  loser.ringoutSpinSpeed = (Math.random() * 0.1 + 0.18) * dir;
   loser.beingUlted = 0;
   loser.invuln = 0;
-  loser.ringoutTrail = [];           // KI-style afterimage trail
-  loser.ringoutFinalized = false;    // guards the final-impact effects
+  loser.ringoutFinalized = false;       // guards the X-ray/CRASH effects
 
-  // Initial dramatic effects
+  // PHASE 1 entry FX: hard-cut close-up, red flash, freeze
+  hitstop = 18;
   slowMo = 60;
-  shake(18, 28);
+  shake(38, 22);
   flashTime = 30;
-  flashAlpha = 0.9;
-  flashColor = '255,60,60';
-  ultTargetDarken = 0.45;
-  cameraTargetZoom = 1;          // no zoom — pan must do all the camera work cleanly
-  cameraZoom = 1;                // snap immediately so the lerp doesn't fight the pan
-  hitstop = 12;
+  flashAlpha = 1.0;
+  flashColor = '255,40,40';
+  ultTargetDarken = 0.55;
+  cameraTargetZoom = 2.4;
+  cameraZoom = 2.4;                     // SNAP — no zoom-in animation
   Audio.ultFinisher();
-  Audio.fallYell();
-  Audio.musicStop();              // music drops out for the cinematic fall
-
-  // Spawn a big burst at the loser's current position
-  spawnHitSpark(loser.x, loser.y - 60, '#ff3860', 36, 3);
-  spawnStar(loser.x, loser.y - 60, '#ffcc00', 3);
-  spawnCombo(loser.x, loser.y - 140, 'K.O.', '#ff3860');
+  Audio.musicStop();
+  spawnHitSpark(loser.x, loser.y - 60, '#ff3030', 36, 3);
 }
-
-const PIT_FLOOR = GROUND + 1200;   // where the ragdoll bounces
-const MAX_BOUNCES = 2;
 
 function updateRingout() {
   if(!ringoutFighter) return;
