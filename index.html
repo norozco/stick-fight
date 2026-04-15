@@ -1599,7 +1599,11 @@ class Fighter {
     if(input.heavyPressed) this.startAttack('heavy');
     if(input.throwPressed) this.startAttack('throw');
     if(input.ultPressed && this.ult >= this.maxUlt && this.state === 'idle') this.startAttack('ult');
-    if(input.dashPressed) this.startDash(this.facing);
+    if(input.dashPressed) {
+      // Forward/back dash based on held direction; default to forward
+      const dashDir = input.left ? -1 : input.right ? 1 : this.facing;
+      this.startDash(dashDir);
+    }
 
     // Physics — horizontal
     let targetVx = 0;
