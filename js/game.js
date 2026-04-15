@@ -735,20 +735,56 @@ function loop(now) {
     cameraY = lerp(cameraY, cameraTargetY, 0.06);
   }
 
-  // Ring-out pan: lock screen to the falling fighter
-  // Math: world point (fx, fy) renders at screen (fx - cameraPanX, fy - cameraPanY)
-  // when cameraZoom == 1 (which we force during ring-out).
-  // We want fighter ~150 px from top of screen so we can see ground below them.
+  // Ring-out: phase-driven camera. HARD CUTS between phases — we snap pan,
+  // zoom, and angle to the new values the instant the phase changes, no lerp.
   if(state === 'ringout' && ringoutFighter) {
-    cameraPanTargetX = ringoutFighter.x - W / 2;
-    cameraPanTargetY = ringoutFighter.y - 180;
-    if(ringoutTime < 14) {
-      cameraPanX = lerp(cameraPanX, cameraPanTargetX, 0.28);
-      cameraPanY = lerp(cameraPanY, cameraPanTargetY, 0.28);
-    } else {
-      cameraPanX = cameraPanTargetX;
-      cameraPanY = cameraPanTargetY;
+    const f = ringoutFighter;
+    const phName = (RINGOUT_PHASES[ringoutPhaseIdx] || {}).name;
+    let zoom = 1, panX = 0, panY = 0, angle = 0;
+    if(phName === 'IMPACT') {
+      // Extreme close-up on the hit point
+      zoom = 2.4;
+      panX = f.x - W / 2;
+      panY = f.y - 110;
+      angle = 0.06;                          // slight dutch tilt
+    } else if(phName === 'LAUNCH') {
+      // Mid-shot tracking the loser as they arc out, dutch tilt
+      zoom = 1.45;
+      panX = f.x - W / 2;
+      panY = f.y - 220;
+      angle = 0.18 * (f.ringoutLaunchDir || 1) * -1;   // tilt opposite to flight
+    } else if(phName === 'FREEFALL') {
+      // FRONT VIEW — camera fixed, loser drawn at world(f.x, f.y) which the
+      // pose override (in poses.js) interprets as front-facing flail.
+      zoom = 1.6;
+      panX = f.x - W / 2;
+      panY = f.y - H / 2 + 30;
+      // Subtle wobble for descent feel
+      angle = Math.sin(globalTime * 0.18) * 0.04;
+    } else if(phName === 'APPROACH') {
+      // Looking UP at the loser plummeting — they're rendered higher on screen
+      zoom = 1.7;
+      panX = f.x - W / 2;
+      panY = f.y - H + 80;                   // loser appears near top of screen
+      angle = -0.05;
+    } else if(phName === 'CRASH') {
+      // Top-down on impact site
+      zoom = 1.4;
+      panX = f.x - W / 2;
+      panY = PIT_FLOOR - H / 2 - 40;
+      angle = 0;
+    } else if(phName === 'SETTLE') {
+      // Wide pull-back, zoom slowly out
+      zoom = 1.0 + 0.2 * (1 - ringoutPhaseFrame / 60);
+      panX = f.x - W / 2;
+      panY = PIT_FLOOR - H / 2 - 60;
+      angle = 0;
     }
+    // SNAP — no lerp during ringout, hard cuts only
+    cameraTargetZoom = zoom; cameraZoom = zoom;
+    cameraPanTargetX = panX; cameraPanX = panX;
+    cameraPanTargetY = panY; cameraPanY = panY;
+    cameraTargetAngle = angle; cameraAngle = angle;
   } else {
     cameraPanTargetX = 0;
     cameraPanTargetY = 0;
