@@ -11,68 +11,136 @@ function shake(mag, time) {
 }
 
 // ============================================================
-// EPIC FINISH — cinematic zoom + slow-mo for ults & long combos
+// FATAL BLOW — MK-style multi-phase cinematic finisher
 // ============================================================
-// Called when the hit that ends a round was either (a) the ult finisher
-// or (b) the capstone of a combo ≥ 5 hits. Adds a longer slow-mo window,
-// a zoom-in on the winner, and a big announcement before the normal KO
-// flow (replay / ring-out) fires. Non-epic KOs skip this and go straight
-// to the existing replay system.
+// Triggered when the hit that ends a round was (a) the ult finisher or
+// (b) the capstone of a combo ≥ 5. Drives ~2.7s of camera cuts, flashes,
+// slow-mo, shake, text overlays, and fire particles around the winner.
+// Non-epic KOs skip this and go straight to the existing replay system.
+
+// Character-specific battle cries, used as the mid-cinematic Beat-2 taunt.
+const FATAL_TAUNTS = {
+  aurora:  { text: 'OUT OF TIME!',   voice: 'Out of time!'   },
+  crimson: { text: 'BURN!',          voice: 'Burn!'          },
+  jade:    { text: 'SHATTERED!',     voice: 'Shattered!'     },
+  noir:    { text: "YOU'RE MINE!",   voice: 'You are mine!'  },
+};
+
 function handleKO(loser, winner, winnerIdx) {
   if(canRingOut(loser, winnerIdx)) { triggerRingOut(loser, winnerIdx); return; }
 
-  // Detect epic finish conditions
   const wasUlt = winner.state === 'attack' && winner.attackType === 'ult';
   const wasLongCombo = (winner.combo || 0) >= 5;
 
   if(!(wasUlt || wasLongCombo)) {
-    // Normal KO → slow-mo + replay path
     startReplay(winnerIdx);
     return;
   }
-
-  // ----- EPIC FINISH -----
-  triggerEpicFinish(winner, loser, wasUlt ? 'ult' : 'combo');
-
-  // After the cinematic, fall into the replay system.
-  // ~2s of real time gives ~1.2s of "game time" thanks to slow-mo.
-  const cinematicMs = wasUlt ? 2400 : 1900;
-  setTimeout(() => {
-    // The cinematic reset: drop zoom + darken back to normal before replay.
-    cameraTargetZoom = 1;
-    ultTargetDarken = 0;
-    if(state === 'playing') startReplay(winnerIdx);
-  }, cinematicMs);
+  runFatalBlow(winner, loser, winnerIdx, wasUlt ? 'ult' : 'combo');
 }
 
-function triggerEpicFinish(winner, loser, reason) {
-  // Extend slow-mo & freeze so the final blow lands like a cutscene.
-  slowMo = Math.max(slowMo, reason === 'ult' ? 180 : 130);
-  hitstop = Math.max(hitstop, reason === 'ult' ? 26 : 18);
-  shake(reason === 'ult' ? 22 : 16, reason === 'ult' ? 40 : 28);
+// Spawn a ring of warm particles around a fighter for the finisher glow.
+function spawnFatalEmbers(f, count = 30, color = '#ff6020') {
+  for(let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const s = Math.random() * 4 + 2;
+    spawnParticle({
+      type: 'spark',
+      x: f.x + Math.cos(a) * 30,
+      y: f.y - 50 + Math.sin(a) * 40,
+      vx: Math.cos(a) * s,
+      vy: Math.sin(a) * s - 2,
+      life: 30 + Math.random() * 20, maxLife: 50,
+      size: Math.random() * 4 + 2,
+      color, grav: -0.05,
+    });
+  }
+}
 
-  // Zoom the camera on a point between the two fighters, biased toward winner
-  const focusX = winner.x * 0.65 + loser.x * 0.35;
-  const focusY = (winner.y + loser.y) / 2 - 40;
-  cameraTargetZoom = reason === 'ult' ? 1.75 : 1.55;
-  cameraTargetX = focusX;
-  cameraTargetY = focusY;
-  // Snap panning so it locks in instead of lagging behind the freeze
-  cameraX = focusX;
-  cameraY = focusY;
+function runFatalBlow(winner, loser, winnerIdx, reason) {
+  state = 'fatalBlow';   // gate the main KO re-check while the cinematic plays
+  const midX = (winner.x + loser.x) / 2;
+  const midY = (winner.y + loser.y) / 2 - 40;
+  const winId = winner.character && winner.character.id;
+  const taunt = FATAL_TAUNTS[winId] || { text: 'FINISHED!', voice: 'Finished!' };
 
-  // Visual flash + dramatic darken behind the fighters
-  flashTime = 40;
-  flashAlpha = 0.85;
-  flashColor = reason === 'ult' ? '255,220,80' : '255,80,120';
-  ultTargetDarken = 0.55;
+  // ---------- BEAT 1 — INITIAL IMPACT (0 ms) ----------
+  // Hard cut to close-up on the winner. Screen flashes red, hitstop, shake.
+  cameraTargetZoom = 2.1;
+  cameraTargetX = winner.x;
+  cameraTargetY = winner.y - 40;
+  cameraX = cameraTargetX;   // snap instead of lerp on the first cut
+  cameraY = cameraTargetY;
+  cameraZoom = 2.1;          // snap zoom too — sudden cut, no ramp
+  hitstop  = 22;
+  slowMo   = 240;
+  flashTime = 28; flashAlpha = 1.0; flashColor = '255,40,40';
+  ultTargetDarken = 0.7;
+  ultDarken = 0.7;
+  shake(36, 30);
+  announce('FATAL BLOW!', 110);
+  spawnFatalEmbers(winner, 40, '#ff4020');
+  try { Audio.ultFinisher(); } catch(e){}
 
-  // Announce + voice + sound after a short beat so the flash reads first
+  // ---------- BEAT 2 — WINDUP (550 ms) ----------
+  // Snap the camera to loser, warmer orange flash, character taunt + voice.
   setTimeout(() => {
-    announce(reason === 'ult' ? 'FINISHED!' : 'DEVASTATING!', 100);
+    if(state !== 'fatalBlow') return;
+    cameraTargetZoom = 2.4;
+    cameraTargetX = loser.x;
+    cameraTargetY = loser.y - 55;
+    cameraX = cameraTargetX; cameraY = cameraTargetY;
+    cameraZoom = 2.4;
+    flashTime = 22; flashAlpha = 0.75; flashColor = '255,120,40';
+    shake(20, 22);
+    hitstop = 14;
+    announce(taunt.text, 50);
+    spawnFatalEmbers(loser, 20, '#ff8040');
+    try { Audio.heavy(); } catch(e){}
+    try { Audio.say(taunt.voice, { interrupt: true }); } catch(e){}
+  }, 550);
+
+  // ---------- BEAT 3 — FINAL IMPACT (1300 ms) ----------
+  // Pull out to show both fighters, biggest flash + shake + slow-mo extension.
+  setTimeout(() => {
+    if(state !== 'fatalBlow') return;
+    cameraTargetZoom = 1.45;
+    cameraTargetX = midX;
+    cameraTargetY = midY;
+    cameraX = midX; cameraY = midY;
+    cameraZoom = 1.45;
+    hitstop = 32;
+    slowMo = Math.max(slowMo, 160);
+    flashTime = 48; flashAlpha = 1.0; flashColor = '255,248,200';
+    ultTargetDarken = 0.85;
+    ultDarken = 0.85;
+    shake(48, 40);
+    announce('FINISHED!', 130);
+    // Big spark burst centered on loser
+    spawnHitSpark(loser.x, loser.y - 60, '#ffcc00', 60, 3.2);
+    spawnStar(loser.x, loser.y - 60, '#ffee00', 4);
+    spawnFatalEmbers(loser, 50, '#ff6020');
     try { Audio.ultFinisher(); } catch(e){}
-    try { Audio.say(reason === 'ult' ? 'Finished!' : 'Devastating!', { interrupt: true }); } catch(e){}
-  }, 220);
+  }, 1300);
+
+  // ---------- BEAT 4 — LINGER (2100 ms) ----------
+  // Fade red glow, start pulling zoom back, ember rain on winner.
+  setTimeout(() => {
+    if(state !== 'fatalBlow') return;
+    cameraTargetZoom = 1.25;
+    ultTargetDarken = 0.4;
+    spawnFatalEmbers(winner, 25, '#ff8040');
+    try { Audio.say(winnerIdx === 1 ? 'Player one!' : (mode === 'cpu' ? 'C P U!' : 'Player two!'), { interrupt: true }); } catch(e){}
+  }, 2100);
+
+  // ---------- BEAT 5 — RESOLVE (2900 ms) ----------
+  // Reset camera/darken, hand off to the end-round flow.
+  setTimeout(() => {
+    cameraTargetZoom = 1.0;
+    ultTargetDarken = 0;
+    state = 'playing';         // un-gate before endRound so it can transition
+    endRound(winnerIdx);
+  }, 2900);
 }
 
 
