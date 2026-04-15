@@ -11,15 +11,14 @@ const Audio = (() => {
   function _loadVoices() {
     try { _voices = (window.speechSynthesis && speechSynthesis.getVoices()) || []; } catch(e){}
   }
-  if(typeof window !== 'undefined' && window.speechSynthesis) {
-    _loadVoices();
-    speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', _loadVoices);
-    // Fallback for older browsers
-    if(speechSynthesis.onvoiceschanged !== undefined) {
-      const prev = speechSynthesis.onvoiceschanged;
-      speechSynthesis.onvoiceschanged = function(){ _loadVoices(); if(typeof prev === 'function') prev.apply(this, arguments); };
+  try {
+    if(typeof window !== 'undefined' && window.speechSynthesis) {
+      _loadVoices();
+      if(typeof speechSynthesis.addEventListener === 'function') {
+        speechSynthesis.addEventListener('voiceschanged', _loadVoices);
+      }
     }
-  }
+  } catch(e) { /* never let voice init break the game */ }
   function ensure() {
     if(!ctx) {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
