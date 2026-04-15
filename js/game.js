@@ -159,22 +159,26 @@ function spawnFatalEmbers(f, count = 30, color = '#ff6020') {
 }
 
 function runFatalBlow(winner, loser, winnerIdx, reason) {
-  state = 'fatalBlow';   // gate the main KO re-check while the cinematic plays
+  state = 'fatalBlow';
   const midX = (winner.x + loser.x) / 2;
   const midY = (winner.y + loser.y) / 2 - 40;
   const winId = winner.character && winner.character.id;
   const taunt = FATAL_TAUNTS[winId] || { text: 'FINISHED!', voice: 'Finished!' };
+  // Direction the winner faces toward the loser (−1 or +1)
+  const fc = loser.x > winner.x ? 1 : -1;
+  // Impact point on the stage floor — where the loser will be slammed
+  const slamX = winner.x + fc * 70;
 
-  // ---------- BEAT 1 — INITIAL IMPACT (0 ms) ----------
-  // Hard cut to close-up on the winner. Screen flashes red, hitstop, shake.
+  // ---------- BEAT 1 — IMPACT (0 ms) ----------
+  // Hard cut on winner, screen flashes red, dutch tilt begins.
   cameraTargetZoom = 2.1;
   cameraTargetX = winner.x;
   cameraTargetY = winner.y - 40;
-  cameraX = cameraTargetX;   // snap instead of lerp on the first cut
-  cameraY = cameraTargetY;
-  cameraZoom = 2.1;          // snap zoom too — sudden cut, no ramp
+  cameraX = cameraTargetX; cameraY = cameraTargetY;
+  cameraZoom = 2.1;
+  cameraTargetAngle = -fc * 0.08;       // subtle dutch tilt
   hitstop  = 22;
-  slowMo   = 240;
+  slowMo   = 260;
   flashTime = 28; flashAlpha = 1.0; flashColor = '255,40,40';
   ultTargetDarken = 0.7;
   ultDarken = 0.7;
@@ -183,8 +187,8 @@ function runFatalBlow(winner, loser, winnerIdx, reason) {
   spawnFatalEmbers(winner, 40, '#ff4020');
   try { Audio.ultFinisher(); } catch(e){}
 
-  // ---------- BEAT 2 — WINDUP (550 ms) ----------
-  // Snap the camera to loser, warmer orange flash, character taunt + voice.
+  // ---------- BEAT 2 — GRAB + TILT (550 ms) ----------
+  // Camera tilts further, snaps to loser, character taunt fires.
   setTimeout(() => {
     if(state !== 'fatalBlow') return;
     cameraTargetZoom = 2.4;
@@ -192,54 +196,80 @@ function runFatalBlow(winner, loser, winnerIdx, reason) {
     cameraTargetY = loser.y - 55;
     cameraX = cameraTargetX; cameraY = cameraTargetY;
     cameraZoom = 2.4;
+    cameraTargetAngle = -fc * 0.22;     // full dutch tilt
     flashTime = 22; flashAlpha = 0.75; flashColor = '255,120,40';
     shake(20, 22);
     hitstop = 14;
     announce(taunt.text, 50);
+    // Lift the loser into the air in prep for the slam
+    loser.y = GROUND - 130;
+    loser.x = winner.x + fc * 50;
+    loser.onGround = false;
     spawnFatalEmbers(loser, 20, '#ff8040');
     try { Audio.heavy(); } catch(e){}
     try { Audio.say(taunt.voice, { interrupt: true }); } catch(e){}
   }, 550);
 
-  // ---------- BEAT 3 — FINAL IMPACT (1300 ms) ----------
-  // Pull out to show both fighters, biggest flash + shake + slow-mo extension.
+  // ---------- BEAT 3 — SLAM INTO THE GROUND (1300 ms) ----------
+  // Whip rotate camera the opposite way, drive loser into the floor,
+  // punch a crack into the terrain with massive shockwave + debris.
   setTimeout(() => {
     if(state !== 'fatalBlow') return;
-    cameraTargetZoom = 1.45;
-    cameraTargetX = midX;
-    cameraTargetY = midY;
-    cameraX = midX; cameraY = midY;
-    cameraZoom = 1.45;
-    hitstop = 32;
-    slowMo = Math.max(slowMo, 160);
-    flashTime = 48; flashAlpha = 1.0; flashColor = '255,248,200';
-    ultTargetDarken = 0.85;
-    ultDarken = 0.85;
-    shake(48, 40);
-    announce('FINISHED!', 130);
-    // Big spark burst centered on loser
-    spawnHitSpark(loser.x, loser.y - 60, '#ffcc00', 60, 3.2);
-    spawnStar(loser.x, loser.y - 60, '#ffee00', 4);
-    spawnFatalEmbers(loser, 50, '#ff6020');
+    // Place the loser at the impact point, face-down on the ground
+    loser.x = slamX;
+    loser.y = GROUND;
+    loser.onGround = true;
+    loser.vx = 0; loser.vy = 0;
+    loser.hurtFlash = 30;
+
+    cameraTargetZoom = 1.8;
+    cameraTargetX = slamX;
+    cameraTargetY = GROUND - 30;
+    cameraX = slamX; cameraY = GROUND - 30;
+    cameraZoom = 1.8;
+    // WHIP ROTATE to the opposite tilt — camera reacts to the slam
+    cameraTargetAngle = fc * 0.18;
+    cameraAngle = -fc * 0.22;             // snap to carry-over angle before whipping
+
+    hitstop = 34;
+    slowMo = Math.max(slowMo, 200);
+    flashTime = 52; flashAlpha = 1.0; flashColor = '255,248,200';
+    ultTargetDarken = 0.85; ultDarken = 0.85;
+    shake(54, 44);
+
+    // Crack the terrain + heavy debris + sparks
+    spawnGroundCrack(slamX, 1.4);
+    spawnGroundCrack(slamX - 40, 0.6);
+    spawnGroundCrack(slamX + 40, 0.6);
+    // Radial shockwave at impact height
+    spawnHitSpark(slamX, GROUND - 4, '#ffcc00', 70, 3.6);
+    spawnStar(slamX, GROUND - 4, '#ffee00', 5);
+    spawnParticle({
+      type: 'ring', x: slamX, y: GROUND - 4, vx: 0, vy: 0,
+      life: 22, maxLife: 22, size: 8, color: '#ff8828', power: 4,
+    });
+    announce('FINISHED!', 140);
     try { Audio.ultFinisher(); } catch(e){}
+    try { Audio.bounce && Audio.bounce(); } catch(e){}
   }, 1300);
 
-  // ---------- BEAT 4 — LINGER (2100 ms) ----------
-  // Fade red glow, start pulling zoom back, ember rain on winner.
+  // ---------- BEAT 4 — SETTLE (2100 ms) ----------
+  // Camera untilts, pulls back, ember rain, victor voice line.
   setTimeout(() => {
     if(state !== 'fatalBlow') return;
     cameraTargetZoom = 1.25;
+    cameraTargetAngle = 0;
     ultTargetDarken = 0.4;
     spawnFatalEmbers(winner, 25, '#ff8040');
     try { Audio.say(winnerIdx === 1 ? 'Player one!' : (mode === 'cpu' ? 'C P U!' : 'Player two!'), { interrupt: true }); } catch(e){}
   }, 2100);
 
   // ---------- BEAT 5 — RESOLVE (2900 ms) ----------
-  // Reset camera/darken, hand off to the end-round flow.
   setTimeout(() => {
     cameraTargetZoom = 1.0;
+    cameraTargetAngle = 0;
     ultTargetDarken = 0;
-    state = 'playing';         // un-gate before endRound so it can transition
+    state = 'playing';
     endRound(winnerIdx);
   }, 2900);
 }
