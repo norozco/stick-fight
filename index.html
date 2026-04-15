@@ -419,10 +419,10 @@ addEventListener('keydown', e => {
 });
 addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
-// Audio module is loaded from js/audio.js — this IIFE was moved to that file
-// to reduce merge conflicts when collaborating on sound. Nothing below this line
-// references audio internals; only the exported `Audio` object is used.
-const _Audio_moved_stub = (() => {
+// ============================================================
+// AUDIO — SFX + procedural fight music
+// ============================================================
+const Audio = (() => {
   let ctx;
   let muted = false;
   let masterSfxGain = null;
