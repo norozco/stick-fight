@@ -62,6 +62,15 @@
   }
   #p1bar { background: linear-gradient(90deg, #3bf0ff, #0080ff); box-shadow: 0 0 20px rgba(59,240,255,0.4) inset; }
   #p2bar { background: linear-gradient(270deg, #ff3860, #9400d3); box-shadow: 0 0 20px rgba(255,56,96,0.4) inset; margin-left: auto; }
+  .bar.low {
+    background: linear-gradient(90deg, #ff2030, #ff8800) !important;
+    animation: barpulse 0.55s ease-in-out infinite alternate;
+    box-shadow: 0 0 18px #ff3860 inset !important;
+  }
+  @keyframes barpulse {
+    from { filter: brightness(1); box-shadow: 0 0 14px #ff3860 inset; }
+    to   { filter: brightness(1.6); box-shadow: 0 0 28px #ff3860 inset, 0 0 16px #ff3860; }
+  }
   .bar::after {
     content: '';
     position: absolute;
