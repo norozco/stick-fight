@@ -619,11 +619,12 @@ const Audio = (() => {
   }
   function scheduler() {
     if(!music.playing) return;
-    const tempo = music.intense ? 150 : 132;
+    const stage = STAGE_PATTERNS[currentStageId] || STAGE_PATTERNS.twilight;
+    const tempo = music.intense ? stage.tempoIntense : stage.tempo;
     const stepDur = 60 / tempo / 4;
     while(music.nextNoteTime < ctx.currentTime + 0.12) {
       const s = music.step % PATTERN_LEN;
-      const P = music.intense ? PATTERNS_INTENSE : PATTERNS;
+      const P = music.intense ? stage.intense : stage.normal;
       const t = music.nextNoteTime;
       if(P.kick[s])  pKick(t);
       if(P.snare[s]) pSnare(t);
