@@ -1840,6 +1840,36 @@ function drawPit() {
     ctx.arc(sx2, sy2, 2, 0, Math.PI * 2);
     ctx.fill();
   }
+
+  // Pit floor — molten rocky ground at the bounce depth
+  if(typeof PIT_FLOOR === 'number') {
+    const floorY = PIT_FLOOR;
+    const floorGrad = ctx.createLinearGradient(0, floorY - 60, 0, floorY + 200);
+    floorGrad.addColorStop(0, 'rgba(40,10,0,0)');
+    floorGrad.addColorStop(0.5, '#3a0c05');
+    floorGrad.addColorStop(1, '#1a0400');
+    ctx.fillStyle = floorGrad;
+    ctx.fillRect(-500, floorY - 60, W + 1000, 800);
+
+    // Cracked molten lines
+    ctx.strokeStyle = 'rgba(255,90,30,0.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-500, floorY);
+    for(let i = -500; i <= W + 500; i += 40) {
+      const off = Math.sin(i * 0.03 + globalTime * 0.02) * 3;
+      ctx.lineTo(i, floorY + off);
+    }
+    ctx.stroke();
+
+    // Glow line where the bounce lands
+    const glow = ctx.createLinearGradient(0, floorY - 30, 0, floorY + 30);
+    glow.addColorStop(0, 'rgba(255,140,60,0)');
+    glow.addColorStop(0.5, 'rgba(255,140,60,0.55)');
+    glow.addColorStop(1, 'rgba(255,140,60,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(-500, floorY - 30, W + 1000, 60);
+  }
 }
 
 // ============================================================
