@@ -857,10 +857,9 @@ class Fighter {
       return { start: 10, active: 14, total: 40, dmg: 14, kb: 14, up: -5, reach: 78, boxH: 36, boxY: -65, ult: 12, canCombo: false };
     }
     if(this.attackType === 'throw') {
-      // Grab window at start; full choreography plays out once contact is made.
-      // The sequence is 55 frames total: 6 startup, 10 grab-active, then a
-      // 24-frame swing & slam choreography (handled separately), then recovery.
-      return { start: 4, active: 10, total: 55, dmg: 22, kb: 20, up: -4, reach: 82, boxH: 100, boxY: -100, ult: 14, canCombo: false, beatsBlock: true, isGrab: true };
+      // Ken-style shoulder throw — tight 35-frame sequence.
+      // 0-3 startup/grab, 4-24 arc (victim flips overhead), 24-35 recovery.
+      return { start: 3, active: 8, total: 35, dmg: 22, kb: 18, up: -4, reach: 82, boxH: 100, boxY: -100, ult: 14, canCombo: false, beatsBlock: true, isGrab: true };
     }
     return null;
   }
