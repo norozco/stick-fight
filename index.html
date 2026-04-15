@@ -1176,30 +1176,28 @@ class Fighter {
       return;
     }
 
-    // Being thrown — locked to the attacker's grab choreography up through the slam
-    // Lock ends at stateTime > 40 so normal physics can apply the release knockback.
+    // Being thrown — locked through the entire arc up to impact (frame 24)
     if(this.beingThrown > 0 && opponent &&
        opponent.state === 'attack' && opponent.attackType === 'throw' &&
-       opponent.stateTime <= 40) {
+       opponent.stateTime <= 24) {
       lockVictimToThrow(this, opponent);
-      // Apply damage + queued knockback at the slam frame (40)
-      if(opponent.stateTime === 40 && !this.throwDamageApplied) {
+      // Damage + impact effects at impact frame (24)
+      if(opponent.stateTime === 24 && !this.throwDamageApplied) {
         this.throwDamageApplied = true;
         const dmgMult = (opponent.dmgMult) || 1;
         const dmg = 22 * dmgMult;
         this.hp = Math.max(0, this.hp - dmg);
         this.hurtFlash = 16;
-        this.hitStun = 26;
-        // Stash the impulse — next frame (lock released) physics will launch them
-        this._throwReleaseKb = -opponent.facing * 18;
-        this._throwReleaseUp = -6;
+        this.hitStun = 20;
+        this._throwReleaseKb = -opponent.facing * 14;   // push further away on release
+        this._throwReleaseUp = -4;
         spawnDamageNumber(this.x, this.y - 110, dmg, '#ff6600', true);
-        spawnHitSpark(this.x, this.y - 30, '#ffaa44', 24, 2.0);
-        for(let i = 0; i < 18; i++) spawnDust(this.x + (Math.random()-0.5)*60, GROUND + 2, -opponent.facing);
-        shake(12, 16);
-        hitstop = 8;
+        spawnHitSpark(this.x, this.y - 30, '#ffaa44', 22, 1.8);
+        for(let i = 0; i < 16; i++) spawnDust(this.x + (Math.random()-0.5)*60, GROUND + 2, -opponent.facing);
+        shake(10, 14);
+        hitstop = 6;
         Audio.heavy();
-        if(opponent) opponent.addUlt(14);
+        if(opponent) opponent.addUlt(12);
       }
       return;
     }
