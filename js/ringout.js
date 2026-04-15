@@ -256,18 +256,15 @@ function updateRingout() {
       break;
     }
     case 'APPROACH': {
-      // HARD CUT to looking up at the falling loser. Rapid descent ENDING AT
-      // PIT_FLOOR exactly (was ending 80 px above — that 80-px snap on the
-      // CRASH transition made the impact feel desynced). Now the fighter is
-      // visually on the floor at the moment CRASH begins; CRASH just triggers
-      // the pose change + effects.
-      const p = ph.frame / ph.total;
+      // HARD CUT to looking up at the falling loser. Rapid descent ending
+      // EXACTLY AT PIT_FLOOR on the last frame — using (frame+1)/total so the
+      // final APPROACH tick reaches p=1.0 (was 21/22, leaving a ~53 px gap).
+      const p = (ph.frame + 1) / ph.total;
       f.x = f.ringoutAnchorX;
-      f.y = lerp(GROUND + 600, PIT_FLOOR, p * p);        // lands exactly at PIT_FLOOR
+      f.y = lerp(GROUND + 600, PIT_FLOOR, p * p);        // lands AT PIT_FLOOR
       f.ringoutSpin = (1 - p) * 0.3 * dir;
       // Pre-fire the "Ultra K O!" voice a few frames before the visual impact
       // so browser TTS latency (~150-300 ms) lines up with the CRASH flash.
-      // Also pre-fire a soft "whoosh" rising to the impact.
       if(ph.frame === 3) {
         Audio.fallYell();
         try { Audio.say('Ultra K O!', { interrupt: true }); } catch(e){}
