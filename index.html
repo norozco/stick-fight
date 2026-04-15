@@ -3299,7 +3299,37 @@ function toggleMute() {
 }
 addEventListener('keydown', e => {
   if(e.key === 'm' || e.key === 'M') toggleMute();
+  if(e.key === 'Escape' && state === 'playing') pauseGame();
+  else if(e.key === 'Escape' && state === 'paused') resumeGame();
 });
+
+let prePauseState = null;
+function pauseGame() {
+  if(state !== 'playing') return;
+  prePauseState = state;
+  state = 'paused';
+  document.getElementById('pause').classList.remove('hidden');
+  Audio.musicStop();
+}
+function resumeGame() {
+  if(state !== 'paused') return;
+  document.getElementById('pause').classList.add('hidden');
+  state = prePauseState || 'playing';
+  prePauseState = null;
+  Audio.musicStart(false);
+  lastSecond = performance.now();
+  requestAnimationFrame(loop);
+}
+function restartMatch() {
+  document.getElementById('pause').classList.add('hidden');
+  Audio.musicStop();
+  state = 'menu';
+  showSetup();
+}
+function quitToMenu() {
+  document.getElementById('pause').classList.add('hidden');
+  backToMenu();
+}
 
 // ============================================================
 // MAIN LOOP
