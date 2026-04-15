@@ -75,7 +75,3 @@ function drawReplay() {
     endRound(w);
   }
 }
-
-const keys = {};
-const keyPressed = {};
-addEventListener('keydown', e => {
