@@ -1118,6 +1118,11 @@ class Fighter {
     this.addUlt(box.dmg * 0.8);
     this.combo = 0;
 
+    // Physics impulse — head whips back, arms snap on the hit vector
+    const impulseMag = box.type === 'heavy' ? 10 : 6;
+    this.impactVx = fromFacing * impulseMag;
+    this.impactVy = (box.up && box.up < 0) ? -4 : -1.5;
+
     spawnDamageNumber(this.x, this.y - 110, box.dmg, box.type === 'heavy' ? '#ff3860' : '#fff');
 
     if(this.hp < 0) this.hp = 0;
