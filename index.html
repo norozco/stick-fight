@@ -1607,7 +1607,7 @@ function drawLimb(a, b) {
 }
 
 function drawFighter(f) {
-  // Ring-out: render the fighter as a tumbling ragdoll
+  // Ring-out: render the fighter as a clean tumbling silhouette, no trail/glow
   if(f.state === 'ringout') {
     ctx.save();
     ctx.translate(f.x, f.y - 55);
@@ -1615,15 +1615,8 @@ function drawFighter(f) {
     ctx.translate(-f.x, -(f.y - 55));
     const target = computeTargetPose(f);
     if(!f.smoothPose) f.smoothPose = clonePose(target);
-    // Lock to a hurt-ish pose
     smoothPose(f.smoothPose, target, 0.4);
-    // Motion trail
-    if(globalTime % 2 === 0) spawnAfterimage(f, 0.4);
-    ctx.save();
-    ctx.shadowColor = '#ff3860';
-    ctx.shadowBlur = 14;
     renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
-    ctx.restore();
     ctx.restore();
     return;
   }
