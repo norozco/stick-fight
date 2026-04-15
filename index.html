@@ -743,7 +743,7 @@ const Audio = (() => {
   return {
     setMute(m) {
       muted = m;
-      if(music.musicGain) music.musicGain.gain.value = m ? 0 : 0.5;
+      if(music.musicGain) music.musicGain.gain.value = m ? 0 : 0.35;
       if(masterSfxGain) masterSfxGain.gain.value = m ? 0 : 1.0;
     },
     isMuted() { return muted; },
