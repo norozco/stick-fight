@@ -3279,13 +3279,20 @@ function endRound(winner) {
     if(roundsWon[winner - 1] === 1 && roundsWon[winner === 1 ? 1 : 0] === 0) {
       setTimeout(() => Audio.say('One more round!'), 1100);
     } else if(roundsWon[winner - 1] >= 2) {
+      // Achievement: FLAWLESS — winner won 2-0 without losing a round
+      const loserIdx = winner === 1 ? 1 : 0;
+      const flawless = roundsWon[loserIdx] === 0;
+      if(flawless) {
+        setTimeout(() => announce('FLAWLESS VICTORY!', 140), 600);
+        setTimeout(() => Audio.say('Flawless victory!', { interrupt: true }), 700);
+      }
       // Match-winning round — fanfare + voice
       setTimeout(() => {
         if(mode === 'cpu' && winner === 2) Audio.youLose();
         else Audio.youWin();
       }, 900);
-      setTimeout(() => Audio.say('You win!', { interrupt: true }), 1500);
-      setTimeout(() => Audio.say(winner === 1 ? 'Player one!' : (mode === 'cpu' ? 'C P U!' : 'Player two!')), 2200);
+      setTimeout(() => Audio.say('You win!', { interrupt: true }), flawless ? 2400 : 1500);
+      setTimeout(() => Audio.say(winner === 1 ? 'Player one!' : (mode === 'cpu' ? 'C P U!' : 'Player two!')), flawless ? 3100 : 2200);
     }
   }
   setTimeout(() => {
