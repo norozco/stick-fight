@@ -189,174 +189,250 @@ function triggerRingOut(loser, winningPlayer) {
   spawnHitSpark(loser.x, loser.y - 60, '#ff3030', 36, 3);
 }
 
+// Stage-themed colors used by particles + parallax during the fall
+function ringoutStageColors() {
+  const stageId = currentStage && currentStage.id;
+  if(stageId === 'inferno') return { spark: '#ffd060', ring: '#ffcc66', dust: 'rgba(255,200,80,0.85)' };
+  if(stageId === 'dojo')    return { spark: '#ffcc88', ring: '#ffd9a0', dust: 'rgba(220,190,140,0.75)' };
+  return { spark: '#c0d0ff', ring: '#c8d8ff', dust: 'rgba(180,200,255,0.7)' };
+}
+
 function updateRingout() {
   if(!ringoutFighter) return;
   const f = ringoutFighter;
   ringoutTime++;
+  if(ringoutXrayFlashTime > 0) ringoutXrayFlashTime--;
 
-  // Launch ramp — the first 8 frames ease velocities up to full throw so the
-  // exit looks like a follow-through rather than a jump cut.
-  if((f.ringoutLaunchFrames || 0) < 8) {
-    f.ringoutLaunchFrames = (f.ringoutLaunchFrames || 0) + 1;
-    const p = f.ringoutLaunchFrames / 8;
-    const ease = p * p * (3 - 2 * p);                  // smoothstep
-    const dir = f.ringoutLaunchDir || (f.x < W / 2 ? -1 : 1);
-    f.vx = lerp(f.vx, dir * 18, ease);
-    f.vy = lerp(f.vy, -16, ease);
-  }
+  // Resolve current phase + sub-frame
+  const ph = ringoutPhase(ringoutTime);
+  const justEntered = ph.idx !== ringoutPhaseIdx;
+  ringoutPhaseIdx = ph.idx;
+  ringoutPhaseFrame = ph.frame;
 
-  // Custom physics — eased gravity so terminal velocity is approached smoothly
-  // and slight air drag on horizontal so the arc actually curves visibly.
-  const terminal = 34;
-  f.vy += (terminal - f.vy) * 0.035 + 0.45;            // smooth ramp, not a clamp
-  if(f.vy > terminal) f.vy = terminal;
-  f.vx *= 0.994;
-  // Rotational air resistance — the tumble winds down on its own instead of
-  // spinning at a constant rate until the bounce.
-  f.ringoutSpinSpeed = (f.ringoutSpinSpeed || 0.2) * 0.995;
-  f.x += f.vx;
-  f.y += f.vy;
-  f.ringoutSpin = (f.ringoutSpin || 0) + f.ringoutSpinSpeed;
+  const dir = f.ringoutLaunchDir || (f.x < W / 2 ? -1 : 1);
+  const colors = ringoutStageColors();
 
-  // Cinematic camera swap: once the fighter has actually cleared the stage
-  // (falling past ~80 px below the ground), cut to a front-facing "flailing"
-  // view. The finalizer turns it back off so we see the crash impact.
-  if(!f.ringoutFinalized && f.y > GROUND + 80 && !f.ringoutFrontView) {
-    f.ringoutFrontView = true;
-    f.ringoutFrontViewStart = ringoutTime;
-  }
-
-  // Afterimage trail — only during the side-view phase; in front-view the
-  // trail would be a stack of flailing copies which reads as clutter.
-  if(!f.ringoutTrail) f.ringoutTrail = [];
-  const speed = Math.abs(f.vx) + Math.abs(f.vy) + Math.abs(f.ringoutSpinSpeed) * 20;
-  if(!f.ringoutFrontView && ringoutTime % 2 === 0 && speed > 1.2) {
-    f.ringoutTrail.push({ x: f.x, y: f.y, spin: f.ringoutSpin, life: 18 });
-    if(f.ringoutTrail.length > 8) f.ringoutTrail.shift();
-  }
-  // Age out existing trail samples
-  for(const s of f.ringoutTrail) s.life--;
-  f.ringoutTrail = f.ringoutTrail.filter(s => s.life > 0);
-
-  // Bounce off the pit floor
-  f.ringoutBounces = f.ringoutBounces || 0;
-  f.ringoutRestTime = f.ringoutRestTime || 0;
-  if(f.y >= PIT_FLOOR && f.vy > 0) {
-    f.y = PIT_FLOOR;
-    if(f.ringoutBounces < MAX_BOUNCES) {
-      const dampen = f.ringoutBounces === 0 ? 0.6 : 0.35;
-      f.vy = -Math.abs(f.vy) * dampen;
-      f.vx *= 0.55;
-      // Dampen spin without flipping it — a flipped spin reads as jittery; a
-      // smoothly decelerating tumble reads as momentum.
-      f.ringoutSpinSpeed = (f.ringoutSpinSpeed || 0.2) * 0.55;
-      f.ringoutBounces++;
-
-      // Stage-themed impact
-      const stageId = currentStage && currentStage.id;
-      const splashColor = stageId === 'inferno' ? 'rgba(255,200,80,0.85)'
-                       : stageId === 'dojo'    ? 'rgba(220,190,140,0.75)'
-                       : 'rgba(180,200,255,0.7)';
-      const sparkColor = stageId === 'inferno' ? '#ffe080'
-                       : stageId === 'dojo'    ? '#ffcc88'
-                       : '#aaccff';
-      for(let i = 0; i < 28; i++) {
-        spawnParticle({
-          type: 'dust',
-          x: f.x + (Math.random() - 0.5) * 70,
-          y: PIT_FLOOR + 2,
-          vx: (Math.random() - 0.5) * 12,
-          vy: -Math.random() * 9 - 3,
-          life: 50, maxLife: 50,
-          size: Math.random() * 5 + 4,
-          color: splashColor,
-          grav: stageId === 'inferno' ? 0.35 : 0.25,
-        });
+  // ----- PHASE-DRIVEN CHOREOGRAPHY -----
+  // Each phase positions the loser deterministically (no physics integration).
+  switch(ph.name) {
+    case 'IMPACT': {
+      // Loser frozen at the hit point — camera locked on (handled in game.js)
+      f.x = f.ringoutAnchorX;
+      f.y = f.ringoutAnchorY;
+      f.ringoutSpin = 0;
+      if(justEntered) {
+        Audio.say('K O!', { interrupt: true });
+        announce('K.O.!', 60);
       }
-      spawnHitSpark(f.x, PIT_FLOOR - 10, sparkColor, 22, 2.2);
-      shake(16 - f.ringoutBounces * 4, 22);
-      hitstop = f.ringoutBounces === 1 ? 8 : 4;
-      Audio.bounce();
-      if(stageId === 'inferno' && f.ringoutBounces === 1) Audio.heavy();   // lava sizzle
-      if(stageId === 'twilight' && f.ringoutBounces === 1) Audio.parry();   // glass shatter
-    } else {
-      // Final rest — ease velocities to zero instead of snapping, so the
-      // ragdoll visibly settles instead of jumping to a statue pose.
-      f.vy = 0;
-      f.vx *= 0.75;
-      f.ringoutSpinSpeed = (f.ringoutSpinSpeed || 0) * 0.82;
-      if(Math.abs(f.vx) < 0.15) f.vx = 0;
-      if(Math.abs(f.ringoutSpinSpeed) < 0.01) f.ringoutSpinSpeed = 0;
-      f.ringoutRestTime++;
-
-      // --- Killer-Instinct finalizer: fires once when the ragdoll lands ---
+      break;
+    }
+    case 'LAUNCH': {
+      // Smooth arc from the anchor point off-screen in `dir` direction.
+      // By end of phase, loser is well off-screen.
+      const p = ph.frame / ph.total;
+      const ease = p * p * (3 - 2 * p);                 // smoothstep
+      const launchDist = 600;                            // off-screen by ~end
+      f.x = f.ringoutAnchorX + dir * launchDist * ease;
+      f.y = f.ringoutAnchorY - 70 * Math.sin(p * Math.PI) - 40 * p;  // arc up then down
+      f.ringoutSpin = ease * Math.PI * 1.6 * dir;        // ~290° tumble during launch
+      // Speed lines streaking from the loser
+      if(ringoutTime % 2 === 0) {
+        spawnStreak(f.x, f.y - 50, -dir, '#ff5040');
+        spawnStreak(f.x - dir * 14, f.y - 30, -dir, '#ff8a40');
+      }
+      if(justEntered) {
+        Audio.fallYell();
+      }
+      break;
+    }
+    case 'FREEFALL': {
+      // FRONT VIEW — the user-requested moment. Loser is locked at center
+      // of screen (the camera handles centering). Pose is overridden in
+      // poses.js when phase === 'FREEFALL'. Position-wise we just keep them
+      // at a stable world location so the camera math is simple.
+      f.x = f.ringoutAnchorX;       // (camera locks to f.x in game.js anyway)
+      f.y = GROUND + 600;            // somewhere mid-pit visually
+      f.ringoutSpin = 0;             // no tumble — flailing is in the pose
+      break;
+    }
+    case 'APPROACH': {
+      // HARD CUT to looking up at the falling loser. Rapid descent.
+      const p = ph.frame / ph.total;
+      f.x = f.ringoutAnchorX;
+      f.y = lerp(GROUND + 600, PIT_FLOOR - 80, p * p);   // accelerating down
+      f.ringoutSpin = (1 - p) * 0.3 * dir;
+      // Building hitstun / wind
+      if(ph.frame === 4) Audio.fallYell();
+      break;
+    }
+    case 'CRASH': {
+      // HARD CUT to top-down. Massive impact at the start of this phase.
+      f.x = f.ringoutAnchorX;
+      f.y = PIT_FLOOR;
+      f.ringoutSpin = 0;
       if(!f.ringoutFinalized) {
         f.ringoutFinalized = true;
-        f.ringoutFrontView = false;   // cut back to side view for the crash impact
-        f.ringoutTrail = [];          // clear any stale snapshots
-        // Dramatic freeze-frame on impact
-        hitstop = 14;
-        shake(22, 30);
-        flashTime = 22;
-        flashAlpha = 0.85;
-        flashColor = '255,80,60';
-        // Expanding shockwave ring
-        const stageId = currentStage && currentStage.id;
-        const ringColor = stageId === 'inferno' ? '#ffcc66'
-                        : stageId === 'dojo'    ? '#ffd9a0'
-                        : '#c8d8ff';
-        for(let r = 0; r < 3; r++) {
+        // X-ray skeleton flash
+        ringoutXrayFlashTime = 8;
+        // Dramatic freeze-frame + flash
+        hitstop = 28;
+        shake(50, 36);
+        flashTime = 36;
+        flashAlpha = 1.0;
+        flashColor = '255,255,255';
+        ultTargetDarken = 0.7;
+        // Expanding shockwave rings (multi-layer)
+        for(let r = 0; r < 4; r++) {
           spawnParticle({
-            type: 'ring',
-            x: f.x, y: PIT_FLOOR,
+            type: 'ring', x: f.x, y: PIT_FLOOR,
             vx: 0, vy: 0,
-            life: 40 + r * 6, maxLife: 40 + r * 6,
-            size: 10 + r * 4,
-            power: 4 + r,
-            color: ringColor,
+            life: 44 + r * 6, maxLife: 44 + r * 6,
+            size: 10 + r * 4, power: 5 + r,
+            color: r === 0 ? '#ffffff' : colors.ring,
           });
         }
-        // Secondary debris burst
-        for(let i = 0; i < 40; i++) {
-          const ang = Math.random() * Math.PI - Math.PI;    // mostly upward
+        // Heavy debris
+        for(let i = 0; i < 56; i++) {
+          const ang = -Math.PI/2 + (Math.random() - 0.5) * Math.PI * 1.1;
           spawnParticle({
             type: 'spark',
-            x: f.x + (Math.random() - 0.5) * 50,
-            y: PIT_FLOOR - 2,
-            vx: Math.cos(ang) * (Math.random() * 10 + 2),
-            vy: Math.sin(ang) * (Math.random() * 9 + 4) - 4,
-            life: 36, maxLife: 36,
-            size: Math.random() * 3 + 2,
-            color: ringColor,
-            grav: 0.35,
+            x: f.x + (Math.random() - 0.5) * 60,
+            y: PIT_FLOOR - 4,
+            vx: Math.cos(ang) * (Math.random() * 12 + 4),
+            vy: Math.sin(ang) * (Math.random() * 11 + 5),
+            life: 44, maxLife: 44,
+            size: Math.random() * 4 + 2,
+            color: i % 3 === 0 ? '#ffffff' : colors.spark,
+            grav: 0.32,
           });
         }
-        // KI-style text overlay + announcer voice line
+        // ULTRA K.O. — text + voice + sound stinger
         announce('ULTRA K.O.!', 120);
         Audio.ultFinisher();
         try { Audio.say('Ultra K O!', { interrupt: true }); } catch(e){}
       }
+      break;
+    }
+    case 'SETTLE': {
+      f.x = f.ringoutAnchorX;
+      f.y = PIT_FLOOR;
+      f.ringoutSpin = 0;
+      // Lazy ember rain rising from impact
+      if(ringoutTime % 4 === 0) {
+        spawnParticle({
+          type: 'spark',
+          x: f.x + (Math.random() - 0.5) * 80,
+          y: PIT_FLOOR + 4,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: -Math.random() * 2 - 1,
+          life: 50, maxLife: 50,
+          size: Math.random() * 3 + 2,
+          color: colors.spark,
+          grav: -0.04,
+        });
+      }
+      break;
+    }
+    case 'DONE': {
+      state = 'playing';
+      ringoutFighter = null;
+      cameraTargetZoom = 1;
+      ultTargetDarken = 0;
+      endRound(ringoutWinner);
+      return;
     }
   }
+}
 
-  // (no trail particles during the fall — we use radial speed lines instead)
-
-  // Announce after initial burst
-  if(ringoutTime === 18 && !ringoutAnnounced) {
-    ringoutAnnounced = true;
-    Audio.say('K O!', { interrupt: true });
-    announce('K.O.!', 140);
-    flashTime = 14;
-    flashAlpha = 0.5;
-    flashColor = '255,200,60';
+// X-ray skeleton flash — drawn in screen space at the impact point during CRASH.
+// Called from the main render loop when ringoutXrayFlashTime > 0.
+function drawXraySkeletonFlash() {
+  if(ringoutXrayFlashTime <= 0 || !ringoutFighter) return;
+  const f = ringoutFighter;
+  const a = ringoutXrayFlashTime / 8;
+  ctx.save();
+  ctx.globalAlpha = a;
+  ctx.strokeStyle = '#ffffff';
+  ctx.fillStyle = '#ffffff';
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round';
+  ctx.shadowColor = '#ffffff';
+  ctx.shadowBlur = 24;
+  // Stick-figure skeleton silhouette — slightly larger than normal
+  const s = 1.4;
+  const x = f.x, y = f.y;
+  // Head
+  ctx.beginPath();
+  ctx.arc(x, y - 95 * s, 16 * s, 0, Math.PI * 2);
+  ctx.stroke();
+  // Spine
+  ctx.beginPath();
+  ctx.moveTo(x, y - 80 * s);
+  ctx.lineTo(x, y - 40 * s);
+  ctx.stroke();
+  // Arms splayed (impact pose)
+  ctx.beginPath();
+  ctx.moveTo(x, y - 75 * s);
+  ctx.lineTo(x - 36 * s, y - 30 * s);
+  ctx.moveTo(x, y - 75 * s);
+  ctx.lineTo(x + 36 * s, y - 30 * s);
+  ctx.stroke();
+  // Legs splayed
+  ctx.beginPath();
+  ctx.moveTo(x, y - 40 * s);
+  ctx.lineTo(x - 22 * s, y);
+  ctx.moveTo(x, y - 40 * s);
+  ctx.lineTo(x + 22 * s, y);
+  ctx.stroke();
+  // Rib lines for "skeleton" feel
+  ctx.lineWidth = 4;
+  for(let i = 0; i < 4; i++) {
+    const ry = y - 70 * s + i * 8 * s;
+    ctx.beginPath();
+    ctx.moveTo(x - 12 * s, ry);
+    ctx.lineTo(x + 12 * s, ry);
+    ctx.stroke();
   }
+  ctx.restore();
+}
 
-  // Finish once the ragdoll has settled after the final bounce
-  if(f.ringoutRestTime > 60) {
-    state = 'playing';
-    ringoutFighter = null;
-    cameraTargetZoom = 1;
-    ultTargetDarken = 0;
-    endRound(ringoutWinner);
+// Background parallax during the FREEFALL phase — vertical bands streaking up
+// at high speed, giving the sensation of plummeting straight down.
+function drawRingoutFreefallBackdrop() {
+  const colors = ringoutStageColors();
+  const t = (globalTime * 28) | 0;        // fast scroll
+  ctx.save();
+  // Dark base
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#02030a');
+  grad.addColorStop(0.5, '#08060f');
+  grad.addColorStop(1, '#000');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+  // Vertical bands (10 of them) scrolling upward at varying speeds
+  for(let i = 0; i < 14; i++) {
+    const x = (i * 73) % W;
+    const speed = 1 + (i % 4) * 0.4;       // parallax — different bands move at different speeds
+    const offset = (t * speed) % 200;
+    const w = 6 + (i % 3);
+    ctx.fillStyle = i % 3 === 0 ? '#1a0a08' : '#0a0508';
+    for(let y = -200 + offset; y < H + 100; y += 200) {
+      ctx.fillRect(x, y, w, 80);
+    }
   }
+  // Speed lines — bright streaks suggesting wind
+  ctx.strokeStyle = colors.spark;
+  ctx.lineWidth = 2;
+  for(let i = 0; i < 30; i++) {
+    const lx = (i * 47 + t * 3) % W;
+    const ly = (i * 91 + t * 12) % (H + 200) - 100;
+    const a = 0.4 + (i % 5) * 0.1;
+    ctx.globalAlpha = a;
+    ctx.beginPath();
+    ctx.moveTo(lx, ly);
+    ctx.lineTo(lx, ly + 60);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
 }
