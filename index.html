@@ -2111,20 +2111,7 @@ function updateRingout() {
     }
   }
 
-  // Trailing sparks so you can follow the fall
-  if(f.vy > 4 && ringoutTime % 2 === 0) {
-    spawnParticle({
-      type: 'spark',
-      x: f.x + (Math.random() - 0.5) * 20,
-      y: f.y - 50 + (Math.random() - 0.5) * 30,
-      vx: -f.vx * 0.15 + (Math.random() - 0.5) * 2,
-      vy: -f.vy * 0.1 + (Math.random() - 0.5) * 2,
-      life: 30, maxLife: 30,
-      size: Math.random() * 3 + 2,
-      color: ringoutTime < 40 ? '#ff6600' : '#ff3860',
-      grav: 0.05,
-    });
-  }
+  // (no trail particles during the fall — we use radial speed lines instead)
 
   // Announce after initial burst
   if(ringoutTime === 18 && !ringoutAnnounced) {
