@@ -794,6 +794,15 @@ class Fighter {
 
     // Smoothed animation pose (lerped each frame)
     this.smoothPose = null;
+
+    // ---- Video-game-style secondary physics ----
+    // These layer on top of the smoothed pose for reactive feel.
+    this.impactVx = 0;        // head/limbs get pushed sideways on hits, decays
+    this.impactVy = 0;        // and vertically
+    this.squashY = 0;         // vertical squash on landings (positive = compressed)
+    this.squashVel = 0;       // squash spring velocity
+    this.limbDragX = 0;       // limbs trail behind velocity changes
+    this.lastVx = 0;          // to detect velocity changes for drag
   }
 
   reset(x, facing) {
