@@ -2893,20 +2893,54 @@ function drawDojoPit() {
 }
 
 function drawInfernoPit() {
-  // Lava lake — bright, dangerous, beautiful
+  // Lava cavern — bright orange chasm getting hotter as you fall
   const pitTop = GROUND + (H - GROUND);
   const g = ctx.createLinearGradient(0, pitTop, 0, pitTop + 1200);
   g.addColorStop(0, '#3a0810');
-  g.addColorStop(0.4, '#7a2010');
-  g.addColorStop(1, '#3a0808');
+  g.addColorStop(0.3, '#5a1408');
+  g.addColorStop(0.7, '#a02810');
+  g.addColorStop(1, '#ff5810');
   ctx.fillStyle = g;
   ctx.fillRect(-500, pitTop, W + 1000, 3000);
 
+  // Jagged volcanic rock walls on both sides
+  ctx.fillStyle = '#1a0408';
+  for(let y = pitTop; y < pitTop + 3000; y += 30) {
+    const lJag = 60 + Math.sin(y * 0.04) * 18 + Math.cos(y * 0.07) * 10;
+    const rJag = 60 + Math.sin(y * 0.04 + 1.5) * 18 + Math.cos(y * 0.06) * 12;
+    ctx.fillRect(-200, y, lJag + 200, 32);
+    ctx.fillRect(W - rJag, y, rJag + 200, 32);
+  }
+  // Glowing magma cracks in the walls
+  ctx.strokeStyle = 'rgba(255,150,40,0.7)';
+  ctx.lineWidth = 2;
+  for(let i = 0; i < 20; i++) {
+    const cy = pitTop + i * 150 + ((globalTime * 0.4) % 150);
+    ctx.beginPath();
+    ctx.moveTo(20, cy);
+    ctx.lineTo(70 + Math.sin(i) * 20, cy + 30 + Math.sin(i*2) * 10);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W - 20, cy + 70);
+    ctx.lineTo(W - 70 - Math.sin(i) * 20, cy + 100 + Math.cos(i*2) * 10);
+    ctx.stroke();
+  }
+  // Glowing red veins behind everything (deep magma)
+  for(let i = 0; i < 6; i++) {
+    const vx = 100 + (i * 137) % (W - 200);
+    const vy = pitTop + ((i * 211 + globalTime * 0.6) % 1400);
+    const vg = ctx.createRadialGradient(vx, vy, 0, vx, vy, 80);
+    vg.addColorStop(0, 'rgba(255,100,40,0.5)');
+    vg.addColorStop(1, 'rgba(255,80,20,0)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(vx - 80, vy - 80, 160, 160);
+  }
+
   // Heat-haze speed lines (warm-colored)
-  ctx.strokeStyle = 'rgba(255,160,80,0.12)';
+  ctx.strokeStyle = 'rgba(255,160,80,0.18)';
   ctx.lineWidth = 1;
   for(let i = 0; i < 30; i++) {
-    const lx = (i * 97 + (globalTime * 11) % 80) % (W + 200) - 100;
+    const lx = 100 + (i * 97 + (globalTime * 11) % 80) % (W - 200) - 50;
     const ly = pitTop + ((i * 137 + globalTime * 18) % 1400);
     ctx.beginPath();
     ctx.moveTo(lx, ly);
