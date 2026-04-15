@@ -279,9 +279,12 @@ function updateRingout() {
       if(!f.ringoutFinalized) {
         f.ringoutFinalized = true;
         // X-ray skeleton flash
-        ringoutXrayFlashTime = 8;
-        // Dramatic freeze-frame + flash
-        hitstop = 28;
+        ringoutXrayFlashTime = 10;
+        // Dramatic punctuation — short hitstop + long slow-mo so the moment
+        // stretches visually without a full 28-frame lockup (was feeling like
+        // a "skip" because the game fully froze the instant the pose switched).
+        hitstop = 14;
+        slowMo = Math.max(slowMo, 90);
         shake(50, 36);
         flashTime = 36;
         flashAlpha = 1.0;
