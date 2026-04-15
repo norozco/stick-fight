@@ -1145,6 +1145,10 @@ class Fighter {
   takeHit(box, fromFacing, attacker) {
     if(this.invuln > 0 && box.type !== 'ult') return 'dodge';
 
+    // Apply attacker's character damage multiplier
+    const dmgMult = (attacker && attacker.dmgMult) || 1;
+    box = { ...box, dmg: box.dmg * dmgMult };
+
     // Ult hits always connect
     if(box.type === 'ult') {
       const ulHit = box.ultHit;
