@@ -1916,6 +1916,101 @@ function announce(text, frames = 90) {
   announceScale = 0;
 }
 
+// ============================================================
+// RING-OUT — Killer-Instinct-style stage fall finisher
+// ============================================================
+const EDGE_THRESHOLD = 150;   // px from screen edge that counts as "near edge"
+
+function canRingOut(loser, winningPlayer) {
+  // Only fires when THIS KO ends the match (winner already has 1 round win)
+  if(roundsWon[winningPlayer - 1] < 1) return false;
+  // Must be near an edge of the stage
+  return loser.x < EDGE_THRESHOLD || loser.x > W - EDGE_THRESHOLD;
+}
+
+function triggerRingOut(loser, winningPlayer) {
+  ringoutFighter = loser;
+  ringoutWinner = winningPlayer;
+  ringoutTime = 0;
+  ringoutAnnounced = false;
+  state = 'ringout';
+
+  // Flick them off whichever side they were closer to
+  const dir = loser.x < W / 2 ? -1 : 1;
+  loser.vx = dir * 18;
+  loser.vy = -16;
+  loser.onGround = false;
+  loser.hitStun = 999;
+  loser.state = 'ringout';
+  loser.stateTime = 0;
+  loser.ringoutSpin = 0;
+  loser.ringoutSpinSpeed = (Math.random() * 0.1 + 0.18) * dir;
+  loser.beingUlted = 0;
+  loser.invuln = 0;
+
+  // Initial dramatic effects
+  slowMo = 60;
+  shake(18, 28);
+  flashTime = 30;
+  flashAlpha = 0.9;
+  flashColor = '255,60,60';
+  ultTargetDarken = 0.45;
+  cameraTargetZoom = 1.25;
+  hitstop = 12;
+  Audio.ultFinisher();
+
+  // Spawn a big burst at the loser's current position
+  spawnHitSpark(loser.x, loser.y - 60, '#ff3860', 36, 3);
+  spawnStar(loser.x, loser.y - 60, '#ffcc00', 3);
+  spawnCombo(loser.x, loser.y - 140, 'RING OUT', '#ff3860');
+}
+
+function updateRingout() {
+  if(!ringoutFighter) return;
+  const f = ringoutFighter;
+  ringoutTime++;
+
+  // Custom physics — exaggerated, no bounds clamp
+  f.vy += 0.55;
+  f.vx *= 0.995;
+  f.x += f.vx;
+  f.y += f.vy;
+  f.ringoutSpin = (f.ringoutSpin || 0) + (f.ringoutSpinSpeed || 0.2);
+
+  // Trailing sparks so you can follow the fall
+  if(ringoutTime % 2 === 0) {
+    spawnParticle({
+      type: 'spark',
+      x: f.x + (Math.random() - 0.5) * 20,
+      y: f.y - 50 + (Math.random() - 0.5) * 30,
+      vx: -f.vx * 0.15 + (Math.random() - 0.5) * 2,
+      vy: -f.vy * 0.1 + (Math.random() - 0.5) * 2,
+      life: 30, maxLife: 30,
+      size: Math.random() * 3 + 2,
+      color: ringoutTime < 40 ? '#ff6600' : '#ff3860',
+      grav: 0.05,
+    });
+  }
+
+  // Announce after initial burst
+  if(ringoutTime === 18 && !ringoutAnnounced) {
+    ringoutAnnounced = true;
+    announce('RING OUT!', 140);
+    flashTime = 14;
+    flashAlpha = 0.5;
+    flashColor = '255,200,60';
+  }
+
+  // Finish after fighter falls well below and animation settles
+  if(ringoutTime > 160) {
+    state = 'playing';              // allow endRound to run
+    ringoutFighter = null;
+    cameraTargetZoom = 1;
+    ultTargetDarken = 0;
+    endRound(ringoutWinner);
+  }
+}
+
 function endRound(winner) {
   if(state !== 'playing') return;
   state = 'roundover';
