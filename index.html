@@ -674,6 +674,7 @@ const Audio = (() => {
       }
     },
     musicSetIntense(intense) { music.intense = intense; },
+    musicSetStage(stageId) { currentStageId = stageId || 'twilight'; },
 
     // Punchier impact SFX
     hit: () => {
