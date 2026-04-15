@@ -453,22 +453,51 @@ const Audio = (() => {
     src.connect(filt).connect(g).connect(music.musicGain);
     src.start(time);
   }
+  function pPad(freq, time, dur) {
+    if(muted) return;
+    // Soft pad — three detuned saws through a low-pass filter
+    const f1 = ctx.createOscillator();
+    const f2 = ctx.createOscillator();
+    const f3 = ctx.createOscillator();
+    const filt = ctx.createBiquadFilter();
+    const g = ctx.createGain();
+    f1.type = f2.type = f3.type = 'sawtooth';
+    f1.frequency.setValueAtTime(freq, time);
+    f2.frequency.setValueAtTime(freq * 1.005, time);
+    f3.frequency.setValueAtTime(freq * 0.5, time);   // sub octave
+    filt.type = 'lowpass';
+    filt.frequency.setValueAtTime(900, time);
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(0.05, time + 0.15);
+    g.gain.setValueAtTime(0.05, time + dur - 0.2);
+    g.gain.exponentialRampToValueAtTime(0.001, time + dur);
+    f1.connect(filt); f2.connect(filt); f3.connect(filt);
+    filt.connect(g).connect(music.musicGain);
+    f1.start(time); f1.stop(time + dur);
+    f2.start(time); f2.stop(time + dur);
+    f3.start(time); f3.stop(time + dur);
+  }
   function scheduler() {
     if(!music.playing) return;
-    const tempo = music.intense ? 148 : 128;
+    const tempo = music.intense ? 150 : 132;
     const stepDur = 60 / tempo / 4;
     while(music.nextNoteTime < ctx.currentTime + 0.12) {
-      const s = music.step % 16;
+      const s = music.step % PATTERN_LEN;
       const P = music.intense ? PATTERNS_INTENSE : PATTERNS;
       const t = music.nextNoteTime;
       if(P.kick[s])  pKick(t);
       if(P.snare[s]) pSnare(t);
       if(P.hat[s])   pHat(t);
-      if(P.bass[s])  pNote(midiToFreq(P.bass[s]), t, stepDur * 1.6, 'sawtooth', 0.18);
+      if(P.bass[s])  pNote(midiToFreq(P.bass[s]), t, stepDur * 1.8, 'sawtooth', 0.20);
       if(P.lead[s])  {
-        // Octave up + detuned for thicker lead
-        pNote(midiToFreq(P.lead[s] + 12), t, stepDur * 1.4, 'square', 0.07);
-        pNote(midiToFreq(P.lead[s] + 12) * 1.005, t, stepDur * 1.4, 'square', 0.05);
+        // Lead — octave up, slightly detuned chorus for thickness
+        pNote(midiToFreq(P.lead[s] + 12), t, stepDur * 2.4, 'square', 0.08);
+        pNote(midiToFreq(P.lead[s] + 12) * 1.006, t, stepDur * 2.4, 'square', 0.06);
+        pNote(midiToFreq(P.lead[s]), t, stepDur * 2.4, 'triangle', 0.05);
+      }
+      if(P.pad && P.pad[s]) {
+        // Pad note holds for a full bar
+        pPad(midiToFreq(P.pad[s] + 12), t, stepDur * 16);
       }
       music.nextNoteTime += stepDur;
       music.step++;
