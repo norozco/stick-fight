@@ -678,8 +678,24 @@ function quitToMenu() {
 // Main render + update loop
 // MAIN LOOP
 // ============================================================
+// Monitor-refresh-rate decoupling.
+// requestAnimationFrame fires at the display's refresh rate — 60/120/144/240 Hz
+// depending on the player's monitor. Our game logic is frame-count based, so on
+// a 144 Hz display the game ran 2.4× too fast. We gate the loop body to a fixed
+// ~60 Hz budget: if the next RAF arrives less than ~15.6 ms after the last
+// processed tick, we skip the update/render entirely and reschedule. This keeps
+// perceived speed identical across displays.
+let _lastLoopTick = 0;
+const _TARGET_FRAME_MS = 1000 / 60;   // 16.666 ms
+
 function loop(now) {
   if(state === 'matchover') return;
+  if(now - _lastLoopTick < _TARGET_FRAME_MS - 1) {
+    // Too soon — let the display refresh again without running game logic
+    requestAnimationFrame(loop);
+    return;
+  }
+  _lastLoopTick = now;
   globalTime++;
 
   // Slow-mo controls update cadence
