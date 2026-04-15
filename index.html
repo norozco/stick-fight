@@ -2653,33 +2653,59 @@ function drawPit() {
 }
 
 function drawTwilightPit() {
-  // Broken stage edge at the bottom of the original ground
+  // City alley below the tower — buildings rising on both sides
   const pitTop = GROUND + (H - GROUND);
   const pitBottom = pitTop + 3000;
 
-  // Solid dark fill extending far down
+  // Night sky fade
   const g = ctx.createLinearGradient(0, pitTop, 0, pitBottom);
-  g.addColorStop(0, '#0a0508');
-  g.addColorStop(0.2, '#050307');
-  g.addColorStop(1, '#000');
+  g.addColorStop(0, '#0a0d18');
+  g.addColorStop(0.3, '#0a0d18');
+  g.addColorStop(1, '#03040a');
   ctx.fillStyle = g;
   ctx.fillRect(-500, pitTop, W + 1000, pitBottom - pitTop);
 
-  // Distant city lights twinkling far below — like falling off the tower
+  // Side buildings (parallax — they appear to rush past as you fall)
+  ctx.fillStyle = '#0f1422';
+  ctx.fillRect(-500, pitTop, 580, 3000);
+  ctx.fillRect(W - 80, pitTop, 580, 3000);
+  // Building edge highlights
+  ctx.fillStyle = '#1a2236';
+  ctx.fillRect(70, pitTop, 14, 3000);
+  ctx.fillRect(W - 80, pitTop, 14, 3000);
+
+  // Lots of lit windows along the building walls — PARALLAX scrolling
+  // Use globalTime for scroll so windows visibly streak past during fall
+  ctx.fillStyle = '#ffe080';
+  for(let row = 0; row < 60; row++) {
+    const yPos = pitTop + (row * 60) + ((globalTime * 0.5) % 60);
+    if(yPos < pitTop || yPos > pitBottom) continue;
+    // Left wall windows
+    for(let c = 0; c < 4; c++) {
+      const lit = ((row * 7 + c * 13) % 5) > 1;
+      if(lit) ctx.fillRect(8 + c * 18, yPos, 10, 16);
+    }
+    // Right wall windows
+    for(let c = 0; c < 4; c++) {
+      const lit = ((row * 11 + c * 17) % 5) > 1;
+      if(lit) ctx.fillRect(W - 70 + c * 18, yPos, 10, 16);
+    }
+  }
+
+  // Distant ambient city glow far below
   for(let i = 0; i < 18; i++) {
-    const lx = (i * 167) % W;
+    const lx = 90 + (i * 49) % (W - 180);
     const ly = pitTop + 800 + ((i * 91) % 1500);
     const flick = (Math.sin(globalTime * 0.1 + i) + 1) * 0.5;
     ctx.fillStyle = `rgba(180,200,255,${0.3 + flick * 0.4})`;
     ctx.fillRect(lx, ly, 2, 2);
   }
-  // Building tops silhouettes way down
-  ctx.fillStyle = '#02040a';
-  for(let i = 0; i < 8; i++) {
-    const bx = i * 130 - 30;
-    const bh = 80 + (i * 53) % 60;
-    ctx.fillRect(bx, PIT_FLOOR - bh, 90, bh + 100);
-  }
+  // Street level haze
+  const haze = ctx.createLinearGradient(0, PIT_FLOOR - 200, 0, PIT_FLOOR + 50);
+  haze.addColorStop(0, 'rgba(140,160,200,0)');
+  haze.addColorStop(1, 'rgba(140,160,200,0.25)');
+  ctx.fillStyle = haze;
+  ctx.fillRect(80, PIT_FLOOR - 200, W - 160, 250);
 
   // Hot glow at the broken edge
   const edgeGlow = ctx.createLinearGradient(0, pitTop - 40, 0, pitTop + 80);
