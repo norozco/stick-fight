@@ -1667,65 +1667,42 @@ function computeTargetPose(f) {
       pose.head.x += fc * 2;
     }
     else if(f.attackType === 'throw') {
-      // Full throw choreography: grab → lift → swing → slam → recovery
-      // (matches the victim's locked positions in lockVictimToThrow)
-      if(t < 4) {
-        // Startup lunge — both arms out
-        const p = t / 4;
-        pose.bodyLean = fc * (4 + p * 4);
-        const ext = easeOutCubic(p) * 34;
-        pose.rHand.x = x + fc * ext; pose.rHand.y = y - 80;
+      // Ken-style shoulder throw — smooth arm-arc that mirrors the victim's path
+      // 0-3 grab / 4-24 arc / 24 impact / 25-35 recovery
+      if(t <= 3) {
+        // Lunge and reach
+        const p = t / 3;
+        pose.bodyLean = fc * (4 + p * 6);
+        const ext = easeOutCubic(p) * 40;
+        pose.rHand.x = x + fc * ext; pose.rHand.y = y - 78;
         pose.lHand.x = x + fc * ext; pose.lHand.y = y - 70;
         pose.rElbow.x = x + fc * ext * 0.5; pose.rElbow.y = y - 78;
         pose.lElbow.x = x + fc * ext * 0.5; pose.lElbow.y = y - 72;
         pose.head.x += fc * 4;
-      } else if(t < 14) {
-        // Grab window — arms locked out at the grab point
-        pose.bodyLean = fc * 8;
-        pose.rHand.x = x + fc * 42; pose.rHand.y = y - 80;
-        pose.lHand.x = x + fc * 42; pose.lHand.y = y - 70;
-        pose.rElbow.x = x + fc * 22; pose.rElbow.y = y - 78;
-        pose.lElbow.x = x + fc * 22; pose.lElbow.y = y - 72;
-        pose.head.x += fc * 3;
-      } else if(t < 22) {
-        // Lift up — arms rising to shoulder height, body straightens
-        const p = (t - 14) / 8;
-        pose.bodyLean = fc * (8 - p * 10);
-        const armY = lerp(-80, -110, p);
-        pose.rHand.x = x + fc * 46; pose.rHand.y = y + armY;
-        pose.lHand.x = x + fc * 46; pose.lHand.y = y + armY + 10;
-        pose.rElbow.x = x + fc * 24; pose.rElbow.y = y + armY + 12;
-        pose.lElbow.x = x + fc * 24; pose.lElbow.y = y + armY + 16;
-      } else if(t < 32) {
-        // Swing — arms arc up and over to the other side
-        const p = (t - 22) / 10;
-        const angle = lerp(Math.PI * 0.25, Math.PI * 1.15, easeOutCubic(p));
-        const radius = 58;
-        const hx = Math.cos(angle) * radius * fc;
-        const hy = -120 - Math.sin(angle) * 20;
-        pose.rHand.x = x + hx; pose.rHand.y = y + hy;
-        pose.lHand.x = x + hx; pose.lHand.y = y + hy + 8;
-        pose.rElbow.x = x + hx * 0.5; pose.rElbow.y = y - 95 + Math.sin(angle + Math.PI/2) * 10;
-        pose.lElbow.x = x + hx * 0.5; pose.lElbow.y = y - 90 + Math.sin(angle + Math.PI/2) * 10;
-        pose.bodyLean = -fc * (4 + p * 10);
-        pose.head.x += -fc * p * 4;
-      } else if(t < 40) {
-        // Slam down — body bends forward, arms follow through
-        const p = (t - 32) / 8;
-        pose.bodyLean = -fc * (14 - p * 10);
-        const downY = lerp(-120, -10, easeOutCubic(p));
-        const xOff = lerp(-50, -90, p) * fc;
-        pose.rHand.x = x + xOff; pose.rHand.y = y + downY;
-        pose.lHand.x = x + xOff; pose.lHand.y = y + downY + 5;
-        pose.rElbow.x = x + xOff * 0.5; pose.rElbow.y = y - 80;
-        pose.lElbow.x = x + xOff * 0.5; pose.lElbow.y = y - 76;
-        pose.head.x += -fc * 4;
+      } else if(t <= 24) {
+        // Arms track the victim's arc — hands stay roughly on the victim
+        const raw = (t - 3) / 21;
+        const p = easeInOutCubic(raw);
+        const angle = p * Math.PI;
+        const handX = Math.cos(angle) * 50 * fc;
+        const handY = -Math.sin(angle) * 80 - 55;
+        pose.rHand.x = x + handX;         pose.rHand.y = y + handY;
+        pose.lHand.x = x + handX - fc*4;  pose.lHand.y = y + handY + 8;
+        pose.rElbow.x = x + handX * 0.45; pose.rElbow.y = y - 78 + handY * 0.3;
+        pose.lElbow.x = x + handX * 0.45; pose.lElbow.y = y - 74 + handY * 0.3;
+        // Body leans opposite to the victim — counterbalance
+        pose.bodyLean = fc * lerp(10, -18, p);
+        pose.head.x += fc * (4 - p * 8);
+        // Slight knee bend at apex
+        pose.pelvis.y = y - 42 + Math.sin(angle) * 6;
       } else {
-        // Recovery — stand back up
-        const p = (t - 40) / 15;
-        pose.bodyLean = -fc * (4 - p * 4);
-        pose.rHand.x = x + fc * 16; pose.rHand.y = y - 70 + p * 6;
-        pose.lHand.x = x - fc * 14; pose.lHand.y = y - 62;
+        // Recovery — straighten up, arms drop
+        const p = clamp((t - 24) / 11, 0, 1);
+        pose.bodyLean = -fc * (10 - p * 10);
+        pose.rHand.x = x + fc * lerp(8, 14, p);  pose.rHand.y = y - 62 + p * 4;
+        pose.lHand.x = x - fc * lerp(8, 14, p);  pose.lHand.y = y - 62;
+        pose.rElbow.x = x + fc * 8; pose.rElbow.y = y - 72;
+        pose.lElbow.x = x - fc * 8; pose.lElbow.y = y - 72;
       }
     }
     else if(f.attackType === 'ult') {
