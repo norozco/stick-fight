@@ -3584,8 +3584,12 @@ function loop(now) {
   ctx.translate(-cx - (cameraX - cx) * (cameraZoom - 1) / cameraZoom,
                 -cy - (cameraY - cy) * (cameraZoom - 1) / cameraZoom);
 
-  drawScene();
-  if(state === 'ringout' || cameraPanY > 2) drawPit();
+  if(state === 'replay') {
+    drawReplay();
+  } else {
+    drawScene();
+    if(state === 'ringout' || cameraPanY > 2) drawPit();
+  }
 
   // Dark overlay during ultimate for cinematic look
   if(ultDarken > 0.02) {
