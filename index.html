@@ -1696,6 +1696,14 @@ class Fighter {
               this.combo++;
               this.comboTimer = 90;
               if(this.combo >= 2) spawnCombo(this.x, this.y - 130, this.combo);
+              if(this.combo === 5) {
+                spawnCombo(this.x, this.y - 170, 'BRUTAL!', '#ff3860');
+                Audio.parry();
+              }
+              if(this.combo === 8) {
+                spawnCombo(this.x, this.y - 200, 'INSANE!', '#ff8800');
+                Audio.heavy();
+              }
               // Open a juggle/air-combo window if the opponent was launched
               if(!opponent.onGround || (box.up && box.up < 0)) {
                 this.juggleWindow = 28;
