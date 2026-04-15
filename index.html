@@ -3696,7 +3696,7 @@ function loop(now) {
     document.getElementById('p2ult').style.width = (p2.ult / p2.maxUlt * 100) + '%';
     document.getElementById('p1ult').classList.toggle('ready', p1.ult >= p1.maxUlt);
     document.getElementById('p2ult').classList.toggle('ready', p2.ult >= p2.maxUlt);
-    document.getElementById('timer').textContent = String(Math.max(0, roundTime)).padStart(2, '0');
+    document.getElementById('timer').textContent = (mode === 'training') ? '∞' : String(Math.max(0, roundTime)).padStart(2, '0');
   }
 
   if(announceTimer > 0) {
