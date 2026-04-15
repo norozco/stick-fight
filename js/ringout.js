@@ -129,10 +129,14 @@ function triggerRingOut(loser, winningPlayer) {
   ringoutAnnounced = false;
   state = 'ringout';
 
-  // Flick them off whichever side they were closer to
+  // Flick them off whichever side they were closer to.
+  // Kick velocities are built up over the first few frames (see updateRingout)
+  // so the launch has a visible wind-up rather than snapping to full speed.
   const dir = loser.x < W / 2 ? -1 : 1;
-  loser.vx = dir * 18;
-  loser.vy = -16;
+  loser.vx = dir * 6;             // starting nudge — ramped up in update
+  loser.vy = -8;
+  loser.ringoutLaunchDir = dir;
+  loser.ringoutLaunchFrames = 0;
   loser.onGround = false;
   loser.hitStun = 999;
   loser.state = 'ringout';
@@ -170,12 +174,29 @@ function updateRingout() {
   const f = ringoutFighter;
   ringoutTime++;
 
-  // Custom physics — stronger gravity, terminal velocity
-  f.vy = Math.min(f.vy + 0.7, 34);
-  f.vx *= 0.997;
+  // Launch ramp — the first 8 frames ease velocities up to full throw so the
+  // exit looks like a follow-through rather than a jump cut.
+  if((f.ringoutLaunchFrames || 0) < 8) {
+    f.ringoutLaunchFrames = (f.ringoutLaunchFrames || 0) + 1;
+    const p = f.ringoutLaunchFrames / 8;
+    const ease = p * p * (3 - 2 * p);                  // smoothstep
+    const dir = f.ringoutLaunchDir || (f.x < W / 2 ? -1 : 1);
+    f.vx = lerp(f.vx, dir * 18, ease);
+    f.vy = lerp(f.vy, -16, ease);
+  }
+
+  // Custom physics — eased gravity so terminal velocity is approached smoothly
+  // and slight air drag on horizontal so the arc actually curves visibly.
+  const terminal = 34;
+  f.vy += (terminal - f.vy) * 0.035 + 0.45;            // smooth ramp, not a clamp
+  if(f.vy > terminal) f.vy = terminal;
+  f.vx *= 0.994;
+  // Rotational air resistance — the tumble winds down on its own instead of
+  // spinning at a constant rate until the bounce.
+  f.ringoutSpinSpeed = (f.ringoutSpinSpeed || 0.2) * 0.995;
   f.x += f.vx;
   f.y += f.vy;
-  f.ringoutSpin = (f.ringoutSpin || 0) + (f.ringoutSpinSpeed || 0.2);
+  f.ringoutSpin = (f.ringoutSpin || 0) + f.ringoutSpinSpeed;
 
   // Bounce off the pit floor
   f.ringoutBounces = f.ringoutBounces || 0;
@@ -186,7 +207,9 @@ function updateRingout() {
       const dampen = f.ringoutBounces === 0 ? 0.6 : 0.35;
       f.vy = -Math.abs(f.vy) * dampen;
       f.vx *= 0.55;
-      f.ringoutSpinSpeed = (f.ringoutSpinSpeed || 0.2) * -0.75;
+      // Dampen spin without flipping it — a flipped spin reads as jittery; a
+      // smoothly decelerating tumble reads as momentum.
+      f.ringoutSpinSpeed = (f.ringoutSpinSpeed || 0.2) * 0.55;
       f.ringoutBounces++;
 
       // Stage-themed impact
@@ -217,10 +240,13 @@ function updateRingout() {
       if(stageId === 'inferno' && f.ringoutBounces === 1) Audio.heavy();   // lava sizzle
       if(stageId === 'twilight' && f.ringoutBounces === 1) Audio.parry();   // glass shatter
     } else {
-      // Final rest — stop
+      // Final rest — ease velocities to zero instead of snapping, so the
+      // ragdoll visibly settles instead of jumping to a statue pose.
       f.vy = 0;
-      f.vx = 0;
-      f.ringoutSpinSpeed = 0;
+      f.vx *= 0.75;
+      f.ringoutSpinSpeed = (f.ringoutSpinSpeed || 0) * 0.82;
+      if(Math.abs(f.vx) < 0.15) f.vx = 0;
+      if(Math.abs(f.ringoutSpinSpeed) < 0.01) f.ringoutSpinSpeed = 0;
       f.ringoutRestTime++;
     }
   }
