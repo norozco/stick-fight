@@ -3333,6 +3333,12 @@ addEventListener('keydown', e => {
   if(e.key === 'm' || e.key === 'M') toggleMute();
   if(e.key === 'Escape' && state === 'playing') pauseGame();
   else if(e.key === 'Escape' && state === 'paused') resumeGame();
+  // Quick-rematch: any non-modifier key on the win screen
+  if(state === 'matchover' && !document.getElementById('over').classList.contains('hidden')
+      && e.key !== 'Escape' && e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta') {
+    e.preventDefault();
+    playAgain();
+  }
 });
 
 let prePauseState = null;
