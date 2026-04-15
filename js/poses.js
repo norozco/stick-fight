@@ -506,3 +506,191 @@ function applyPosePhysics(f, pose) {
   }
 }
 
+function renderStoredPose(pose, color, shadowFactor = 1) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 4.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const lean = pose.bodyLean;
+  const neckX = pose.neck.x + lean;
+  const neckY = pose.neck.y;
+
+  // Legs
+  drawLimb(pose.pelvis, pose.lKnee);
+  drawLimb(pose.lKnee, pose.lFoot);
+  drawLimb(pose.pelvis, pose.rKnee);
+  drawLimb(pose.rKnee, pose.rFoot);
+
+  // Body
+  ctx.beginPath();
+  ctx.moveTo(pose.pelvis.x, pose.pelvis.y);
+  ctx.lineTo(neckX, neckY);
+  ctx.stroke();
+
+  // Arms
+  drawLimb({ x: neckX, y: neckY }, pose.lElbow);
+  drawLimb(pose.lElbow, pose.lHand);
+  drawLimb({ x: neckX, y: neckY }, pose.rElbow);
+  drawLimb(pose.rElbow, pose.rHand);
+
+  // Head
+  const hx = pose.head.x + lean;
+  const hy = pose.head.y;
+  const tilt = pose.headTilt || 0;
+  ctx.save();
+  ctx.translate(hx, hy);
+  ctx.rotate(tilt);
+  ctx.beginPath();
+  ctx.arc(0, 0, 13, 0, Math.PI * 2);
+  ctx.stroke();
+  if(pose.facing) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(pose.facing * 5, -2, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function drawLimb(a, b) {
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+}
+
+function drawFighter(f) {
+  // Ring-out: render the fighter as a clean tumbling silhouette, no trail/glow
+  if(f.state === 'ringout') {
+    ctx.save();
+    ctx.translate(f.x, f.y - 55);
+    ctx.rotate(f.ringoutSpin || 0);
+    ctx.translate(-f.x, -(f.y - 55));
+    const target = computeTargetPose(f);
+    if(!f.smoothPose) f.smoothPose = clonePose(target);
+    smoothPose(f.smoothPose, target, 0.4);
+    renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
+    ctx.restore();
+    return;
+  }
+
+  // Being thrown — tumble head-over-heels through the over-the-shoulder arc
+  if(f.beingThrown > 0 && f.throwSpin !== undefined && f.throwSpin !== 0) {
+    ctx.save();
+    const pivotY = f.y - 50;
+    ctx.translate(f.x, pivotY);
+    ctx.rotate(f.throwSpin);
+    ctx.translate(-f.x, -pivotY);
+    const target = computeTargetPose(f);
+    if(!f.smoothPose) f.smoothPose = clonePose(target);
+    smoothPose(f.smoothPose, target, 0.4);
+    renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
+    ctx.restore();
+    return;
+  }
+
+  const target = computeTargetPose(f);
+  if(!f.smoothPose) f.smoothPose = clonePose(target);
+
+  // Variable smoothing: crisper for attacks, silkier for idle/walk
+  let factor = 0.32;
+  if(f.state === 'attack') factor = 0.55;
+  if(f.state === 'dash') factor = 0.6;
+  if(f.state === 'hurt') factor = 0.5;
+  if(f.state === 'stagger') factor = 0.4;
+  if(f.state === 'attack' && f.attackType === 'ult') factor = 0.45;
+  smoothPose(f.smoothPose, target, factor);
+
+  // ---- Apply secondary physics to the rendered pose ----
+  // We mutate smoothPose directly; next frame the lerp rebuilds toward target.
+  applyPosePhysics(f, f.smoothPose);
+
+  // Shadow
+  const airFactor = Math.max(0, 1 - (GROUND - f.y) / 250);
+  ctx.save();
+  ctx.globalAlpha = 0.3 * airFactor;
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.ellipse(f.x, GROUND + 3, 22 * airFactor, 5 * airFactor, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Ult-ready aura glow
+  if(f.ult >= f.maxUlt && f.state !== 'attack') {
+    ctx.save();
+    const g = Math.abs(Math.sin(globalTime * 0.08));
+    ctx.strokeStyle = f.glow;
+    ctx.globalAlpha = 0.35 + g * 0.25;
+    ctx.lineWidth = 10;
+    ctx.shadowColor = f.glow;
+    ctx.shadowBlur = 20;
+    renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.glow);
+    ctx.restore();
+  }
+
+  // Ult attack aura
+  if(f.state === 'attack' && f.attackType === 'ult') {
+    ctx.save();
+    ctx.shadowColor = f.glow;
+    ctx.shadowBlur = 30;
+    ctx.strokeStyle = f.glow;
+    ctx.lineWidth = 9;
+    ctx.globalAlpha = 0.55;
+    renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.glow);
+    ctx.restore();
+    // Continuous ult particles
+    if(globalTime % 2 === 0) {
+      spawnParticle({
+        type: 'spark',
+        x: f.x + (Math.random() - 0.5) * 50,
+        y: f.y - 30 - Math.random() * 80,
+        vx: (Math.random() - 0.5) * 2,
+        vy: -Math.random() * 3,
+        life: 26, maxLife: 26,
+        size: Math.random() * 5 + 3,
+        color: f.glow,
+        grav: -0.05,
+      });
+    }
+    // Swirling energy ring at feet during windup
+    if(f.stateTime < 16 && globalTime % 2 === 0) {
+      const ang = globalTime * 0.3;
+      for(let i = 0; i < 3; i++) {
+        const a2 = ang + i * Math.PI * 2 / 3;
+        spawnParticle({
+          type: 'spark',
+          x: f.x + Math.cos(a2) * 30,
+          y: GROUND - 2 + Math.sin(a2) * 6,
+          vx: -Math.sin(a2) * 2,
+          vy: -Math.cos(a2) * 0.5,
+          life: 20, maxLife: 20,
+          size: 4,
+          color: f.glow,
+          grav: 0,
+        });
+      }
+    }
+    // Motion streaks at impact frames
+    const info = currentUltHit(f.stateTime);
+    if(info && f.stateTime === info.hit.start) {
+      for(let i = 0; i < 4; i++) {
+        spawnStreak(f.x + f.facing * 30, f.y - 60 - i * 10, f.facing, f.glow);
+      }
+    }
+  }
+
+  // Hurt flash overlay
+  const flash = f.hurtFlash > 0 && Math.floor(f.hurtFlash / 2) % 2 === 0;
+  const col = flash ? '#ffe0e0' : f.color;
+
+  ctx.save();
+  ctx.shadowColor = f.color;
+  ctx.shadowBlur = 4;
+  renderStoredPose({ ...f.smoothPose, facing: f.facing }, col);
+  ctx.restore();
+}
