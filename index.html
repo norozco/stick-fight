@@ -1569,8 +1569,45 @@ class Fighter {
     if(this.state === 'hurt' && this.hitStun === 0) { this.state = 'idle'; this.stateTime = 0; this.stateTimeF = 0; }
     if(this.state === 'stagger' && this.hitStun === 0) { this.state = 'idle'; this.stateTime = 0; this.stateTimeF = 0; }
 
-    if(this.x < 40) { this.x = 40; this.knockback = 0; }
-    if(this.x > W - 40) { this.x = W - 40; this.knockback = 0; }
+    // Wall splat — heavy knockback into a wall sticks the fighter briefly
+    const WALL_SPLAT_KB = 9;
+    if(this.x < 40) {
+      if(Math.abs(this.knockback) >= WALL_SPLAT_KB && this.state === 'hurt') {
+        this.state = 'wallsplat';
+        this.stateTime = 0;
+        this.stateTimeF = 0;
+        this.hitStun = 24;
+        this.vy = 0;
+        this.vx = 0;
+        spawnHitSpark(this.x, this.y - 60, '#ffaa44', 18, 1.6);
+        for(let i = 0; i < 12; i++) spawnDust(this.x + Math.random() * 30, this.y - 30 + Math.random() * 60, 1);
+        shake(8, 12);
+        Audio.heavy();
+      }
+      this.x = 40; this.knockback = 0;
+    }
+    if(this.x > W - 40) {
+      if(Math.abs(this.knockback) >= WALL_SPLAT_KB && this.state === 'hurt') {
+        this.state = 'wallsplat';
+        this.stateTime = 0;
+        this.stateTimeF = 0;
+        this.hitStun = 24;
+        this.vy = 0;
+        this.vx = 0;
+        spawnHitSpark(this.x, this.y - 60, '#ffaa44', 18, 1.6);
+        for(let i = 0; i < 12; i++) spawnDust(this.x - Math.random() * 30, this.y - 30 + Math.random() * 60, -1);
+        shake(8, 12);
+        Audio.heavy();
+      }
+      this.x = W - 40; this.knockback = 0;
+    }
+    // After wall splat ends, slide to ground
+    if(this.state === 'wallsplat' && this.hitStun === 0) {
+      this.state = 'hurt';
+      this.hitStun = 8;
+      this.vy = 4;
+      this.onGround = false;
+    }
 
     // Pushback
     if(opponent) {
