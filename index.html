@@ -3473,24 +3473,23 @@ function endRound(winner) {
       announce(winner === 1 ? 'PLAYER 1 WINS' : (mode === 'cpu' ? 'CPU WINS' : 'PLAYER 2 WINS'), 120);
     }
     setTimeout(() => Audio.say('K O!', { interrupt: true }), 450);
-    // "Finish him!" line if winner has 1 round, loser has 0 (about to clinch)
+    // "One more round!" line if winner has 1 round, loser has 0 (about to clinch)
     if(roundsWon[winner - 1] === 1 && roundsWon[winner === 1 ? 1 : 0] === 0) {
-      setTimeout(() => Audio.say('One more round!'), 1100);
+      setTimeout(() => Audio.say('One more round!', { interrupt: true }), 1700);
     } else if(roundsWon[winner - 1] >= 2) {
       // Achievement: FLAWLESS — winner won 2-0 without losing a round
       const loserIdx = winner === 1 ? 1 : 0;
       const flawless = roundsWon[loserIdx] === 0;
       if(flawless) {
-        setTimeout(() => announce('FLAWLESS VICTORY!', 140), 600);
-        setTimeout(() => Audio.say('Flawless victory!', { interrupt: true }), 700);
+        setTimeout(() => announce('FLAWLESS VICTORY!', 140), 1700);
+        setTimeout(() => Audio.say('Flawless victory!', { interrupt: true }), 1800);
       }
       // Match-winning round — fanfare + voice
       setTimeout(() => {
         if(mode === 'cpu' && winner === 2) Audio.youLose();
         else Audio.youWin();
-      }, 900);
-      setTimeout(() => Audio.say('You win!', { interrupt: true }), flawless ? 2400 : 1500);
-      setTimeout(() => Audio.say(winner === 1 ? 'Player one!' : (mode === 'cpu' ? 'C P U!' : 'Player two!')), flawless ? 3100 : 2200);
+      }, 1200);
+      setTimeout(() => Audio.say('You win!', { interrupt: true }), flawless ? 3500 : 2400);
     }
   }
   setTimeout(() => {
