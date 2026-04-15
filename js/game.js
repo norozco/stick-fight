@@ -341,14 +341,25 @@ function resetRound() {
   lastSecond = performance.now();
   particles.length = 0;
   hitstop = 0;
+  lastHitstop = 0;
+  slowMo = 0;
   shakeMag = 0;
   shakeTime = 0;
   flashTime = 0;
+  flashAlpha = 0;
+  flashColor = '255,255,255';
   ultDarken = 0;
   ultTargetDarken = 0;
   cameraTargetZoom = 1;
   cameraZoom = 1;
   cameraAngle = 0; cameraTargetAngle = 0;
+  // CRITICAL: clear the pan so the new round's camera isn't stuck at the pit.
+  // These were carrying over from the ringout SETTLE phase, sending drawScene
+  // off-screen and leaving only the leftover flash/vignette overlays visible.
+  cameraPanX = 0; cameraPanY = 0;
+  cameraPanTargetX = 0; cameraPanTargetY = 0;
+  cameraX = W / 2; cameraY = H / 2;
+  cameraTargetX = W / 2; cameraTargetY = GROUND - 80;
   groundCracks.length = 0;            // fresh stage each round
   ringoutFighter = null;
   ringoutAnnounced = false;
