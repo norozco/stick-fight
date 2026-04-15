@@ -1874,6 +1874,40 @@ function shake(mag, time) {
   shakeTime = Math.max(shakeTime, time);
 }
 
+// Killer-Instinct-style radial speed lines rushing past the camera.
+// Drawn in SCREEN space (after camera restore) so they emanate from the middle
+// of the canvas regardless of where the fighter is in world space.
+function drawFallSpeedLines(intensity = 1) {
+  const cx = W / 2, cy = H / 2;
+  ctx.save();
+  ctx.lineCap = 'round';
+  const lineCount = 28;
+  for(let i = 0; i < lineCount; i++) {
+    // Each line marches outward from center at a fixed angle, with a phase
+    // offset so they don't all reach the edge at the same time.
+    const angle = (i / lineCount) * Math.PI * 2 + (i * 0.61);
+    const phase = ((globalTime * 0.022 + i * 0.137) % 1);
+    const innerR = 30 + phase * 720;
+    const lineLen = 90 + phase * 260;
+    const cosA = Math.cos(angle), sinA = Math.sin(angle);
+    const x1 = cx + cosA * innerR;
+    const y1 = cy + sinA * innerR;
+    const x2 = cx + cosA * (innerR + lineLen);
+    const y2 = cy + sinA * (innerR + lineLen);
+
+    // Fade in then out: invisible at center, brightest mid-flight, gone at edge
+    const alpha = Math.sin(phase * Math.PI) * 0.55 * intensity;
+    if(alpha < 0.02) continue;
+    ctx.strokeStyle = `rgba(220,220,225,${alpha})`;
+    ctx.lineWidth = 1 + phase * 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 // ============================================================
 // AI
 // ============================================================
