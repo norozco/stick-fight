@@ -466,7 +466,9 @@ class Fighter {
         this.hp = Math.max(0, this.hp - dmg);
         this.hurtFlash = 16;
         this.hitStun = 20;
-        this._throwReleaseKb = -opponent.facing * 14;   // push further away on release
+        // Release in the direction of the throw (forward throw = forward, back throw = behind)
+        const throwDir = opponent.throwDir || -1;
+        this._throwReleaseKb = throwDir * opponent.facing * 14;
         this._throwReleaseUp = -4;
         spawnDamageNumber(this.x, this.y - 110, dmg, '#ff6600', true);
         spawnHitSpark(this.x, this.y - 30, '#ffaa44', 22, 1.8);
@@ -523,7 +525,13 @@ class Fighter {
 
     if(input.lightPressed) this.startAttack('light');
     if(input.heavyPressed) this.startAttack('heavy');
-    if(input.throwPressed) this.startAttack('throw');
+    if(input.throwPressed) {
+      // Directional throw: holding back = toss over shoulder (default);
+      // holding forward (or neutral) = slam forward.
+      const holdingBack = (this.facing === 1 && input.left) || (this.facing === -1 && input.right);
+      this.throwDir = holdingBack ? -1 : 1;
+      this.startAttack('throw');
+    }
     if(input.ultPressed && this.ult >= this.maxUlt && this.state === 'idle') this.startAttack('ult');
     if(input.dashPressed) {
       // Forward/back dash based on held direction; default to forward

@@ -7,6 +7,8 @@
 function lockVictimToThrow(victim, attacker) {
   const t = attacker.stateTime;
   const fc = attacker.facing;
+  // -1 = over-the-shoulder back throw (default); +1 = slam forward
+  const dir = attacker.throwDir || -1;
 
   if(t <= 3) {
     // Caught — victim hovers in front of the attacker
@@ -14,21 +16,30 @@ function lockVictimToThrow(victim, attacker) {
     victim.y = attacker.y - 4;
     victim.throwSpin = 0;
   } else if(t <= 24) {
-    // Single smooth arc — angle sweeps 0 (front) → π (behind)
-    //   x : front → overhead → behind
-    //   y : ground → apex     → ground
     const raw = (t - 3) / 21;
     const p = easeInOutCubic(raw);
-    const angle = p * Math.PI;
-    victim.x = attacker.x + Math.cos(angle) * 62 * fc;
-    victim.y = attacker.y - Math.sin(angle) * 95 - 4;
-    // 360° tumble — starts slow, accelerates through the middle, completes at impact
-    victim.throwSpin = p * Math.PI * 2 * (-fc);
+    if(dir < 0) {
+      // Back throw — single arc front → overhead → behind (original choreography)
+      const angle = p * Math.PI;
+      victim.x = attacker.x + Math.cos(angle) * 62 * fc;
+      victim.y = attacker.y - Math.sin(angle) * 95 - 4;
+      victim.throwSpin = p * Math.PI * 2 * (-fc);
+    } else {
+      // Forward throw — lift them up in front, slam them further forward.
+      //   x : 62 (front) → 84 (further front)
+      //   y : ground → apex → ground
+      const xOff = 62 + p * 22;
+      victim.x = attacker.x + fc * xOff;
+      victim.y = attacker.y - Math.sin(p * Math.PI) * 95 - 4;
+      // Forward somersault in the direction of travel
+      victim.throwSpin = p * Math.PI * 2 * fc;
+    }
   } else {
-    // Landed on the ground behind the attacker
-    victim.x = attacker.x - fc * 62;
+    // Final landed position — behind for back throw, further in front for forward throw
+    const finalX = dir < 0 ? -62 : 84;
+    victim.x = attacker.x + fc * finalX;
     victim.y = attacker.y - 4;
-    victim.throwSpin = Math.PI * 2 * (-fc);
+    victim.throwSpin = Math.PI * 2 * (dir < 0 ? -fc : fc);
   }
 
   // Face the attacker throughout (their body rotates, so direction of the eye dot doesn't matter much)
