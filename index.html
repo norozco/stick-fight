@@ -2223,13 +2223,46 @@ function startGame(m) {
   mode = m;
   if(mode === '2p') document.getElementById('p2name').textContent = 'PLAYER 2';
   document.getElementById('menu').classList.add('hidden');
-  roundsWon = [0, 0];
-  updateRoundDots();
-  p1 = null; p2 = null;
-  resetRound();
-  state = 'playing';
-  lastSecond = performance.now();
-  requestAnimationFrame(loop);
+  // Loading screen → "READY?" → "FIGHT!" then begin
+  showLoadingScreen(() => {
+    roundsWon = [0, 0];
+    updateRoundDots();
+    p1 = null; p2 = null;
+    resetRound();
+    state = 'playing';
+    lastSecond = performance.now();
+    Audio.musicStart(false);
+    requestAnimationFrame(loop);
+  });
+}
+
+function showLoadingScreen(onDone) {
+  const ld = document.getElementById('loading');
+  const bar = document.getElementById('loadbar');
+  const txt = document.getElementById('loadtext');
+  ld.classList.remove('hidden');
+  bar.style.width = '0%';
+  txt.textContent = 'LOADING';
+  let p = 0;
+  const tick = setInterval(() => {
+    p += 4 + Math.random() * 6;
+    if(p >= 100) {
+      p = 100;
+      clearInterval(tick);
+      bar.style.width = '100%';
+      txt.textContent = 'READY?';
+      Audio.ko();   // little jingle for the menu before fight
+      setTimeout(() => {
+        txt.textContent = 'FIGHT!';
+        setTimeout(() => {
+          ld.classList.add('hidden');
+          onDone();
+        }, 500);
+      }, 600);
+    } else {
+      bar.style.width = p + '%';
+    }
+  }, 40);
 }
 
 function updateRoundDots() {
