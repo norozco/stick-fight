@@ -2814,20 +2814,53 @@ function drawDojoPit() {
   }
   ctx.stroke();
 
-  // Wooden walls on either side of the pit (ladder-rung effect)
+  // Tall wooden walls on both sides — packed planks running the full depth
+  ctx.fillStyle = '#3a200c';
+  ctx.fillRect(0, pitTop, 80, 3000);
+  ctx.fillRect(W - 80, pitTop, 80, 3000);
+  // Plank seams scrolling for parallax (visible during fall)
   ctx.fillStyle = '#1a0a04';
-  for(let y = pitTop; y < pitTop + 1400; y += 36) {
-    ctx.fillRect(-200, y, 240, 4);
-    ctx.fillRect(W - 40, y, 240, 4);
+  for(let y = pitTop - 100; y < pitTop + 3000; y += 80) {
+    const offset = ((globalTime * 0.4) % 80);
+    ctx.fillRect(0, y + offset, 80, 4);
+    ctx.fillRect(W - 80, y + offset, 80, 4);
   }
-
+  // Vertical wood grain lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+  ctx.lineWidth = 1;
+  for(let xx = 0; xx < 80; xx += 18) {
+    ctx.beginPath(); ctx.moveTo(xx, pitTop); ctx.lineTo(xx, pitTop + 3000); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W - 80 + xx, pitTop); ctx.lineTo(W - 80 + xx, pitTop + 3000); ctx.stroke();
+  }
+  // Hanging paper lanterns at intervals — clearly dojo
+  for(let i = 0; i < 6; i++) {
+    const ly = pitTop + 220 + i * 250;
+    const lx = (i % 2 === 0) ? 130 : W - 130;
+    // Cord
+    ctx.strokeStyle = '#1a0a04';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(lx, ly - 80); ctx.lineTo(lx, ly); ctx.stroke();
+    // Lantern
+    const flicker = 0.85 + Math.sin(globalTime * 0.1 + i) * 0.15;
+    ctx.fillStyle = `rgba(255,170,80,${flicker})`;
+    ctx.beginPath(); ctx.ellipse(lx, ly + 14, 18, 22, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = `rgba(140,60,20,${flicker})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(lx - 16, ly + 14); ctx.lineTo(lx + 16, ly + 14); ctx.stroke();
+    // Glow halo
+    const lg = ctx.createRadialGradient(lx, ly + 14, 0, lx, ly + 14, 90);
+    lg.addColorStop(0, `rgba(255,200,120,${0.35 * flicker})`);
+    lg.addColorStop(1, 'rgba(255,200,120,0)');
+    ctx.fillStyle = lg;
+    ctx.fillRect(lx - 90, ly - 30, 180, 130);
+  }
   // Floating dust motes
-  for(let i = 0; i < 30; i++) {
-    const dx = (i * 113) % W;
-    const dy = pitTop + ((i * 89 + globalTime * 0.5) % 1400);
+  for(let i = 0; i < 50; i++) {
+    const dx = 90 + (i * 113) % (W - 180);
+    const dy = pitTop + ((i * 89 + globalTime * 1.2) % 1400);
     const f = (Math.sin(globalTime * 0.05 + i) + 1) * 0.5;
-    ctx.fillStyle = `rgba(240,210,160,${0.15 + f * 0.2})`;
-    ctx.fillRect(dx, dy, 1, 1);
+    ctx.fillStyle = `rgba(255,210,160,${0.2 + f * 0.3})`;
+    ctx.fillRect(dx, dy, 2, 2);
   }
 
   // Tatami floor at the bounce depth
