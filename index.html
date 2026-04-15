@@ -3504,7 +3504,9 @@ function loop(now) {
     }
 
     const i1 = getP1Input();
-    const i2 = mode === 'cpu' ? cpuInput(p2, p1) : getP2Input();
+    const i2 = mode === 'cpu' ? cpuInput(p2, p1)
+            : mode === 'training' ? makeInput()      // dummy stands still
+            : getP2Input();
     p1.update(i1, p2);
     p2.update(i2, p1);
 
