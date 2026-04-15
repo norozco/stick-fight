@@ -145,6 +145,8 @@ function triggerRingOut(loser, winningPlayer) {
   loser.ringoutSpinSpeed = (Math.random() * 0.1 + 0.18) * dir;
   loser.beingUlted = 0;
   loser.invuln = 0;
+  loser.ringoutTrail = [];           // KI-style afterimage trail
+  loser.ringoutFinalized = false;    // guards the final-impact effects
 
   // Initial dramatic effects
   slowMo = 60;
@@ -198,6 +200,18 @@ function updateRingout() {
   f.y += f.vy;
   f.ringoutSpin = (f.ringoutSpin || 0) + f.ringoutSpinSpeed;
 
+  // Afterimage trail — capture a position snapshot every other frame while the
+  // fighter is still moving significantly (drop them once we're basically at rest).
+  if(!f.ringoutTrail) f.ringoutTrail = [];
+  const speed = Math.abs(f.vx) + Math.abs(f.vy) + Math.abs(f.ringoutSpinSpeed) * 20;
+  if(ringoutTime % 2 === 0 && speed > 1.2) {
+    f.ringoutTrail.push({ x: f.x, y: f.y, spin: f.ringoutSpin, life: 18 });
+    if(f.ringoutTrail.length > 8) f.ringoutTrail.shift();
+  }
+  // Age out existing trail samples
+  for(const s of f.ringoutTrail) s.life--;
+  f.ringoutTrail = f.ringoutTrail.filter(s => s.life > 0);
+
   // Bounce off the pit floor
   f.ringoutBounces = f.ringoutBounces || 0;
   f.ringoutRestTime = f.ringoutRestTime || 0;
@@ -248,6 +262,51 @@ function updateRingout() {
       if(Math.abs(f.vx) < 0.15) f.vx = 0;
       if(Math.abs(f.ringoutSpinSpeed) < 0.01) f.ringoutSpinSpeed = 0;
       f.ringoutRestTime++;
+
+      // --- Killer-Instinct finalizer: fires once when the ragdoll lands ---
+      if(!f.ringoutFinalized) {
+        f.ringoutFinalized = true;
+        // Dramatic freeze-frame on impact
+        hitstop = 14;
+        shake(22, 30);
+        flashTime = 22;
+        flashAlpha = 0.85;
+        flashColor = '255,80,60';
+        // Expanding shockwave ring
+        const stageId = currentStage && currentStage.id;
+        const ringColor = stageId === 'inferno' ? '#ffcc66'
+                        : stageId === 'dojo'    ? '#ffd9a0'
+                        : '#c8d8ff';
+        for(let r = 0; r < 3; r++) {
+          spawnParticle({
+            type: 'ring',
+            x: f.x, y: PIT_FLOOR,
+            vx: 0, vy: 0,
+            life: 40 + r * 6, maxLife: 40 + r * 6,
+            size: 10 + r * 4,
+            power: 4 + r,
+            color: ringColor,
+          });
+        }
+        // Secondary debris burst
+        for(let i = 0; i < 40; i++) {
+          const ang = Math.random() * Math.PI - Math.PI;    // mostly upward
+          spawnParticle({
+            type: 'spark',
+            x: f.x + (Math.random() - 0.5) * 50,
+            y: PIT_FLOOR - 2,
+            vx: Math.cos(ang) * (Math.random() * 10 + 2),
+            vy: Math.sin(ang) * (Math.random() * 9 + 4) - 4,
+            life: 36, maxLife: 36,
+            size: Math.random() * 3 + 2,
+            color: ringColor,
+            grav: 0.35,
+          });
+        }
+        // KI-style text overlay
+        announce('ULTRA K.O.!', 120);
+        Audio.ultFinisher();
+      }
     }
   }
 

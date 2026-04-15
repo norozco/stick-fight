@@ -568,15 +568,39 @@ function drawLimb(a, b) {
 }
 
 function drawFighter(f) {
-  // Ring-out: render the fighter as a clean tumbling silhouette, no trail/glow
+  // Ring-out: render the fighter as a clean tumbling silhouette, no trail/glow.
+  // KI-style additions: afterimage echo, distance-based scale shrink.
   if(f.state === 'ringout') {
-    ctx.save();
-    ctx.translate(f.x, f.y - 55);
-    ctx.rotate(f.ringoutSpin || 0);
-    ctx.translate(-f.x, -(f.y - 55));
     const target = computeTargetPose(f);
     if(!f.smoothPose) f.smoothPose = clonePose(target);
     smoothPose(f.smoothPose, target, 0.4);
+
+    // Perspective shrink — farther into the pit = smaller on screen
+    const pitProgress = Math.max(0, Math.min(1, (f.y - GROUND) / 900));
+    const scale = 1 - pitProgress * 0.28;
+
+    // Afterimage trail — draw oldest → newest, each slightly transparent.
+    if(f.ringoutTrail && f.ringoutTrail.length) {
+      for(const s of f.ringoutTrail) {
+        const a = (s.life / 18) * 0.35;
+        if(a < 0.02) continue;
+        ctx.save();
+        ctx.globalAlpha = a;
+        const sScale = 1 - Math.max(0, Math.min(1, (s.y - GROUND) / 900)) * 0.28;
+        ctx.translate(s.x, s.y - 55);
+        ctx.scale(sScale, sScale);
+        ctx.rotate(s.spin || 0);
+        ctx.translate(-s.x, -(s.y - 55));
+        renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
+        ctx.restore();
+      }
+    }
+
+    ctx.save();
+    ctx.translate(f.x, f.y - 55);
+    ctx.scale(scale, scale);
+    ctx.rotate(f.ringoutSpin || 0);
+    ctx.translate(-f.x, -(f.y - 55));
     renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
     ctx.restore();
     return;
