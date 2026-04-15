@@ -2532,11 +2532,20 @@ function endRound(winner) {
   slowMo = 50;
   shake(14, 22);
 
-  if(winner === 0) announce('DRAW', 120);
-  else {
+  if(winner === 0) {
+    announce('DRAW', 120);
+    Audio.say('Draw!', { interrupt: true });
+  } else {
     roundsWon[winner - 1]++;
     updateRoundDots();
     announce(winner === 1 ? 'PLAYER 1 WINS' : (mode === 'cpu' ? 'CPU WINS' : 'PLAYER 2 WINS'), 120);
+    setTimeout(() => Audio.say('K O!', { interrupt: true }), 80);
+    // "Finish him!" line if winner has 1 round, loser has 0 (about to clinch)
+    if(roundsWon[winner - 1] === 1 && roundsWon[winner === 1 ? 1 : 0] === 0) {
+      setTimeout(() => Audio.say('One more round!'), 1100);
+    } else if(roundsWon[winner - 1] >= 2) {
+      setTimeout(() => Audio.say(winner === 1 ? 'Player one wins!' : (mode === 'cpu' ? 'C P U wins!' : 'Player two wins!')), 1100);
+    }
   }
   setTimeout(() => {
     if(roundsWon[0] >= 2 || roundsWon[1] >= 2) {
