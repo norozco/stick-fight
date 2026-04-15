@@ -1118,6 +1118,54 @@ function currentUltHit(frame) {
   return null;
 }
 
+// Lock a grabbed victim to the attacker's throw choreography (grab → swing → slam)
+// 55-frame sequence:
+//   0-4   : startup lunge
+//   4-14  : grab window (box active)
+//   14-22 : lift — victim rises in the attacker's hand
+//   22-32 : swing — attacker rotates opponent over their head
+//   32-40 : slam — opponent hurled toward the ground past the attacker
+//   40-55 : recovery
+function lockVictimToThrow(victim, attacker) {
+  const t = attacker.stateTime;
+  const fc = attacker.facing;
+  if(t < 14) {
+    // Grabbed — victim hovers right in front of attacker at chest height
+    victim.x = attacker.x + fc * 42;
+    victim.y = attacker.y - 8;
+    victim.facing = -fc;
+  } else if(t < 22) {
+    // Lift up — radius grows as attacker raises them
+    const p = (t - 14) / 8;
+    const angle = lerp(0, Math.PI * 0.25, p);      // start front, up slightly
+    const radius = lerp(44, 58, p);
+    victim.x = attacker.x + Math.cos(angle) * radius * fc;
+    victim.y = attacker.y - 30 - p * 30;
+    victim.facing = -fc;
+  } else if(t < 32) {
+    // Swing over the attacker's head — arc through 180°
+    const p = (t - 22) / 10;
+    const angle = lerp(Math.PI * 0.25, Math.PI * 1.15, easeOutCubic(p));
+    const radius = 60;
+    victim.x = attacker.x + Math.cos(angle) * radius * fc;
+    victim.y = attacker.y - 70 - Math.sin(angle) * 20;
+    victim.facing = fc;                             // face away as they swing past
+  } else if(t < 40) {
+    // Slam — arc down past the attacker with high velocity
+    const p = (t - 32) / 8;
+    victim.x = attacker.x - fc * lerp(40, 110, p);
+    victim.y = attacker.y - lerp(80, 5, easeInQuad(p));
+    victim.facing = fc;
+  }
+  victim.vx = 0;
+  victim.vy = 0;
+  victim.knockback = 0;
+  victim.knockUp = 0;
+  victim.onGround = false;
+  if(victim.x < 40) victim.x = 40;
+  if(victim.x > W - 40) victim.x = W - 40;
+}
+
 // Force the victim to follow the attacker's ult choreography so every hit connects
 function lockVictimToUlt(victim, attacker) {
   const t = attacker.stateTime;
