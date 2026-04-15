@@ -424,11 +424,9 @@ function loop(now) {
       if(p1.hp <= 0 && p2.hp <= 0) {
         endRound(0);
       } else if(p1.hp <= 0) {
-        if(canRingOut(p1, 2)) triggerRingOut(p1, 2);
-        else startReplay(2);
+        handleKO(p1, p2, 2);
       } else if(p2.hp <= 0) {
-        if(canRingOut(p2, 1)) triggerRingOut(p2, 1);
-        else startReplay(1);
+        handleKO(p2, p1, 1);
       }
     }
   } else if(state === 'ringout' && doUpdate) {
