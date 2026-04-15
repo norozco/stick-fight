@@ -6,6 +6,20 @@ const Audio = (() => {
   let ctx;
   let muted = false;
   let masterSfxGain = null;
+  // Warm up SpeechSynthesis voice list — Chrome populates it asynchronously.
+  let _voices = [];
+  function _loadVoices() {
+    try { _voices = (window.speechSynthesis && speechSynthesis.getVoices()) || []; } catch(e){}
+  }
+  if(typeof window !== 'undefined' && window.speechSynthesis) {
+    _loadVoices();
+    speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', _loadVoices);
+    // Fallback for older browsers
+    if(speechSynthesis.onvoiceschanged !== undefined) {
+      const prev = speechSynthesis.onvoiceschanged;
+      speechSynthesis.onvoiceschanged = function(){ _loadVoices(); if(typeof prev === 'function') prev.apply(this, arguments); };
+    }
+  }
   function ensure() {
     if(!ctx) {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -387,25 +401,31 @@ const Audio = (() => {
       setTimeout(() => beep(330, 0.2, 'square', 0.14, 82), 150);
       setTimeout(() => beep(180, 0.5, 'sawtooth', 0.16, 50), 320);
     },
-    // Voice announcer — energetic but clear. Pass opts.character for per-fighter voice.
+    // Voice announcer — energetic but clear. Pass opts.character for per-fighter voice,
+    // or just let the text itself decide (e.g. "Aurora" / "Aurora Storm!" -> mature female).
     say: (text, opts = {}) => {
       if(muted) return;
       try {
         if(window.speechSynthesis) {
           if(opts.interrupt) speechSynthesis.cancel();
           const u = new SpeechSynthesisUtterance(text);
-          // Per-character voice profile
-          const voices = speechSynthesis.getVoices();
+          // Make sure we have an up-to-date voice list (Chrome loads async).
+          if(!_voices.length) _loadVoices();
+          const voices = _voices;
+          const isAurora = opts.character === 'aurora' || /\baurora\b/i.test(text || '');
           let preferred = null;
           let defPitch = 1.25, defRate = 1.02;
-          if(opts.character === 'aurora') {
-            // Mature/older female tone — still clearly female, just lower and slower.
-            defPitch = 0.88;
-            defRate  = 0.93;
-            preferred = voices.find(v => /(hazel|susan|serena|moira|tessa|fiona|karen|catherine|veena)/i.test(v.name))
-                     || voices.find(v => /en-gb/i.test(v.lang) && /(female|woman)/i.test(v.name))
+          if(isAurora) {
+            // Mature/older female tone — clearly female, distinctly lower & slower.
+            defPitch = 0.80;
+            defRate  = 0.90;
+            preferred = voices.find(v => /(hazel|susan|serena|moira|tessa|fiona|karen|catherine|veena|kate|libby|sonia)/i.test(v.name))
                      || voices.find(v => /google uk english female/i.test(v.name))
-                     || voices.find(v => /en-gb/i.test(v.lang));
+                     || voices.find(v => /en-gb/i.test(v.lang) && /(female|woman)/i.test(v.name))
+                     || voices.find(v => /en-gb/i.test(v.lang))
+                     || voices.find(v => /en-au/i.test(v.lang) && /(female|woman)/i.test(v.name))
+                     // Last resort — any female-sounding English voice, we'll lower its pitch.
+                     || voices.find(v => /^en/i.test(v.lang) && /(female|woman|zira|aria|samantha)/i.test(v.name));
           }
           if(!preferred) {
             preferred = voices.find(v => /(zira|aria|samantha|google us english)/i.test(v.name))
