@@ -207,8 +207,19 @@
 
 <div id="over" class="overlay hidden">
   <div id="winner"></div>
-  <button onclick="location.reload()">PLAY AGAIN</button>
+  <button onclick="playAgain()">PLAY AGAIN</button>
+  <button class="ghost" onclick="backToMenu()">MAIN MENU</button>
 </div>
+
+<div id="loading" class="overlay hidden">
+  <div id="loadtext" style="font-size:42px;font-weight:900;letter-spacing:8px;color:#ffcc00;text-shadow:0 0 20px rgba(255,204,0,0.5);">LOADING</div>
+  <div style="width:380px;height:14px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);border-radius:3px;overflow:hidden;margin-top:24px;">
+    <div id="loadbar" style="height:100%;background:linear-gradient(90deg,#ff3860,#ffcc00);width:0%;transition:width 0.06s linear;box-shadow:0 0 12px #ff3860;"></div>
+  </div>
+  <div style="margin-top:30px;color:rgba(255,255,255,0.4);font-size:12px;letter-spacing:3px;">PREPARING FIGHTERS</div>
+</div>
+
+<button id="muteBtn" title="Mute (M)" onclick="toggleMute()" style="position:fixed;top:14px;right:14px;z-index:20;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:6px 12px;font-size:12px;letter-spacing:2px;border-radius:4px;font-weight:700;cursor:pointer;box-shadow:none;">SOUND ON</button>
 
 <script>
 // ============================================================
