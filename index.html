@@ -819,11 +819,10 @@ const Audio = (() => {
         if(window.speechSynthesis) {
           if(opts.interrupt) speechSynthesis.cancel();
           const u = new SpeechSynthesisUtterance(text);
-          u.pitch = opts.pitch != null ? opts.pitch : 1.05;   // very slightly above neutral
-          u.rate  = opts.rate  != null ? opts.rate  : 1.0;    // natural speed
+          u.pitch = opts.pitch != null ? opts.pitch : 1.25;   // hyped but not distorted
+          u.rate  = opts.rate  != null ? opts.rate  : 1.02;
           u.volume= opts.volume!= null ? opts.volume: 1.0;
           const voices = speechSynthesis.getVoices();
-          // Prefer well-known clean energetic English voices
           const preferred = voices.find(v => /(zira|aria|samantha|google us english)/i.test(v.name))
                          || voices.find(v => /en-us/i.test(v.lang) && /(female|woman)/i.test(v.name))
                          || voices.find(v => /en-us/i.test(v.lang))
