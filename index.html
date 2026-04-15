@@ -2462,6 +2462,7 @@ function getP1Input() {
   i.block = !!keys['s'];
   i.lightPressed = !!keyPressed['f'];
   i.heavyPressed = !!keyPressed['g'];
+  i.throwPressed = !!keyPressed['t'];
   i.dashPressed = !!keyPressed['q'];
   i.ultPressed = !!keyPressed['r'];
   return i;
@@ -2474,6 +2475,7 @@ function getP2Input() {
   i.block = !!keys['arrowdown'];
   i.lightPressed = !!keyPressed['k'];
   i.heavyPressed = !!keyPressed['l'];
+  i.throwPressed = !!keyPressed["'"];
   i.dashPressed = !!keyPressed[';'];
   i.ultPressed = !!keyPressed['enter'];
   return i;
