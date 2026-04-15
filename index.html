@@ -2502,6 +2502,10 @@ function loop(now) {
     p1.update(i1, p2);
     p2.update(i2, p1);
 
+    // Intensify music when either fighter drops below 30% HP
+    const lowHp = (p1.hp / p1.maxHp < 0.3) || (p2.hp / p2.maxHp < 0.3);
+    Audio.musicSetIntense(lowHp);
+
     if(p1.hp <= 0 && p2.hp <= 0) {
       endRound(0);
     } else if(p1.hp <= 0) {
