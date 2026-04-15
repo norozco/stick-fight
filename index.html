@@ -642,45 +642,66 @@ function currentUltHit(frame) {
   return null;
 }
 
-// Lock a grabbed victim to the attacker's throw choreography (grab → swing → slam)
+// Lock a grabbed victim to the attacker's OVER-THE-SHOULDER throw
+// (classic ippon-seoi-nage — over-the-head flip, slam behind attacker)
 // 55-frame sequence:
-//   0-4   : startup lunge
-//   4-14  : grab window (box active)
-//   14-22 : lift — victim rises in the attacker's hand
-//   22-32 : swing — attacker rotates opponent over their head
-//   32-40 : slam — opponent hurled toward the ground past the attacker
-//   40-55 : recovery
+//   0-4   : startup lunge (attacker reaches out)
+//   4-14  : grab window — victim hovers in front, caught
+//   14-22 : lift — victim hoisted overhead (angle sweeps front → overhead)
+//   22-34 : swing — full arc OVER the attacker's head (angle π/2 → 3π/2)
+//   34-42 : slam — victim crashes to the ground BEHIND attacker
+//   42-55 : recovery (attacker recovers, victim settles)
+// Victim also spins head-over-heels during the arc via `throwSpin`.
 function lockVictimToThrow(victim, attacker) {
   const t = attacker.stateTime;
   const fc = attacker.facing;
+  // Default — no spin
+  victim.throwSpin = 0;
+
   if(t < 14) {
-    // Grabbed — victim hovers right in front of attacker at chest height
-    victim.x = attacker.x + fc * 42;
-    victim.y = attacker.y - 8;
+    // Grabbed — victim is held in front of attacker at chest height
+    victim.x = attacker.x + fc * 44;
+    victim.y = attacker.y - 2;
     victim.facing = -fc;
+    victim.throwSpin = 0;
   } else if(t < 22) {
-    // Lift up — radius grows as attacker raises them
+    // Hoist — sweep arc from front (angle 0) up to directly overhead (π/2)
     const p = (t - 14) / 8;
-    const angle = lerp(0, Math.PI * 0.25, p);      // start front, up slightly
+    const angle = lerp(0, Math.PI * 0.5, easeOutCubic(p));
     const radius = lerp(44, 58, p);
     victim.x = attacker.x + Math.cos(angle) * radius * fc;
-    victim.y = attacker.y - 30 - p * 30;
+    victim.y = attacker.y - Math.sin(angle) * radius - 6;
     victim.facing = -fc;
-  } else if(t < 32) {
-    // Swing over the attacker's head — arc through 180°
-    const p = (t - 22) / 10;
-    const angle = lerp(Math.PI * 0.25, Math.PI * 1.15, easeOutCubic(p));
-    const radius = 60;
+    // Starts rotating as they leave the ground
+    victim.throwSpin = lerp(0, Math.PI * 0.5 * fc, p);
+  } else if(t < 34) {
+    // Swing OVER the shoulder — arc from overhead (π/2) to behind (3π/2)
+    const p = (t - 22) / 12;
+    const angle = lerp(Math.PI * 0.5, Math.PI * 1.6, easeInOutCubic(p));
+    const radius = lerp(58, 48, p);
     victim.x = attacker.x + Math.cos(angle) * radius * fc;
-    victim.y = attacker.y - 70 - Math.sin(angle) * 20;
-    victim.facing = fc;                             // face away as they swing past
-  } else if(t < 40) {
-    // Slam — arc down past the attacker with high velocity
-    const p = (t - 32) / 8;
-    victim.x = attacker.x - fc * lerp(40, 110, p);
-    victim.y = attacker.y - lerp(80, 5, easeInQuad(p));
+    victim.y = attacker.y - Math.sin(angle) * radius - 6;
+    victim.facing = fc;
+    // Full 360° tumble across the swing — head-over-heels
+    victim.throwSpin = lerp(Math.PI * 0.5, Math.PI * 2.2, easeInOutCubic(p)) * fc;
+  } else if(t < 42) {
+    // Slam — victim crashes DOWN into the ground behind attacker
+    const p = (t - 34) / 8;
+    const angle = lerp(Math.PI * 1.6, Math.PI * 2.0, p);  // finish arc into ground
+    const radius = lerp(48, 70, p);
+    victim.x = attacker.x + Math.cos(angle) * radius * fc;
+    victim.y = Math.min(attacker.y, lerp(attacker.y - Math.sin(angle) * radius - 6, attacker.y - 6, p));
+    // Final quarter-turn as they land
+    victim.throwSpin = lerp(Math.PI * 2.2, Math.PI * 2.5, p) * fc;
+    victim.facing = fc;
+  } else {
+    // Recovery — on the ground behind attacker
+    victim.x = attacker.x - fc * 70;
+    victim.y = attacker.y - 6;
+    victim.throwSpin = 0;
     victim.facing = fc;
   }
+
   victim.vx = 0;
   victim.vy = 0;
   victim.knockback = 0;
