@@ -2093,6 +2093,12 @@ function drawFighter(f) {
 // BACKGROUND
 // ============================================================
 function drawScene() {
+  if(currentStage && currentStage.id === 'dojo')    return drawDojoStage();
+  if(currentStage && currentStage.id === 'inferno') return drawInfernoStage();
+  return drawTwilightStage();
+}
+
+function drawTwilightStage() {
   const grad = ctx.createLinearGradient(0, 0, 0, H);
   grad.addColorStop(0, '#141a2e');
   grad.addColorStop(0.5, '#2a3050');
