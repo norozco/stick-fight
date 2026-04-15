@@ -238,6 +238,14 @@ let cameraZoom = 1;
 let cameraTargetZoom = 1;
 let cameraX = 0, cameraY = 0;
 let cameraTargetX = 0, cameraTargetY = 0;
+let cameraPanX = 0, cameraPanY = 0;           // extra pan for ring-out cinematic
+let cameraPanTargetX = 0, cameraPanTargetY = 0;
+
+// Ring-out cinematic state
+let ringoutFighter = null;
+let ringoutWinner = 0;
+let ringoutTime = 0;
+let ringoutAnnounced = false;
 
 const keys = {};
 const keyPressed = {};
