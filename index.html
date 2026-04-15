@@ -271,6 +271,12 @@
 
 <button id="muteBtn" title="Mute (M)" onclick="toggleMute()" style="position:fixed;top:14px;right:14px;z-index:20;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:6px 12px;font-size:12px;letter-spacing:2px;border-radius:4px;font-weight:700;cursor:pointer;box-shadow:none;">SOUND ON</button>
 
+<!-- External modules. Load order matters. -->
+<!-- audio.js  — sound effects, music engine, voice announcer -->
+<!-- stages.js — per-stage background + ring-out pit drawing -->
+<script src="js/audio.js"></script>
+<script src="js/stages.js"></script>
+
 <script>
 // ============================================================
 //  STICK FIGHT ARENA — Smooth Edition
