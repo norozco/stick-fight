@@ -315,10 +315,10 @@ function updateRingout() {
             grav: 0.32,
           });
         }
-        // ULTRA K.O. — text + voice + sound stinger
+        // ULTRA K.O. — text + sound stinger. Voice already fired in APPROACH
+        // (3 frames before this moment) so TTS latency aligns with the flash.
         announce('ULTRA K.O.!', 120);
         Audio.ultFinisher();
-        try { Audio.say('Ultra K O!', { interrupt: true }); } catch(e){}
       }
       break;
     }
