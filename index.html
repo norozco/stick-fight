@@ -2507,6 +2507,7 @@ function updateRingout() {
   // Announce after initial burst
   if(ringoutTime === 18 && !ringoutAnnounced) {
     ringoutAnnounced = true;
+    Audio.say('K O!', { interrupt: true });
     announce('K.O.!', 140);
     flashTime = 14;
     flashAlpha = 0.5;
