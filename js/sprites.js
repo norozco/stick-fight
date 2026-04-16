@@ -67,8 +67,47 @@ function shadedLimb(x1,y1,x2,y2,w,light,dark,outline){
     _s.lineTo(x2-nx*w/2,y2-ny*w/2);_s.lineTo(x1-nx*w/2,y1-ny*w/2);_s.closePath();_s.stroke();}
 }
 
+// Pixel face helper — draws a detailed face at head position
+// Eyes with whites + iris + pupil + highlight, nose, mouth, eyebrows
+function pixelFace(bx, hY, opts) {
+  const {eyeColor,eyeW,eyeH,browColor,browAngle,mouthW,mouthColor,mouthY,noseColor,skinDark,outline,expression} = opts;
+  const out = outline || '#1a1020';
+  // Left eye
+  sf(bx-7, hY-3, eyeW+2, eyeH+2, '#ffffff');    // white
+  sf(bx-6, hY-2, eyeW, eyeH, eyeColor);          // iris
+  sf(bx-5, hY-1, 2, 2, out);                      // pupil
+  sf(bx-6, hY-3, 1, 1, '#ffffff');                 // highlight
+  // Right eye
+  sf(bx+3, hY-3, eyeW+2, eyeH+2, '#ffffff');
+  sf(bx+4, hY-2, eyeW, eyeH, eyeColor);
+  sf(bx+5, hY-1, 2, 2, out);
+  sf(bx+4, hY-3, 1, 1, '#ffffff');
+  // Eyebrows
+  const ba = browAngle || 0;
+  sl(bx-8, hY-6+ba, bx-3, hY-7, 2, browColor || out);
+  sl(bx+2, hY-7, bx+7, hY-6-ba, 2, browColor || out);
+  // Nose
+  sf(bx-1, hY+2, 2, 2, noseColor || skinDark || '#c0a090');
+  // Mouth
+  const my = mouthY || 6;
+  if(expression === 'smile') {
+    sl(bx-2, hY+my, bx+2, hY+my+1, 1.5, mouthColor || '#c08080');
+    sf(bx-1, hY+my, 3, 1, mouthColor || '#c08080');
+  } else if(expression === 'grimace') {
+    sf(bx-3, hY+my, mouthW||6, 2, mouthColor || out);
+    sf(bx-2, hY+my, 2, 1, '#ffffff');  // teeth
+    sf(bx+1, hY+my, 2, 1, '#ffffff');
+  } else if(expression === 'serious') {
+    sf(bx-2, hY+my, mouthW||4, 1.5, mouthColor || '#a07060');
+  } else if(expression === 'hidden') {
+    // no mouth (Noir's face is in shadow)
+  } else {
+    sf(bx-2, hY+my, mouthW||4, 1.5, mouthColor || '#c08080');
+  }
+}
+
 // ============================================================
-// AURORA — elegant ice princess
+// AURORA — elegant ice princess, BIG HEAD, visible face
 // ============================================================
 function drawAurora(cx,gy,o){
   const L=o.lean||0,bx=cx+L;
