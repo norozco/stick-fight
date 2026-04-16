@@ -1007,6 +1007,12 @@ function loop(now) {
   ctx.fillStyle = vg;
   ctx.fillRect(0, 0, W, H);
 
+  // CRT scanline overlay — subtle horizontal lines for retro SNES feel
+  ctx.fillStyle = 'rgba(0,0,0,0.06)';
+  for(let y = 0; y < H; y += 3) {
+    ctx.fillRect(0, y, W, 1);
+  }
+
   // Killer-Instinct void: radial speed lines + dark overlay during ring-out.
   // Intensity is driven by the ring-out PHASE (no more bounce-count physics).
   if(state === 'ringout' && ringoutFighter) {
