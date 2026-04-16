@@ -17,41 +17,111 @@ function shadedLimb(x1,y1,x2,y2,w,l,d,o){const dx=x2-x1,dy=y2-y1,ln=Math.sqrt(dx
 function gp(a,f,t){const p=t>1?f/(t-1):0;const o={hY:0,lean:0,lAA:0,rAA:0,lLS:0,rLS:0,lFL:0,rFL:0,rAE:0,lAE:0};if(a==='idle'){o.hY=Math.sin(p*Math.PI*2)*2.5;}else if(a==='walk'){const s=Math.sin(p*Math.PI*2);o.lLS=-s*12;o.rLS=s*12;o.lFL=Math.max(0,s)*8;o.rFL=Math.max(0,-s)*8;o.lAA=s*0.6;o.rAA=-s*0.6;o.lean=3;}else if(a==='attack_light'){o.rAE=(p<0.5?p*2:2-p*2)*35;o.lean=5;}else if(a==='attack_heavy'){if(p<0.35){o.rAA=-1.4;o.lean=-6;}else{o.rAE=((p-0.35)/0.65)*42;o.lean=8;}}else if(a==='hurt'){o.lean=-8;o.hY=4;}else if(a==='jump'){o.lFL=12;o.rFL=14;o.hY=-5;}else if(a==='block'){o.lAA=-1.2;o.rAA=-0.8;o.lean=-3;}else if(a==='dash'){o.lean=12;o.lLS=-16;}else if(a==='attack_ult'){if(p<0.25){o.rAA=-1.7;o.lean=-7;}else if(p<0.65){o.rAE=40;o.lean=10;}else{o.rAA=-2;o.lean=11;o.hY=-4;}}else if(a==='attack_throw'){if(p<0.3){o.rAE=28;o.lAE=28;}else{o.rAA=-Math.PI*((p-0.3)/0.7);o.rAE=22;}}return o;}
 function pixelFace(bx,hY,opts){const{eyeColor,eyeW,eyeH,browColor,browAngle,mouthW,mouthColor,mouthY,noseColor,skinDark,outline,expression}=opts;const o=outline||'#1a1020';sf(bx-8,hY-4,eyeW+3,eyeH+2,'#ffffff');sf(bx-7,hY-3,eyeW,eyeH,eyeColor);sf(bx-6,hY-2,2,2,o);sf(bx-7,hY-4,1,1,'#ffffff');sf(bx+3,hY-4,eyeW+3,eyeH+2,'#ffffff');sf(bx+4,hY-3,eyeW,eyeH,eyeColor);sf(bx+5,hY-2,2,2,o);sf(bx+4,hY-4,1,1,'#ffffff');sl(bx-9,hY-7+browAngle,bx-3,hY-8,2,browColor||o);sl(bx+2,hY-8,bx+8,hY-7-browAngle,2,browColor||o);sf(bx-1,hY+2,3,2,noseColor||skinDark||'#c0a090');const my=mouthY||7;if(expression==='smile'){sf(bx-2,hY+my,5,2,mouthColor||'#d09090');sf(bx-1,hY+my,3,1,'#e8a0a0');}else if(expression==='grimace'){sf(bx-3,hY+my,mouthW||7,3,mouthColor||o);sf(bx-2,hY+my+1,2,1,'#ffffff');sf(bx+1,hY+my+1,2,1,'#ffffff');}else if(expression==='serious'){sf(bx-2,hY+my,mouthW||5,2,mouthColor||'#a07060');}else if(expression!=='hidden'){sf(bx-2,hY+my,mouthW||5,2,mouthColor||'#c08080');}}
 
-// AURORA
-function drawAurora(cx,gy,o){const L=o.lean||0,bx=cx+L;const sk='#f2ddd0',skDk='#d4b8a8',skLt='#fff0e8',hair='#80d8ee',hairDk='#50a8cc',hairLt='#b0f0ff';const top='#3a78b0',topDk='#224870',topLt='#5898d0',topVLt='#78b8e0';const bot='#2a5880',boot='#1a3860',out='#102838',acc='#60ccee',accLt='#90e0ff';
-for(let i=0;i<30;i++){const sw=Math.sin(i*0.2+L*0.05)*5;const w=Math.max(2,8-i/4);sf(bx-4+sw-L*0.3,gy-86+i*2.8,w,3,i%5===0?hairLt:i%3===0?hairDk:hair);}
-sc(bx-3,gy-84,3,acc);sc(bx-3,gy-84,1.5,accLt);
-_s.fillStyle='rgba(58,120,176,0.14)';_s.beginPath();_s.moveTo(bx-8,gy-76);_s.quadraticCurveTo(bx-18-L*3,gy-28,bx-12-L*4,gy+5);_s.lineTo(bx+8,gy+5);_s.quadraticCurveTo(bx+10,gy-28,bx+8,gy-76);_s.closePath();_s.fill();_s.strokeStyle=acc+'30';_s.lineWidth=1;_s.stroke();
-const lx=bx-8+(o.lLS||0),ly=gy-(o.lFL||0),rx=bx+8+(o.rLS||0),ry=gy-(o.rFL||0);
-shadedLimb(bx-4,gy-44,lx,ly,11,topDk,bot,out);shadedLimb(bx+4,gy-44,rx,ry,11,topDk,bot,out);
-sl(bx-7,gy-44,bx-1,gy-44,1.5,acc);sl(bx+1,gy-44,bx+7,gy-44,1.5,acc);
-se((bx-4+lx)/2,(gy-44+ly)/2,5,4,acc+'40');se((bx+4+rx)/2,(gy-44+ry)/2,5,4,acc+'40');
-sf(lx-5,ly-3,12,6,boot);sf(lx-5,ly-3,12,1.5,out);sl(lx-4,ly+1,lx+7,ly+1,1,acc+'50');sf(lx+3,ly-5,3,5,boot);
-sf(rx-5,ry-3,12,6,boot);sf(rx-5,ry-3,12,1.5,out);sl(rx-4,ry+1,rx+7,ry+1,1,acc+'50');sf(rx+3,ry-5,3,5,boot);
-const nY=gy-78,pY=gy-44;se(bx,pY,14,7,bot);
-_s.fillStyle=topDk;_s.beginPath();_s.moveTo(bx-12,pY-2);_s.lineTo(bx+12,pY-2);_s.lineTo(bx+14,pY+6);_s.lineTo(bx-14,pY+6);_s.closePath();_s.fill();sf(bx-12,pY-2,24,1.5,acc);sf(bx-1,pY+1,3,5,topDk);
-sf(bx-7,pY-14,14,14,top);st(bx,pY-14,14,bx,nY,18,top,out);
-for(let i=0;i<4;i++){sl(bx-1,nY+4+i*6,bx+1,nY+7+i*6,1,acc+'60');}
-sf(bx-9,nY,9,pY-nY,topDk+'50');sl(bx+5,nY+4,bx+4,pY-8,1.5,topVLt+'50');
-_s.fillStyle=sk;_s.beginPath();_s.moveTo(bx,nY+2);_s.lineTo(bx-6,nY+14);_s.lineTo(bx+6,nY+14);_s.closePath();_s.fill();
-sl(bx,nY+2,bx-6,nY+14,1.5,acc);sl(bx,nY+2,bx+6,nY+14,1.5,acc);
-sl(bx-6,nY+6,bx-9,nY+2,1,accLt+'40');sl(bx+6,nY+6,bx+9,nY+2,1,accLt+'40');
-sf(bx-9,pY-2,18,3,acc);se(bx,pY-1,3,3,'#fff');sc(bx,pY-1,1.5,acc);
-const sY=nY+4;const lax=bx-18-(o.lAE||0),lay=sY+22+Math.sin(o.lAA||0)*14;const rax=bx+18+(o.rAE||0),ray=sY+22+Math.sin(o.rAA||0)*14;
-shadedLimb(bx-9,sY,lax,lay,8,top,topDk,out);sl(lax-1,lay-1,lax+3,lay-1,2.5,acc);
-shadedLimb(lax,lay,lax-4,lay+14,7,sk,skDk,out);sl(lax-2,lay+6,lax+1,lay+6,2,accLt);sc(lax,lay+6,1.5,'#fff');
-sc(lax-4,lay+17,4.5,sk);sc(lax-4,lay+17,4.5,out+'25');
-shadedLimb(bx+9,sY,rax,ray,8,top,topDk,out);sl(rax-1,ray-1,rax+3,ray-1,2.5,acc);
-shadedLimb(rax,ray,rax+4,ray+14,7,sk,skDk,out);sl(rax,ray+6,rax+3,ray+6,2,accLt);sc(rax+2,ray+6,1.5,'#fff');
-sc(rax+4,ray+17,4.5,sk);sc(rax+4,ray+17,4.5,out+'25');
-const hY=nY-18+(o.hY||0);sf(bx-3,nY-5,7,7,sk);sc(bx,hY,17,sk);sc(bx,hY,17.5,out+'25');
-se(bx-14,hY+1,3,4,sk);se(bx+14,hY+1,3,4,sk);sc(bx-14,hY+5,2,acc);sc(bx-14,hY+5,1,'#fff');sc(bx+14,hY+5,2,acc);sc(bx+14,hY+5,1,'#fff');
-se(bx,hY-12,16,8,hair);se(bx-5,hY-13,8,5,hairDk);se(bx+8,hY-10,6,4,hairLt);sf(bx-12,hY-6,7,5,hairDk);sf(bx+9,hY-4,6,4,hair);
-sl(bx-8,hY-14,bx-10,hY-30,3,acc);sl(bx-4,hY-15,bx-5,hY-26,2.5,accLt);sl(bx,hY-16,bx,hY-34,4,'#c0f4ff');sl(bx+4,hY-15,bx+5,hY-26,2.5,accLt);sl(bx+8,hY-14,bx+10,hY-30,3,acc);
-sc(bx,hY-34,3.5,'#ffffff');sc(bx,hY-34,2,'#c0f4ff');sf(bx-10,hY-14,20,2,acc);
-sl(bx-15,hY-8,bx-17,hY-16,2,acc+'70');sl(bx+15,hY-8,bx+17,hY-16,2,acc+'70');
-pixelFace(bx,hY,{eyeColor:'#3bf0ff',eyeW:4,eyeH:4,browColor:out+'70',browAngle:-1,mouthColor:'#d09090',mouthW:5,mouthY:8,noseColor:skDk,skinDark:skDk,outline:out,expression:'smile'});
-sl(bx-9,hY-5,bx-10,hY-7,1,out+'60');sl(bx+8,hY-5,bx+9,hY-7,1,out+'60');se(bx-8,hY+3,3,2,'#ffcccc30');se(bx+8,hY+3,3,2,'#ffcccc30');}
+// AURORA — Ice Princess. CLEARLY FEMININE: hourglass body with visible curves,
+// massive flowing hair, dress with split skirt, graceful proportions.
+function drawAurora(cx,gy,o){const L=o.lean||0,bx=cx+L;
+const sk='#f2ddd0',skDk='#d4b8a8',skLt='#fff0e8';
+const hair='#80d8ee',hairDk='#50a8cc',hairLt='#b0f0ff';
+const top='#3a78b0',topDk='#224870',topLt='#5898d0';
+const bot='#2858a0',boot='#1a3860',out='#102838',acc='#60ccee',accLt='#90e0ff';
+
+// === MASSIVE FLOWING HAIR (behind everything — this IS her silhouette) ===
+// Hair is huge — extends far down her back, waves and flows
+for(let i=0;i<35;i++){const sw=Math.sin(i*0.18+L*0.04)*6+Math.cos(i*0.3)*2;
+const w=Math.max(2,10-i/4);
+sf(bx-5+sw-L*0.4,gy-92+i*3,w,3,i%6===0?hairLt:i%3===0?hair:hairDk);}
+// Hair ribbon
+sc(bx-4,gy-88,3.5,acc);sc(bx-4,gy-88,2,accLt);
+
+// === CAPE/TRAIN (behind body, flows with movement) ===
+_s.fillStyle='rgba(96,204,238,0.12)';_s.beginPath();_s.moveTo(bx-10,gy-76);
+_s.quadraticCurveTo(bx-22-L*3,gy-30,bx-14-L*4,gy+8);
+_s.lineTo(bx+10,gy+8);_s.quadraticCurveTo(bx+12,gy-30,bx+10,gy-76);_s.closePath();_s.fill();
+
+// === LEGS (slender, long — shows through split skirt) ===
+const lx=bx-7+(o.lLS||0),ly=gy-(o.lFL||0),rx=bx+7+(o.rLS||0),ry=gy-(o.rFL||0);
+shadedLimb(bx-4,gy-38,lx,ly,8,sk,skDk,out);  // visible skin (thigh-highs)
+shadedLimb(bx+4,gy-38,rx,ry,8,sk,skDk,out);
+// Thigh-high boots (tall, with heel)
+sf(lx-4,ly-12,9,14,boot);sf(lx-4,ly-12,9,2,acc);sl(lx-3,ly,lx+5,ly,1.5,acc+'50');sf(lx+2,ly-4,3,6,boot);
+sf(rx-4,ry-12,9,14,boot);sf(rx-4,ry-12,9,2,acc);sl(rx-3,ry,rx+5,ry,1.5,acc+'50');sf(rx+2,ry-4,3,6,boot);
+
+// === TORSO — TRUE HOURGLASS with visible feminine curves ===
+const nY=gy-80,pY=gy-38;
+// Draw the body as a custom bezier shape — NOT a trapezoid
+_s.fillStyle=top;_s.beginPath();
+_s.moveTo(bx-9,nY);                    // left shoulder
+_s.lineTo(bx+9,nY);                    // right shoulder
+_s.quadraticCurveTo(bx+11,nY+10,bx+6,nY+18);  // right bust curve
+_s.quadraticCurveTo(bx+4,nY+22,bx+5,nY+26);   // right waist pinch
+_s.quadraticCurveTo(bx+8,nY+32,bx+12,pY);      // right hip flare
+_s.lineTo(bx-12,pY);                   // bottom
+_s.quadraticCurveTo(bx-8,nY+32,bx-5,nY+26);   // left hip flare
+_s.quadraticCurveTo(bx-4,nY+22,bx-6,nY+18);   // left waist pinch
+_s.quadraticCurveTo(bx-11,nY+10,bx-9,nY);      // left bust curve
+_s.closePath();_s.fill();
+_s.strokeStyle=out;_s.lineWidth=1.2;_s.stroke();
+// Dark shading on left side
+_s.fillStyle=topDk+'50';_s.beginPath();
+_s.moveTo(bx-9,nY);_s.lineTo(bx,nY);_s.lineTo(bx,pY);_s.lineTo(bx-12,pY);
+_s.quadraticCurveTo(bx-8,nY+32,bx-5,nY+26);
+_s.quadraticCurveTo(bx-4,nY+22,bx-6,nY+18);
+_s.quadraticCurveTo(bx-11,nY+10,bx-9,nY);_s.closePath();_s.fill();
+// Bust definition
+se(bx-4,nY+12,5,4,topLt+'40');se(bx+4,nY+12,5,4,topLt+'40');
+// V-neckline
+_s.fillStyle=sk;_s.beginPath();_s.moveTo(bx,nY+1);_s.lineTo(bx-5,nY+14);_s.lineTo(bx+5,nY+14);_s.closePath();_s.fill();
+sl(bx,nY+1,bx-5,nY+14,1.3,acc);sl(bx,nY+1,bx+5,nY+14,1.3,acc);
+// Waist belt (at the narrowest point)
+sf(bx-5,nY+24,10,3,acc);se(bx,nY+25,2.5,2.5,'#fff');
+// Split skirt flare below hips
+_s.fillStyle=bot;_s.beginPath();_s.moveTo(bx-12,pY);_s.lineTo(bx-16,pY+10);
+_s.lineTo(bx-4,pY+8);_s.lineTo(bx,pY+2);_s.closePath();_s.fill();
+_s.beginPath();_s.moveTo(bx+12,pY);_s.lineTo(bx+16,pY+10);
+_s.lineTo(bx+4,pY+8);_s.lineTo(bx,pY+2);_s.closePath();_s.fill();
+sf(bx-12,pY,24,1.5,acc);
+
+// === ARMS (slender, graceful) ===
+const sY=nY+3;const lax=bx-16-(o.lAE||0),lay=sY+20+Math.sin(o.lAA||0)*14;
+const rax=bx+16+(o.rAE||0),ray=sY+20+Math.sin(o.rAA||0)*14;
+shadedLimb(bx-9,sY,lax,lay,6,top,topDk,out);
+shadedLimb(lax,lay,lax-3,lay+12,5,sk,skDk,out);
+// Ice crystal bracer
+sf(lax-2,lay-1,5,3,accLt);sc(lax,lay,2,'#fff');
+sc(lax-3,lay+14,3.5,sk);sc(lax-3,lay+14,3.5,out+'20');
+shadedLimb(bx+9,sY,rax,ray,6,top,topDk,out);
+shadedLimb(rax,ray,rax+3,ray+12,5,sk,skDk,out);
+sf(rax-1,ray-1,5,3,accLt);sc(rax+1,ray,2,'#fff');
+sc(rax+3,ray+14,3.5,sk);sc(rax+3,ray+14,3.5,out+'20');
+
+// === HEAD (bigger, clearly feminine face) ===
+const hY=nY-20+(o.hY||0);
+sf(bx-2,nY-5,5,7,sk);                          // neck (thin)
+sc(bx,hY,18,sk);sc(bx,hY,18.5,out+'20');       // big round head
+// Ears with crystal earrings
+se(bx-16,hY+1,3,4,sk);se(bx+16,hY+1,3,4,sk);
+sc(bx-16,hY+5,2.5,acc);sc(bx-16,hY+5,1.5,'#fff');
+sc(bx+16,hY+5,2.5,acc);sc(bx+16,hY+5,1.5,'#fff');
+// VOLUMINOUS bangs — big sweep
+se(bx+2,hY-13,18,9,hair);se(bx-6,hY-14,10,6,hairDk);
+se(bx+10,hY-11,7,5,hairLt);
+sf(bx-14,hY-6,8,6,hairDk);sf(bx+11,hY-4,7,5,hair);  // side bangs
+// Ice crown — tall, ornate
+sl(bx-9,hY-16,bx-12,hY-34,3.5,acc);
+sl(bx-4,hY-17,bx-6,hY-30,3,accLt);
+sl(bx,hY-18,bx,hY-38,4,'#c0f4ff');
+sl(bx+4,hY-17,bx+6,hY-30,3,accLt);
+sl(bx+9,hY-16,bx+12,hY-34,3.5,acc);
+sc(bx,hY-38,4,'#ffffff');sc(bx,hY-38,2.5,acc);
+sf(bx-12,hY-16,24,2.5,acc);  // tiara band
+// Face — big expressive feminine eyes
+pixelFace(bx,hY,{eyeColor:'#3bf0ff',eyeW:5,eyeH:5,browColor:out+'60',browAngle:-1,
+  mouthColor:'#d09090',mouthW:5,mouthY:9,noseColor:skDk,skinDark:skDk,outline:out,expression:'smile'});
+// Eyelashes (long, visible)
+sl(bx-10,hY-6,bx-12,hY-9,1.5,out+'70');sl(bx-8,hY-7,bx-9,hY-10,1,out+'50');
+sl(bx+9,hY-6,bx+11,hY-9,1.5,out+'70');sl(bx+7,hY-7,bx+8,hY-10,1,out+'50');
+// Blush
+se(bx-10,hY+4,4,2.5,'#ffbbbb30');se(bx+10,hY+4,4,2.5,'#ffbbbb30');}
 
 // CRIMSON
 function drawCrimson(cx,gy,o){const L=o.lean||0,bx=cx+L;const sk='#f0d0b8',skDk='#d0a890',skLt='#ffe0d0';const gi='#cc2244',giDk='#881430',giLt='#ee4466',giVLt='#ff6688';const wrap='#ff8866',wrapDk='#cc5533',band='#ff5566',bandDk='#cc3344',out='#3a0a14';
