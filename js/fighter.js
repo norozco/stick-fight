@@ -446,6 +446,10 @@ class Fighter {
     this.addUlt(box.dmg * 0.8);
     this.combo = 0;
 
+    // Track last hit direction for KO physics
+    this.lastHitDir = fromFacing;
+    this.lastHitUp = box.up || 0;
+
     // Physics impulse — head whips back, arms snap on the hit vector
     const impulseMag = box.type === 'heavy' ? 10 : 6;
     this.impactVx = fromFacing * impulseMag;
@@ -454,6 +458,32 @@ class Fighter {
     spawnDamageNumber(this.x, this.y - 110, box.dmg, box.type === 'heavy' ? '#ff3860' : '#fff');
 
     if(this.hp < 0) this.hp = 0;
+
+    // --- KO TRIGGER: transition to 'ko' state with directional fall ---
+    if(this.hp <= 0) {
+      this.state = 'ko';
+      this.stateTime = 0;
+      this.koLanded = false;
+      // Launch velocity based on hit direction
+      this.koVx = fromFacing * (box.kb || 8) * 0.6;
+      if(box.up && box.up < 0) {
+        // Upward hit → lift then fall
+        this.koVy = box.up * 0.8;
+        this.onGround = false;
+      } else if(box.type === 'heavy' || box.type === 'ult') {
+        // Heavy/ult → strong backward launch
+        this.koVx = fromFacing * (box.kb || 14) * 0.7;
+        this.koVy = -6;
+        this.onGround = false;
+      } else {
+        // Light hit KO → lose balance backward
+        this.koVy = -3;
+        this.onGround = false;
+      }
+      this.vx = 0; this.vy = 0;
+      this.attackType = null;
+      this.blocking = false;
+    }
 
     const power = box.type === 'heavy' ? 1.5 : 1;
     const sparkX = this.x + fromFacing * -15;
