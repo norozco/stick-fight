@@ -116,7 +116,9 @@ class Fighter {
     if(this.attackType === 'throw') {
       // Ken-style shoulder throw — tight 35-frame sequence.
       // 0-3 startup/grab, 4-24 arc (victim flips overhead), 24-35 recovery.
-      return { start: 3, active: 8, total: 35, dmg: 22, kb: 18, up: -4, reach: 82, boxH: 100, boxY: -100, ult: 14, canCombo: false, beatsBlock: true, isGrab: true };
+      // Reach 95 so it reliably connects past the 44px push-apart distance.
+      // Active window 10 frames (was 8) for more forgiving grab timing.
+      return { start: 3, active: 10, total: 35, dmg: 22, kb: 18, up: -4, reach: 95, boxH: 110, boxY: -110, ult: 14, canCombo: false, beatsBlock: true, isGrab: true };
     }
     return null;
   }
