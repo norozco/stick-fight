@@ -151,7 +151,7 @@ function drawParticles() {
       ctx.restore();
     } else if(p.type === 'afterimage') {
       ctx.globalAlpha = a * (p.opacity || 0.5);
-      renderStoredPose(p.snapshot, p.color, 1);
+      renderStoredPose(p.snapshot, p.color, 1, p.snapshot && p.snapshot.visual);
     } else if(p.type === 'streak') {
       ctx.save();
       ctx.strokeStyle = p.color;
