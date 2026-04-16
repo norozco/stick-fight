@@ -118,6 +118,12 @@ const CHARACTERS = [
       ],
       idleStance: { lHandY: 0, rHandY: -4, lHandX: 10, rHandX: -8, lFootX: -4, rFootX: 10, lean: 2 },
       idleAnim: { breathAmp: 1.2, swayFreq: 0.04, motion: 'flicker' },
+      body: {
+        shoulderW: 15, waistW: 12, upperArmW: 5, forearmW: 4, thighW: 7, shinW: 5,
+        handR: 3, footW: 8, footH: 4,
+        skinColor: '#d8c8a8', outfitColor: '#2a1840', outfitDark: '#180c28',
+        outfitAccent: '#6030a0', outlineColor: '#0c0618',
+      },
     },
   },
 ];
