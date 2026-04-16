@@ -128,6 +128,7 @@ const CHARACTERS = [
         handR: 3, footW: 8, footH: 4,
         skinColor: '#d8c8a8', outfitColor: '#2a1840', outfitDark: '#180c28',
         outfitAccent: '#6030a0', outlineColor: '#0c0618',
+        hairColor: '#8a40cc', hairLength: 0,
       },
     },
   },
