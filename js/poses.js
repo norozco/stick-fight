@@ -264,167 +264,156 @@ function computeTargetPose(f) {
 }
 
 // Detailed ultimate pose — 6 cinematic phases
-function computeUltPose(f, pose, t) {
-  const x = f.x, y = f.y;
-  const fc = f.facing;
 
-  // PHASE 0 — windup (0-14) : crouch + pull arm back, aura effect
-  if(t < 14) {
-    const p = t / 14;
-    const crouch = easeOutCubic(p) * 10;
-    pose.pelvis.y = y - 42 + crouch * 0.5;
+// ============================================================
+// DATA-DRIVEN ULT POSE — adapts to each character's hit sequence
+// ============================================================
+// Instead of hardcoding "phase 0 is frames 0-14", we derive pose intent
+// from the hit data: windup → ground combo → launch → aerial → finisher.
+// This makes all 4 character ults automatically animate correctly.
+
+// --- Shared pose helpers ---
+function ultPoseWindup(pose, x, y, fc, p) {
+  const crouch = easeOutCubic(p) * 10;
+  pose.pelvis.y = y - 42 + crouch * 0.5;
+  pose.neck.y = y - 82 + crouch;
+  pose.head.y = y - 98 + crouch;
+  pose.bodyLean = -fc * 10;
+  pose.rHand.x = x - fc * 30; pose.rHand.y = y - 74;
+  pose.rElbow.x = x - fc * 18; pose.rElbow.y = y - 70;
+  pose.lHand.x = x - fc * 10; pose.lHand.y = y - 62;
+  pose.lFoot.x = x - 10; pose.lFoot.y = y;
+  pose.rFoot.x = x + 14; pose.rFoot.y = y;
+  pose.lKnee.y = y - 18; pose.rKnee.y = y - 18;
+}
+
+function ultPoseGroundHit(pose, x, y, fc, hitIdx, isActive) {
+  // Alternating punch/kick based on hit index — odd = left, even = right
+  const useRight = (hitIdx % 2 === 0);
+  const ext = isActive ? 50 : 12;
+  const main = useRight ? 'rHand' : 'lHand';
+  const mainElb = useRight ? 'rElbow' : 'lElbow';
+  const off = useRight ? 'lHand' : 'rHand';
+  pose[main].x = x + fc * ext; pose[main].y = y - 72;
+  pose[mainElb].x = x + fc * ext * 0.45; pose[mainElb].y = y - 76;
+  pose[off].x = x - fc * 14; pose[off].y = y - 60;
+  pose.bodyLean = fc * (4 + (isActive ? 8 : 0));
+  pose.head.x += fc * 3;
+  // Last ground hit → spin kick variant
+  if(hitIdx >= 3 && isActive) {
+    pose.rFoot.x = x + fc * (ext * 0.8); pose.rFoot.y = y - 50;
+    pose.rKnee.x = x + fc * ext * 0.4; pose.rKnee.y = y - 45;
+    pose.bodyLean = -fc * 10;
+  }
+}
+
+function ultPoseLaunch(pose, x, y, fc, p) {
+  const rise = easeOutCubic(p) * 35;
+  pose.bodyLean = fc * (20 + p * 6);
+  pose.rHand.x = x + fc * (30 + p * 30);
+  pose.rHand.y = y - 100 - rise;
+  pose.rElbow.x = x + fc * 20;
+  pose.rElbow.y = y - 75 - rise * 0.3;
+  pose.lHand.x = x - fc * 14; pose.lHand.y = y - 56;
+  pose.pelvis.y = y - 42 - rise * 0.3;
+  pose.neck.y = y - 82 - rise * 0.3;
+  pose.head.y = y - 98 - rise * 0.3;
+  pose.lFoot.y = y - rise * 0.15;
+  pose.rFoot.y = y - rise * 0.15;
+}
+
+function ultPoseAerial(pose, x, y, fc, hitIdx, isActive) {
+  const ext = isActive ? 55 : 10;
+  if(hitIdx % 2 === 0) {
+    // Kick right
+    pose.rFoot.x = x + fc * ext; pose.rFoot.y = y - 40;
+    pose.rKnee.x = x + fc * ext * 0.5; pose.rKnee.y = y - 35;
+    pose.lFoot.x = x - 6; pose.lFoot.y = y - 10;
+    pose.rHand.x = x - fc * 10; pose.rHand.y = y - 78;
+    pose.lHand.x = x - fc * 18; pose.lHand.y = y - 72;
+    pose.bodyLean = -fc * 12;
+  } else {
+    // Kick left
+    pose.lFoot.x = x + fc * ext; pose.lFoot.y = y - 55;
+    pose.lKnee.x = x + fc * ext * 0.5; pose.lKnee.y = y - 42;
+    pose.rFoot.x = x - 4; pose.rFoot.y = y - 8;
+    pose.rHand.x = x + fc * 8; pose.rHand.y = y - 72;
+    pose.lHand.x = x - fc * 12; pose.lHand.y = y - 78;
+    pose.bodyLean = -fc * 16;
+  }
+}
+
+function ultPoseFinisher(pose, x, y, fc, p) {
+  if(p < 0.3) {
+    // Wind up — arms raised
+    const pp = p / 0.3;
+    pose.bodyLean = fc * (4 - pp * 2);
+    pose.rHand.x = x + fc * 8;  pose.rHand.y = y - 140 + pp * 10;
+    pose.lHand.x = x - fc * 8;  pose.lHand.y = y - 140 + pp * 10;
+    pose.rElbow.x = x + fc * 10; pose.rElbow.y = y - 110;
+    pose.lElbow.x = x - fc * 10; pose.lElbow.y = y - 110;
+  } else if(p < 0.7) {
+    // Slam down
+    const pp = (p - 0.3) / 0.4;
+    pose.bodyLean = fc * 6;
+    pose.rHand.x = x + fc * 20;  pose.rHand.y = y - 30 + pp * 10;
+    pose.lHand.x = x - fc * 20;  pose.lHand.y = y - 30 + pp * 10;
+    pose.rElbow.x = x + fc * 15; pose.rElbow.y = y - 60;
+    pose.lElbow.x = x - fc * 15; pose.lElbow.y = y - 60;
+  } else {
+    // Recovery crouch
+    const pp = clamp((p - 0.7) / 0.3, 0, 1);
+    const crouch = (1 - pp) * 14;
+    pose.pelvis.y = y - 42 + crouch * 0.4;
     pose.neck.y = y - 82 + crouch;
     pose.head.y = y - 98 + crouch;
-    pose.bodyLean = -fc * 10;
-    pose.rHand.x = x - fc * 30; pose.rHand.y = y - 74;
-    pose.rElbow.x = x - fc * 18; pose.rElbow.y = y - 70;
-    pose.lHand.x = x - fc * 10; pose.lHand.y = y - 62;
-    pose.lFoot.x = x - 10; pose.lFoot.y = y;
-    pose.rFoot.x = x + 14; pose.rFoot.y = y;
-    pose.lKnee.y = y - 18; pose.rKnee.y = y - 18;
+    pose.bodyLean = fc * 4 * (1 - pp);
+    pose.rHand.x = x + fc * 16;  pose.rHand.y = y - 60 + crouch;
+    pose.lHand.x = x - fc * 16;  pose.lHand.y = y - 60 + crouch;
+    pose.rElbow.x = x + fc * 10; pose.rElbow.y = y - 70;
+    pose.lElbow.x = x - fc * 10; pose.lElbow.y = y - 70;
   }
-  // PHASE 1 — dash-in punch (14-26)
-  else if(t < 26) {
-    const p = (t - 14) / 12;
-    const ext = lerp(-20, 70, easeOutCubic(p));
-    pose.bodyLean = fc * 14;
-    pose.rHand.x = x + fc * ext; pose.rHand.y = y - 72;
-    pose.rElbow.x = x + fc * ext * 0.5; pose.rElbow.y = y - 74;
-    pose.lHand.x = x - fc * 16; pose.lHand.y = y - 58;
-    pose.head.x += fc * 4;
-    // Running legs
-    pose.lFoot.x = x - fc * 18 * Math.cos(p * Math.PI);
-    pose.rFoot.x = x + fc * 14 * Math.cos(p * Math.PI + Math.PI);
-    pose.lKnee.x = (pose.pelvis.x + pose.lFoot.x) / 2;
-    pose.rKnee.x = (pose.pelvis.x + pose.rFoot.x) / 2;
+}
+
+// --- Main dispatcher ---
+function computeUltPose(f, pose, t) {
+  const seq = f.ultSeq;
+  const x = f.x, y = f.y, fc = f.facing;
+
+  // Derive pose intent from hit data
+  const hitInfo = currentUltHit(t, seq);
+  const firstHit    = seq.hits[0];
+  const launchHit   = seq.hits.find(h => h.launch);
+  const finisherHit = seq.hits.find(h => h.finisher);
+  const aerialStart = launchHit ? launchHit.end + 2 : seq.total;
+  const slamStart   = finisherHit ? finisherHit.start - 8 : seq.total;
+
+  // WINDUP — before first hit
+  if(t < firstHit.start) {
+    ultPoseWindup(pose, x, y, fc, t / firstHit.start);
+    return;
   }
-  // PHASE 2 — 3-punch flurry (26-52)
-  else if(t < 52) {
-    const localT = t - 26;       // 0..26
-    const punchIdx = Math.floor(localT / 8); // 0,1,2
-    const pp = (localT % 8) / 8;
-    const useRight = punchIdx % 2 === 0;
-    const main = useRight ? 'rHand' : 'lHand';
-    const mainElb = useRight ? 'rElbow' : 'lElbow';
-    const off = useRight ? 'lHand' : 'rHand';
-    const offElb = useRight ? 'lElbow' : 'rElbow';
-    const ext = lerp(-15, 65, easeOutCubic(clamp(pp * 1.6, 0, 1)));
-    const retract = pp > 0.6 ? (pp - 0.6) / 0.4 : 0;
-    const finalExt = ext - retract * 50;
-    pose[main].x = x + fc * finalExt;
-    pose[main].y = y - 72 - punchIdx * 2;
-    pose[mainElb].x = x + fc * finalExt * 0.45;
-    pose[mainElb].y = y - 76;
-    pose[off].x = x - fc * 12;
-    pose[off].y = y - 60;
-    pose[offElb].x = x - fc * 6;
-    pose[offElb].y = y - 68;
-    pose.bodyLean = fc * (6 + (useRight ? 4 : -4));
-    pose.head.x += fc * 3;
-    // Small hops
-    pose.lFoot.x = x - 12 + Math.sin(localT * 0.5) * 4;
-    pose.rFoot.x = x + 12 - Math.sin(localT * 0.5) * 4;
+  // GROUND COMBO — from first hit to launch
+  if(launchHit && t < launchHit.start) {
+    ultPoseGroundHit(pose, x, y, fc, hitInfo ? hitInfo.index : 0, !!hitInfo);
+    return;
   }
-  // PHASE 3 — roundhouse kick (52-66)
-  else if(t < 66) {
-    const p = (t - 52) / 14;
-    const spin = p * Math.PI * 1.2;
-    const legExt = lerp(15, 62, easeOutCubic(clamp(p * 1.3, 0, 1)));
-    pose.rFoot.x = x + fc * legExt * Math.cos(spin * 0.5);
-    pose.rFoot.y = y - 55 - Math.sin(p * Math.PI) * 8;
-    pose.rKnee.x = x + fc * legExt * 0.5;
-    pose.rKnee.y = y - 50;
-    pose.lFoot.x = x - fc * 4; pose.lFoot.y = y;
-    pose.lKnee.x = x - fc * 2; pose.lKnee.y = y - 22;
-    pose.bodyLean = -fc * 14 + Math.sin(spin) * 10;
-    pose.rHand.x = x + fc * 8; pose.rHand.y = y - 62;
-    pose.lHand.x = x - fc * 18; pose.lHand.y = y - 68;
-    pose.head.x += Math.sin(spin) * 3;
+  // LAUNCH — the uppercut
+  if(launchHit && t >= launchHit.start && t < aerialStart) {
+    const p = (t - launchHit.start) / Math.max(1, aerialStart - launchHit.start);
+    ultPoseLaunch(pose, x, y, fc, p);
+    return;
   }
-  // PHASE 4 — uppercut launcher (66-80)
-  else if(t < 80) {
-    const p = (t - 66) / 14;
-    const rise = easeOutCubic(p) * 35;
-    pose.bodyLean = fc * (20 + p * 6);
-    pose.rHand.x = x + fc * (30 + p * 30);
-    pose.rHand.y = y - 100 - rise;
-    pose.rElbow.x = x + fc * 20;
-    pose.rElbow.y = y - 75 - rise * 0.3;
-    pose.lHand.x = x - fc * 14; pose.lHand.y = y - 56;
-    pose.pelvis.y = y - 42 - rise * 0.3;
-    pose.neck.y = y - 82 - rise * 0.3;
-    pose.head.y = y - 98 - rise * 0.3;
-    pose.lFoot.y = y - rise * 0.15;
-    pose.rFoot.y = y - rise * 0.15;
+  // AERIAL — airborne hits
+  if(t >= aerialStart && t < slamStart) {
+    ultPoseAerial(pose, x, y, fc, hitInfo ? hitInfo.index : 0, !!hitInfo);
+    return;
   }
-  // PHASE 5 — aerial double kick (80-110)
-  else if(t < 110) {
-    // Fighter position is overridden by update() to be airborne
-    const localT = t - 80;
-    const phase = localT / 30;
-    if(localT < 16) {
-      // First aerial kick
-      const p = localT / 16;
-      const ext = lerp(5, 55, easeOutCubic(clamp(p * 1.6, 0, 1)));
-      pose.rFoot.x = x + fc * ext;
-      pose.rFoot.y = y - 40 + Math.sin(p * Math.PI) * 8;
-      pose.rKnee.x = x + fc * ext * 0.5; pose.rKnee.y = y - 35;
-      pose.lFoot.x = x - 6; pose.lFoot.y = y - 10;
-      pose.lKnee.x = x - 4; pose.lKnee.y = y - 30;
-      pose.rHand.x = x - fc * 10; pose.rHand.y = y - 78;
-      pose.lHand.x = x - fc * 18; pose.lHand.y = y - 72;
-      pose.bodyLean = -fc * 12;
-    } else {
-      // Second aerial kick
-      const p = (localT - 16) / 14;
-      const ext = lerp(5, 58, easeOutCubic(clamp(p * 1.6, 0, 1)));
-      pose.lFoot.x = x + fc * ext;
-      pose.lFoot.y = y - 55 + Math.sin(p * Math.PI) * 8;
-      pose.lKnee.x = x + fc * ext * 0.5; pose.lKnee.y = y - 42;
-      pose.rFoot.x = x - 4; pose.rFoot.y = y - 8;
-      pose.rKnee.x = x - 2; pose.rKnee.y = y - 28;
-      pose.rHand.x = x + fc * 8; pose.rHand.y = y - 72;
-      pose.lHand.x = x - fc * 12; pose.lHand.y = y - 78;
-      pose.bodyLean = -fc * 16;
-    }
-  }
-  // PHASE 6 — diving slam (110-135)
-  else {
-    const localT = t - 110;
-    if(localT < 10) {
-      // wind up in air — raise both arms
-      const p = localT / 10;
-      pose.bodyLean = fc * (4 - p * 2);
-      pose.rHand.x = x + fc * 8;  pose.rHand.y = y - 140 + p * 10;
-      pose.lHand.x = x - fc * 8;  pose.lHand.y = y - 140 + p * 10;
-      pose.rElbow.x = x + fc * 10; pose.rElbow.y = y - 110;
-      pose.lElbow.x = x - fc * 10; pose.lElbow.y = y - 110;
-      pose.lFoot.x = x - 6; pose.rFoot.x = x + 6;
-      pose.lFoot.y = y - 4; pose.rFoot.y = y - 4;
-    } else if(localT < 20) {
-      // slam down
-      const p = (localT - 10) / 10;
-      pose.bodyLean = fc * 6;
-      pose.rHand.x = x + fc * 20;  pose.rHand.y = y - 30 + p * 10;
-      pose.lHand.x = x - fc * 20;  pose.lHand.y = y - 30 + p * 10;
-      pose.rElbow.x = x + fc * 15; pose.rElbow.y = y - 60;
-      pose.lElbow.x = x - fc * 15; pose.lElbow.y = y - 60;
-      pose.lFoot.x = x - 10; pose.rFoot.x = x + 10;
-      pose.lKnee.x = x - 8; pose.lKnee.y = y - 22;
-      pose.rKnee.x = x + 8; pose.rKnee.y = y - 22;
-    } else {
-      // recovery crouch
-      const p = clamp((localT - 20) / 15, 0, 1);
-      const crouch = (1 - p) * 14;
-      pose.pelvis.y = y - 42 + crouch * 0.4;
-      pose.neck.y = y - 82 + crouch;
-      pose.head.y = y - 98 + crouch;
-      pose.bodyLean = fc * 4 * (1 - p);
-      pose.rHand.x = x + fc * 16;  pose.rHand.y = y - 60 + crouch;
-      pose.lHand.x = x - fc * 16;  pose.lHand.y = y - 60 + crouch;
-      pose.rElbow.x = x + fc * 10; pose.rElbow.y = y - 70;
-      pose.lElbow.x = x - fc * 10; pose.lElbow.y = y - 70;
-    }
+  // FINISHER — slam down + recovery
+  if(t >= slamStart) {
+    const p = clamp((t - slamStart) / Math.max(1, seq.total - slamStart), 0, 1);
+    ultPoseFinisher(pose, x, y, fc, p);
+    return;
   }
 }
 
