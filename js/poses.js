@@ -157,6 +157,156 @@ function computeTargetPose(f) {
     pose.lHand.y += 4; pose.rHand.y += 4;
   }
 
+  // ============================================================
+  // KO — directional collapse driven by lastHitDir
+  // ============================================================
+  if(f.state === 'ko') {
+    const t = Math.min(f.stateTime, 40);
+    const dir = f.lastHitDir || -fc;  // direction of the final blow
+    if(!f.koLanded) {
+      // AIRBORNE PHASE: body ragdolls backward, limbs trail
+      const tumble = Math.min(t / 12, 1);  // 0→1 over 12 frames
+      pose.bodyLean = dir * lerp(0, 50, easeOutCubic(tumble));
+      pose.headTilt = dir * lerp(0, 0.8, tumble);
+      pose.head.x += dir * tumble * 20;
+      pose.head.y += tumble * 12;
+      pose.neck.x += dir * tumble * 14;
+      pose.neck.y += tumble * 8;
+      // Arms go limp, trailing behind
+      pose.lHand.x = x - dir * lerp(14, 40, tumble);
+      pose.lHand.y = y - lerp(60, 30, tumble);
+      pose.rHand.x = x - dir * lerp(-14, 30, tumble);
+      pose.rHand.y = y - lerp(60, 25, tumble);
+      pose.lElbow.x = x - dir * lerp(10, 28, tumble);
+      pose.lElbow.y = y - lerp(72, 45, tumble);
+      pose.rElbow.x = x - dir * lerp(-10, 18, tumble);
+      pose.rElbow.y = y - lerp(72, 40, tumble);
+      // Legs splay
+      pose.lFoot.x = x - dir * lerp(12, 26, tumble);
+      pose.lFoot.y = y - lerp(0, 16, tumble);
+      pose.rFoot.x = x + dir * lerp(12, 6, tumble);
+      pose.rFoot.y = y - lerp(0, 22, tumble);
+      pose.lKnee.x = x - dir * lerp(8, 18, tumble);
+      pose.lKnee.y = y - lerp(22, 28, tumble);
+      pose.rKnee.x = x + dir * lerp(8, 4, tumble);
+      pose.rKnee.y = y - lerp(22, 30, tumble);
+    } else {
+      // LANDED — collapse to ground, settle into defeated flat pose
+      const settle = Math.min((f.stateTime - (f.koLandFrame || 0)) / 10, 1);
+      const sp = easeOutCubic(settle);
+      // Body goes nearly flat on the ground
+      pose.head.x   = x + dir * lerp(20, 28, sp);
+      pose.head.y   = y - lerp(60, 10, sp);
+      pose.neck.x   = x + dir * lerp(14, 18, sp);
+      pose.neck.y   = y - lerp(50, 8, sp);
+      pose.pelvis.x = x + dir * lerp(0, 4, sp);
+      pose.pelvis.y = y - lerp(42, 4, sp);
+      pose.bodyLean  = dir * lerp(50, 80, sp);
+      pose.headTilt  = dir * lerp(0.8, 0.5, sp);
+      // Arms splayed on ground
+      pose.lHand.x  = x - dir * 10 + dir * sp * 20;
+      pose.lHand.y  = y - lerp(30, 6, sp);
+      pose.rHand.x  = x + dir * 30 + dir * sp * 8;
+      pose.rHand.y  = y - lerp(25, 8, sp);
+      pose.lElbow.x = x + dir * lerp(-5, 10, sp);
+      pose.lElbow.y = y - lerp(45, 8, sp);
+      pose.rElbow.x = x + dir * lerp(18, 22, sp);
+      pose.rElbow.y = y - lerp(40, 10, sp);
+      // Legs crumpled
+      pose.lFoot.x  = x - dir * lerp(26, 18, sp);
+      pose.lFoot.y  = y - lerp(16, 2, sp);
+      pose.rFoot.x  = x + dir * lerp(6, 22, sp);
+      pose.rFoot.y  = y - lerp(22, 2, sp);
+      pose.lKnee.x  = x - dir * lerp(18, 6, sp);
+      pose.lKnee.y  = y - lerp(28, 10, sp);
+      pose.rKnee.x  = x + dir * lerp(4, 14, sp);
+      pose.rKnee.y  = y - lerp(30, 8, sp);
+    }
+  }
+
+  // ============================================================
+  // KNOCKDOWN — flat on ground, defeated
+  // ============================================================
+  if(f.state === 'knockdown') {
+    const dir = f.lastHitDir || -fc;
+    // Completely flat splayed pose
+    pose.head.x   = x + dir * 28;   pose.head.y   = y - 10;
+    pose.neck.x   = x + dir * 18;   pose.neck.y   = y - 8;
+    pose.pelvis.x = x + dir * 4;    pose.pelvis.y  = y - 4;
+    pose.bodyLean = dir * 80;
+    pose.headTilt = dir * 0.5;
+    pose.lHand.x  = x + dir * 10;   pose.lHand.y  = y - 6;
+    pose.rHand.x  = x + dir * 38;   pose.rHand.y  = y - 8;
+    pose.lElbow.x = x + dir * 10;   pose.lElbow.y = y - 8;
+    pose.rElbow.x = x + dir * 22;   pose.rElbow.y = y - 10;
+    pose.lFoot.x  = x - dir * 18;   pose.lFoot.y  = y - 2;
+    pose.rFoot.x  = x + dir * 22;   pose.rFoot.y  = y - 2;
+    pose.lKnee.x  = x - dir * 6;    pose.lKnee.y  = y - 10;
+    pose.rKnee.x  = x + dir * 14;   pose.rKnee.y  = y - 8;
+  }
+
+  // ============================================================
+  // GRABBED — defender is held by attacker, looks off-balance / compressed
+  // ============================================================
+  if(f.state === 'grabbed') {
+    const dir = f.facing;   // facing attacker
+    const t = Math.min(f.stateTime, 20);
+    const pull = Math.min(t / 6, 1);  // ramp up over 6 frames
+    // Body leans INTO the attacker — pulled off-balance
+    pose.bodyLean = dir * lerp(0, 25, pull);
+    pose.headTilt = dir * lerp(0, 0.4, pull);
+    pose.head.y += lerp(0, 8, pull);        // head droops
+    pose.neck.y += lerp(0, 6, pull);
+    pose.pelvis.y += lerp(0, 4, pull);      // compressed stance
+    // Arms dangling / pushed back — no control
+    pose.lHand.x = x - dir * lerp(14, 6, pull);
+    pose.lHand.y = y - lerp(60, 40, pull);
+    pose.rHand.x = x + dir * lerp(14, 2, pull);
+    pose.rHand.y = y - lerp(60, 44, pull);
+    pose.lElbow.x = x - dir * lerp(10, 8, pull);
+    pose.lElbow.y = y - lerp(72, 52, pull);
+    pose.rElbow.x = x + dir * lerp(10, 6, pull);
+    pose.rElbow.y = y - lerp(72, 56, pull);
+    // Feet stumbling — one lifted
+    pose.lFoot.x = x + dir * lerp(-12, -4, pull);
+    pose.lFoot.y = y - lerp(0, 6, pull);     // lifted off ground
+    pose.rFoot.x = x + dir * lerp(12, 16, pull);
+    pose.rFoot.y = y;
+    pose.lKnee.x = x + dir * lerp(-8, -2, pull);
+    pose.lKnee.y = y - lerp(22, 18, pull);
+    pose.rKnee.x = x + dir * lerp(8, 12, pull);
+    pose.rKnee.y = y - lerp(22, 24, pull);
+  }
+
+  // ============================================================
+  // THROWN — airborne after release, limp ragdoll tumble
+  // ============================================================
+  if(f.state === 'thrown') {
+    const t = Math.min(f.stateTime, 30);
+    const tumble = Math.min(t / 8, 1);
+    const dir = (f.vx > 0) ? 1 : -1;
+    // Body rotating backward in the air
+    pose.bodyLean = dir * lerp(0, 45, tumble);
+    pose.headTilt = dir * lerp(0, 0.6, tumble);
+    // Head leads the tumble
+    pose.head.x += dir * tumble * 16;
+    pose.head.y += tumble * 8;
+    // Arms trailing limp
+    pose.lHand.x = x - dir * lerp(14, 30, tumble);
+    pose.lHand.y = y - lerp(60, 35, tumble);
+    pose.rHand.x = x - dir * lerp(-14, 20, tumble);
+    pose.rHand.y = y - lerp(60, 30, tumble);
+    pose.lElbow.x = x - dir * lerp(10, 22, tumble);
+    pose.lElbow.y = y - lerp(72, 48, tumble);
+    pose.rElbow.x = x - dir * lerp(-10, 12, tumble);
+    pose.rElbow.y = y - lerp(72, 42, tumble);
+    // Legs splayed outward
+    pose.lFoot.y = y - lerp(0, 14, tumble);
+    pose.rFoot.y = y - lerp(0, 20, tumble);
+    pose.lKnee.y = y - lerp(22, 30, tumble);
+    pose.rKnee.y = y - lerp(22, 34, tumble);
+  }
+
   // Attacks
   if(f.state === 'attack' && f.attackType) {
     const t = f.stateTimeF;
