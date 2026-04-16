@@ -556,9 +556,16 @@ class Fighter {
     if(this.blocking) this.blockTime++; else this.blockTime = 0;
 
     if(input.jumpPressed) this.jumpBuffer = 8;
+    // ARCADE: allow jump cancel from attack recovery (after hit landed)
+    if(this.jumpBuffer > 0 && this.state === 'attack' && this.attackHit) {
+      const data = this.attackData();
+      if(data && this.stateTime > data.start + data.active) {
+        this.state = 'idle'; this.attackType = null; this.stateTime = 0;
+      }
+    }
     if(this.jumpBuffer > 0) {
       if(this.onGround || this.coyote > 0) {
-        this.vy = -15;     // slightly stronger jump for arcade height
+        this.vy = -15;
         this.onGround = false;
         this.jumpsLeft = 1;
         this.jumpBuffer = 0;
