@@ -13,9 +13,11 @@ function replaySnapshot() {
   if(replayBuffer.length >= REPLAY_MAX) replayBuffer.shift();
   replayBuffer.push({
     p1: { x: p1.x, y: p1.y, facing: p1.facing, color: p1.color, glow: p1.glow,
-          pose: p1.smoothPose ? clonePose(p1.smoothPose) : null, hp: p1.hp, hurtFlash: p1.hurtFlash, state: p1.state, ringoutSpin: p1.ringoutSpin },
+          pose: p1.smoothPose ? clonePose(p1.smoothPose) : null, hp: p1.hp, hurtFlash: p1.hurtFlash, state: p1.state, ringoutSpin: p1.ringoutSpin,
+          visual: (p1.character && p1.character.visual) || null },
     p2: { x: p2.x, y: p2.y, facing: p2.facing, color: p2.color, glow: p2.glow,
-          pose: p2.smoothPose ? clonePose(p2.smoothPose) : null, hp: p2.hp, hurtFlash: p2.hurtFlash, state: p2.state, ringoutSpin: p2.ringoutSpin },
+          pose: p2.smoothPose ? clonePose(p2.smoothPose) : null, hp: p2.hp, hurtFlash: p2.hurtFlash, state: p2.state, ringoutSpin: p2.ringoutSpin,
+          visual: (p2.character && p2.character.visual) || null },
   });
 }
 function startReplay(winner) {
