@@ -22,10 +22,85 @@ function easeOutBack(t) { const c = 2.2; return 1 + c * Math.pow(t - 1, 3) + c *
 // CHARACTER & STAGE ROSTERS
 // ============================================================
 const CHARACTERS = [
-  { id: 'aurora',  name: 'AURORA',  color: '#e8f4ff', glow: '#3bf0ff', hp: 100, speed: 1.00, dmg: 1.00, desc: 'BALANCED',     ultName: 'AURORA STORM',  ultSeq: 'aurora'  },
-  { id: 'crimson', name: 'CRIMSON', color: '#ffe0e8', glow: '#ff3860', hp:  92, speed: 1.10, dmg: 1.08, desc: 'GLASS · QUICK', ultName: 'CRIMSON BLAZE', ultSeq: 'crimson' },
-  { id: 'jade',    name: 'JADE',    color: '#dfffe0', glow: '#44ff88', hp: 125, speed: 0.88, dmg: 0.95, desc: 'TANK · SLOW',   ultName: 'JADE QUAKE',    ultSeq: 'jade'    },
-  { id: 'noir',    name: 'NOIR',    color: '#fff0c0', glow: '#ffcc00', hp:  88, speed: 1.18, dmg: 1.12, desc: 'BERSERKER',     ultName: 'NOIR SHROUD',   ultSeq: 'noir'    },
+  { id: 'aurora', name: 'AURORA', color: '#e8f4ff', glow: '#3bf0ff', hp: 100, speed: 1.00, dmg: 1.00,
+    desc: 'BALANCED', ultName: 'AURORA STORM', ultSeq: 'aurora',
+    visual: {
+      headRadius: 13, lineWidth: 4.5, bodyScale: 1.0,
+      headDecor: [
+        // Ice crystal crown — 3 spikes + diamond
+        { type: 'line', x1: -6, y1: -10, x2: -8, y2: -22, color: '#a0e8ff', width: 2 },
+        { type: 'line', x1: 0,  y1: -12, x2: 0,  y2: -26, color: '#c0f4ff', width: 2.5 },
+        { type: 'line', x1: 6,  y1: -10, x2: 8,  y2: -22, color: '#a0e8ff', width: 2 },
+        { type: 'diamond', cx: 0, cy: -26, size: 3, color: '#ffffff' },
+      ],
+      eyes: { type: 'wide', w: 4, h: 3, color: '#3bf0ff', highlight: true },
+      costume: [
+        { attach: 'cape', length: 35, color: 'rgba(59,240,255,0.22)', border: '#3bf0ff' },
+        { attach: 'shoulders', radius: 6, color: 'rgba(59,240,255,0.3)', border: '#3bf0ff' },
+      ],
+      idleStance: { lHandY: -8, rHandY: -8, lHandX: -4, rHandX: 4, lFootX: 2, rFootX: -2, lean: 0 },
+      idleAnim: { breathAmp: 1.5, swayFreq: 0.03, motion: 'float' },
+    },
+  },
+  { id: 'crimson', name: 'CRIMSON', color: '#ffe0e8', glow: '#ff3860', hp: 92, speed: 1.10, dmg: 1.08,
+    desc: 'GLASS · QUICK', ultName: 'CRIMSON BLAZE', ultSeq: 'crimson',
+    visual: {
+      headRadius: 12, lineWidth: 4, bodyScale: 0.95,
+      headDecor: [
+        // Flame hair — 5 backward-swept spikes
+        { type: 'line', x1: -4, y1: -8,  x2: -12, y2: -20, color: '#ff6644', width: 2.5 },
+        { type: 'line', x1: 0,  y1: -11, x2: -6,  y2: -28, color: '#ff3860', width: 3 },
+        { type: 'line', x1: 3,  y1: -10, x2: -2,  y2: -24, color: '#ff5533', width: 2 },
+        { type: 'line', x1: 6,  y1: -8,  x2: 2,   y2: -18, color: '#ff4444', width: 2 },
+        { type: 'line', x1: 8,  y1: -5,  x2: 6,   y2: -14, color: '#ff6644', width: 1.5 },
+      ],
+      eyes: { type: 'slit', w: 6, h: 2, color: '#ff3860', angle: -0.15 },
+      costume: [
+        { attach: 'forearms', extraWidth: 2, color: '#ff8866' },
+        { attach: 'sash', length: 18, color: 'rgba(255,56,96,0.4)' },
+      ],
+      idleStance: { lHandY: -12, rHandY: -6, lHandX: 8, rHandX: 12, lFootX: -6, rFootX: 6, lean: 4 },
+      idleAnim: { breathAmp: 2.0, swayFreq: 0.07, motion: 'bounce' },
+    },
+  },
+  { id: 'jade', name: 'JADE', color: '#dfffe0', glow: '#44ff88', hp: 125, speed: 0.88, dmg: 0.95,
+    desc: 'TANK · SLOW', ultName: 'JADE QUAKE', ultSeq: 'jade',
+    visual: {
+      headRadius: 15, lineWidth: 6.5, bodyScale: 1.15,
+      headDecor: [
+        // Helmet visor bar + crest ridge
+        { type: 'rect', x: -10, y: -8, w: 20, h: 5, fill: 'rgba(68,255,136,0.3)', border: '#44ff88' },
+        { type: 'line', x1: 0, y1: -13, x2: 0, y2: -20, color: '#44ff88', width: 3 },
+      ],
+      eyes: { type: 'dot', radius: 3, color: '#44ff88' },
+      costume: [
+        { attach: 'shoulders', radius: 10, color: 'rgba(68,255,136,0.35)', border: '#44ff88' },
+        { attach: 'chest', width: 16, color: 'rgba(68,255,136,0.2)', border: '#44ff88' },
+        { attach: 'shins', extraWidth: 3, color: '#66cc44' },
+      ],
+      idleStance: { lHandY: 4, rHandY: 4, lHandX: -6, rHandX: 6, lFootX: -8, rFootX: 8, lean: 0 },
+      idleAnim: { breathAmp: 1.0, swayFreq: 0.02, motion: 'none' },
+    },
+  },
+  { id: 'noir', name: 'NOIR', color: '#fff0c0', glow: '#ffcc00', hp: 88, speed: 1.18, dmg: 1.12,
+    desc: 'BERSERKER', ultName: 'NOIR SHROUD', ultSeq: 'noir',
+    visual: {
+      headRadius: 12, lineWidth: 3.5, bodyScale: 1.0,
+      headDecor: [
+        // Hood — arc over head with pointed ear tips
+        { type: 'arc', rx: 16, ry: 14, fill: 'rgba(138,64,204,0.15)', border: '#8a40cc', width: 3 },
+        { type: 'line', x1: -14, y1: 0, x2: -18, y2: -8, color: '#8a40cc', width: 2 },
+        { type: 'line', x1: 14,  y1: 0, x2: 18,  y2: -8, color: '#8a40cc', width: 2 },
+      ],
+      eyes: { type: 'glow', w: 5, h: 2, color: '#ffcc00', glowRadius: 6 },
+      costume: [
+        { attach: 'cape', length: 50, color: 'rgba(40,20,60,0.5)', border: '#8a40cc' },
+        { attach: 'forearms', extraWidth: 1.5, color: '#cc80ff' },
+      ],
+      idleStance: { lHandY: 0, rHandY: -4, lHandX: 10, rHandX: -8, lFootX: -4, rFootX: 10, lean: 2 },
+      idleAnim: { breathAmp: 1.2, swayFreq: 0.04, motion: 'flicker' },
+    },
+  },
 ];
 const STAGES = [
   { id: 'twilight', name: 'TWILIGHT TOWER' },
