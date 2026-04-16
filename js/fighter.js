@@ -603,7 +603,7 @@ class Fighter {
     let targetVx = 0;
     if(this.state === 'dash') {
       this.dashTime--;
-      targetVx = this.dashDir * 12;
+      targetVx = this.dashDir * 16;  // faster dash for arcade feel
       if(this.stateTime % 2 === 0) spawnAfterimage(this, 0.55);
       if(this.dashTime <= 0) { this.state = 'idle'; this.stateTime = 0; this.stateTimeF = 0; }
     } else if(this.blocking) {
