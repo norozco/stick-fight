@@ -1016,6 +1016,26 @@ function frontFacingFlailPose(f) {
 
 function drawFighter(f) {
   const vis = f.character && f.character.visual;
+
+  // Try sprite-based rendering first (SNES-quality pixel art).
+  // Falls back to procedural if sprites aren't cached yet or for special states
+  // like ringout/thrown where the sprite can't represent the custom camera work.
+  if(f.state !== 'ringout' && !(f.beingThrown > 0 && f.throwSpin) &&
+     typeof drawFighterSprite === 'function' && drawFighterSprite(f)) {
+    // Shadow (still drawn procedurally — sprites don't include their own shadow)
+    const airFactor = Math.max(0, 1 - (GROUND - f.y) / 250);
+    if(airFactor > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = 0.3 * airFactor;
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.ellipse(f.x, GROUND + 3, 22 * airFactor, 5 * airFactor, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    return;
+  }
+
   // Ring-out: phase-driven rendering. The cinematic uses HARD CUTS between
   // distinct camera/pose moments — see RINGOUT_PHASES in ringout.js.
   if(f.state === 'ringout') {
