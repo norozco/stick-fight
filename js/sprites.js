@@ -496,15 +496,90 @@ sl(lax-5,lay+14,lax-1,lay+14,3,glow+'80');_s.shadowColor=glow;_s.shadowBlur=3;sl
 shadedLimb(bx+8,sY,rax,ray,7,cloak,dk,out);_s.shadowColor='#9060cc';_s.shadowBlur=3;shadedLimb(rax,ray,rax+3,ray+12,6,'#9060cc','#6040a0',out);_s.shadowBlur=0;_s.shadowColor='transparent';
 sc(rax+3,ray+14,4,sk);sl(rax+3,ray+14,rax+7,ray+30,2.5,blade);sl(rax+7,ray+30,rax+8,ray+33,2,bladeDk);
 sl(rax+1,ray+14,rax+5,ray+14,3,glow+'80');_s.shadowColor=glow;_s.shadowBlur=3;sl(rax+4,ray+16,rax+8,ray+30,1,glow+'40');_s.shadowBlur=0;_s.shadowColor='transparent';
-const hY=nY-18+(o.hY||0);sf(bx-3,nY-5,6,7,sk);sc(bx,hY,15,sk);
-sf(bx-12,hY+1,24,10,dk+'d0');sl(bx-12,hY+1,bx+12,hY+1,1,acc+'40');sl(bx-12,hY+10,bx+12,hY+10,1,acc+'40');
-sl(bx-12,hY+5,bx-18,hY+12,2,dk+'a0');sl(bx-18,hY+12,bx-22,hY+18,1.5,dk+'60');
-_s.fillStyle=cloak;_s.beginPath();_s.ellipse(bx,hY-3,22,17,0,Math.PI,0);_s.fill();_s.strokeStyle=acc;_s.lineWidth=3;_s.beginPath();_s.ellipse(bx,hY-3,22,17,0,Math.PI,0);_s.stroke();
-sl(bx-21,hY-3,bx-28,hY-16,3.5,acc);sl(bx+21,hY-3,bx+28,hY-16,3.5,acc);
-sc(bx,hY-14,3,acc+'30');_s.strokeStyle=acc+'40';_s.lineWidth=0.8;_s.beginPath();_s.arc(bx,hY-14,3,0,Math.PI*2);_s.stroke();
-se(bx,hY+4,12,8,cloak+'e0');
-_s.shadowColor=glow;_s.shadowBlur=10;sf(bx-7,hY-4,6,4,glow);sf(bx+3,hY-4,6,4,glow);sf(bx-6,hY-3,4,2,glowLt);sf(bx+4,hY-3,4,2,glowLt);sf(bx-5,hY-2,2,1,'#ffffff');sf(bx+5,hY-2,2,1,'#ffffff');_s.shadowBlur=0;_s.shadowColor='transparent';
-sl(bx-8,hY-7,bx-3,hY-6,2,dk);sl(bx+2,hY-6,bx+7,hY-7,2,dk);}
+// === HEAD — BIG, dramatic hood, face wraps, piercing glowing eyes ===
+const hY=nY-22+(o.hY||0);
+// Neck (thin, partly wrapped)
+sf(bx-2,nY-6,5,8,sk);sf(bx-3,nY-4,7,4,dk+'90'); // neck wrapping
+
+// Head base (hidden under hood+wraps, but defines the shape)
+sc(bx,hY,17,sk);
+
+// === FACE WRAPS — ninja-style, layered cloth covering lower face ===
+// Multiple strips for texture (not just one rectangle)
+sf(bx-14,hY+2,28,12,dk+'e0');                     // main wrap area
+// Wrap cloth texture — horizontal strips with slight color variation
+sf(bx-13,hY+2,26,2,dk+'c0');sf(bx-14,hY+5,28,2,dk+'d0');
+sf(bx-13,hY+8,26,2,dk+'b0');sf(bx-14,hY+11,28,2,dk+'c0');
+// Wrap edges
+sl(bx-14,hY+2,bx+14,hY+2,1.2,acc+'30');          // top edge
+sl(bx-14,hY+14,bx+14,hY+14,1,acc+'20');           // bottom edge
+// Wrap crossing point (where cloth folds)
+sl(bx+4,hY+3,bx-2,hY+13,1,acc+'25');
+// Trailing wrap tail (flowing behind)
+_s.strokeStyle=dk+'90';_s.lineWidth=3;_s.lineCap='round';_s.beginPath();
+_s.moveTo(bx-14,hY+7);_s.quadraticCurveTo(bx-22,hY+14,bx-26,hY+22);_s.stroke();
+_s.lineWidth=2;_s.strokeStyle=dk+'50';_s.beginPath();
+_s.moveTo(bx-26,hY+22);_s.quadraticCurveTo(bx-28,hY+28,bx-24,hY+32);_s.stroke();
+
+// === MASSIVE HOOD (the defining silhouette element) ===
+// Hood is HUGE — extends well beyond the head on both sides
+_s.fillStyle=cloak;_s.beginPath();_s.ellipse(bx,hY-4,26,20,0,Math.PI,0);_s.fill();
+// Hood inner shadow (darker gradient at the top)
+_s.fillStyle=dk+'80';_s.beginPath();_s.ellipse(bx,hY-8,20,10,0,Math.PI,0);_s.fill();
+// Hood outline — thick, ornate purple accent
+_s.strokeStyle=acc;_s.lineWidth=3.5;_s.beginPath();_s.ellipse(bx,hY-4,26,20,0,Math.PI,0);_s.stroke();
+// Inner trim line
+_s.strokeStyle=accLt+'40';_s.lineWidth=1;_s.beginPath();_s.ellipse(bx,hY-4,23,17,0,Math.PI+0.1,2*Math.PI-0.1);_s.stroke();
+
+// Pointed ear/horn tips (dramatic, extend upward)
+sl(bx-25,hY-4,bx-32,hY-18,4,acc);sl(bx-30,hY-14,bx-34,hY-22,2,accLt+'60');
+sl(bx+25,hY-4,bx+32,hY-18,4,acc);sl(bx+30,hY-14,bx+34,hY-22,2,accLt+'60');
+
+// Hood rune (glowing symbol at the peak)
+sc(bx,hY-18,4,acc+'40');
+_s.strokeStyle=acc+'50';_s.lineWidth=1;_s.beginPath();_s.arc(bx,hY-18,4,0,Math.PI*2);_s.stroke();
+// Inner rune cross
+sl(bx-2,hY-18,bx+2,hY-18,0.8,acc+'40');sl(bx,hY-20,bx,hY-16,0.8,acc+'40');
+
+// Shadow covering the face between hood and wraps (only eyes visible)
+se(bx,hY+1,16,6,cloak+'c0');
+
+// === GLOWING EYES — the MAIN feature, piercing from the darkness ===
+// These eyes should be ICONIC — narrow, intense, glowing yellow from pure shadow
+
+// Outer glow (ambient light spilling from the eyes into the hood shadow)
+_s.shadowColor=glow;_s.shadowBlur=14;
+
+// --- LEFT EYE (narrow, intense, glowing) ---
+// Dark eye socket first (shadow recess)
+se(bx-7,hY-2,8,4,dk+'a0');
+// Bright glowing iris (narrow anime-style — wider than tall)
+se(bx-7,hY-2,7,3.5,glow);
+// Inner bright core
+se(bx-7,hY-2,5,2.5,'#ffe060');
+// Hot white center
+se(bx-6,hY-2,3,1.5,'#ffffff');
+// Pupil slit (vertical, cat-like — assassin)
+sf(bx-7,hY-3,1.5,3,'#806020');
+
+// --- RIGHT EYE (mirror) ---
+se(bx+7,hY-2,8,4,dk+'a0');
+se(bx+7,hY-2,7,3.5,glow);
+se(bx+7,hY-2,5,2.5,'#ffe060');
+se(bx+8,hY-2,3,1.5,'#ffffff');
+sf(bx+7,hY-3,1.5,3,'#806020');
+
+// Extra glow flare (light streaking from outer corners — dramatic)
+sl(bx-13,hY-2,bx-17,hY-3,1.5,glow+'60');
+sl(bx+13,hY-2,bx+17,hY-3,1.5,glow+'60');
+
+_s.shadowBlur=0;_s.shadowColor='transparent';
+
+// Eyebrows (sharp V-shape, visible above the glow — menacing)
+sl(bx-12,hY-5,bx-4,hY-8,2.5,dk);
+sl(bx+4,hY-8,bx+12,hY-5,2.5,dk);
+
+// No nose, no mouth — all hidden behind wraps. The eyes ARE the face.}
 
 // GEN + DRAW + INIT
 function generateSpritesForCharacter(c){const id=c.id;spriteCache[id]={};const fn=id==='aurora'?drawAurora:id==='crimson'?drawCrimson:id==='jade'?drawJade:id==='noir'?drawNoir:drawAurora;for(const[a,d]of Object.entries(SPRITE_ANIMS)){spriteCache[id][a]=[];for(let f=0;f<d.frames;f++){const cv=document.createElement('canvas');cv.width=SPRITE_W;cv.height=SPRITE_H;_s=cv.getContext('2d');_s.imageSmoothingEnabled=false;fn(SPRITE_W/2,SPRITE_H-14,gp(a,f,d.frames));spriteCache[id][a].push(cv);}}_s=null;}
