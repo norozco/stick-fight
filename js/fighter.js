@@ -160,9 +160,9 @@ class Fighter {
       return true;
     }
     // ARCADE CANCEL: during attack recovery (after active frames end),
-    // allow canceling into a DIFFERENT move type. This keeps gameplay fluid:
-    // light→heavy, light→throw, light→jump, heavy→ult, etc.
-    if(this.state === 'attack' && this.attackHit) {
+    // allow canceling into a DIFFERENT move type. This keeps gameplay fluid.
+    // Throws are EXCLUDED — they use the 4-phase system initiated from idle only.
+    if(this.state === 'attack' && this.attackHit && type !== 'throw' && type !== 'ult') {
       const data = this.attackData();
       if(data && this.stateTime > data.start + data.active && type !== this.attackType) {
         this.state = 'attack';
