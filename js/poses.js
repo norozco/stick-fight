@@ -475,13 +475,14 @@ function smoothPose(current, target, factor) {
 }
 
 function captureFighterPose(f) {
-  // Deep clone smoothPose for afterimage use + facing
+  // Deep clone smoothPose for afterimage use + facing + visual identity
   const p = f.smoothPose ? clonePose(f.smoothPose) : clonePose(computeTargetPose(f));
   p.facing = f.facing;
   p.hurtFlash = 0;
   p.onGround = f.onGround;
   p.x = f.x;
   p.y = f.y;
+  p.visual = (f.character && f.character.visual) || null;
   return p;
 }
 
