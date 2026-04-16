@@ -1201,20 +1201,55 @@ function frontFacingFlailPose(f) {
 function drawFighter(f) {
   const vis = f.character && f.character.visual;
 
-  // Sprite-based rendering for ALL states. Special states (thrown, ringout)
-  // apply transforms (rotation, etc.) around the sprite instead of falling
-  // back to the tiny procedural renderer.
+  // Sprite-based rendering for ALL states. Special states (thrown, ringout, ko, knockdown)
+  // apply transforms (rotation, etc.) around the sprite.
   if(typeof drawFighterSprite === 'function') {
-    // Handle rotation for thrown/ringout states
+    // Determine rotation for special states
     const hasThrowSpin = f.beingThrown > 0 && f.throwSpin;
     const hasRingoutSpin = f.state === 'ringout' && f.ringoutSpin;
+    const dir = f.lastHitDir || -f.facing;
 
-    if(hasThrowSpin || hasRingoutSpin) {
-      const spin = hasThrowSpin ? f.throwSpin : f.ringoutSpin;
+    // KO: tumble rotation while airborne, then tilt flat when landed
+    let koRotation = 0;
+    if(f.state === 'ko') {
+      if(!f.koLanded) {
+        // Airborne: progressive backward tumble (up to ~100 degrees)
+        const tumbleP = Math.min(f.stateTime / 18, 1);
+        koRotation = dir * easeOutCubic(tumbleP) * 1.7;  // ~100° in hit direction
+      } else {
+        // Landed: settle to ~90° (lying flat)
+        const settleP = Math.min((f.stateTime - (f.koLandFrame || 0)) / 8, 1);
+        koRotation = dir * lerp(1.7, Math.PI / 2, easeOutCubic(settleP));
+      }
+    }
+
+    // Knockdown: flat on the ground (~90°)
+    let knockdownRotation = 0;
+    if(f.state === 'knockdown') {
+      knockdownRotation = dir * Math.PI / 2;
+    }
+
+    // Thrown state: tumble through arc
+    let thrownRotation = 0;
+    if(f.state === 'thrown') {
+      thrownRotation = dir * Math.min(f.stateTime / 6, 1) * 1.4;
+    }
+
+    const needsRotation = hasThrowSpin || hasRingoutSpin || koRotation || knockdownRotation || thrownRotation;
+
+    if(needsRotation) {
+      const spin = hasThrowSpin ? f.throwSpin
+                 : hasRingoutSpin ? f.ringoutSpin
+                 : koRotation || knockdownRotation || thrownRotation;
       ctx.save();
-      ctx.translate(f.x, f.y - SPRITE_DRAW_H / 2 + 10);
+      // Pivot at the fighter's center-mass
+      const pivotX = f.x;
+      const pivotY = (f.state === 'knockdown' || (f.state === 'ko' && f.koLanded))
+                   ? f.y - 20   // lower pivot for ground states
+                   : f.y - SPRITE_DRAW_H / 2 + 10;
+      ctx.translate(pivotX, pivotY);
       ctx.rotate(spin);
-      ctx.translate(-f.x, -(f.y - SPRITE_DRAW_H / 2 + 10));
+      ctx.translate(-pivotX, -pivotY);
       drawFighterSprite(f);
       ctx.restore();
     } else {
