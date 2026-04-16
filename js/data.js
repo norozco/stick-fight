@@ -40,6 +40,13 @@ const CHARACTERS = [
       ],
       idleStance: { lHandY: -8, rHandY: -8, lHandX: -4, rHandX: 4, lFootX: 2, rFootX: -2, lean: 0 },
       idleAnim: { breathAmp: 1.5, swayFreq: 0.03, motion: 'float' },
+      // SNES-quality filled body
+      body: {
+        shoulderW: 18, waistW: 14, upperArmW: 7, forearmW: 6, thighW: 9, shinW: 7,
+        handR: 4, footW: 10, footH: 5,
+        skinColor: '#e8d8cc', outfitColor: '#4488cc', outfitDark: '#2a5580',
+        outfitAccent: '#66bbee', outlineColor: '#1a3050',
+      },
     },
   },
   { id: 'crimson', name: 'CRIMSON', color: '#ffe0e8', glow: '#ff3860', hp: 92, speed: 1.10, dmg: 1.08,
