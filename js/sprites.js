@@ -159,23 +159,28 @@ function drawAurora(cx,gy,o){
   // Ice bracers
   sf(lax-2,lay,6,4,acc+'70');sf(rax-2,ray,6,4,acc+'70');
 
-  // Head
-  const hY=nY-14+(o.hY||0);
-  sf(bx-3,nY-4,6,6,sk);sc(bx,hY,13,sk);sc(bx,hY,13.5,out+'30');
-  // Bangs (layered)
-  se(bx+3,hY-8,10,5,hair);se(bx-4,hY-9,6,4,hairDk);se(bx+6,hY-6,4,3,hairLt);
-  // Crown
-  sl(bx-7,hY-10,bx-9,hY-26,3,acc);sl(bx,hY-12,bx,hY-30,3.5,'#c0f4ff');sl(bx+7,hY-10,bx+9,hY-26,3,acc);
-  sc(bx,hY-30,3,'#ffffff');sc(bx,hY-30,2,'#c0f4ff');
-  // Small side crystals
-  sl(bx-12,hY-6,bx-14,hY-14,1.5,acc+'80');sl(bx+12,hY-6,bx+14,hY-14,1.5,acc+'80');
+  // Head — BIG for chibi proportions, detailed pixel face
+  const hY=nY-18+(o.hY||0);
+  sf(bx-3,nY-5,7,7,sk);                            // neck
+  sc(bx,hY,17,sk);sc(bx,hY,17.5,out+'30');         // big round head
+  // Ears
+  se(bx-14,hY+1,3,4,sk);se(bx+14,hY+1,3,4,sk);
+  // Bangs (layered, voluminous)
+  se(bx,hY-12,16,8,hair);se(bx-5,hY-13,8,5,hairDk);se(bx+8,hY-10,6,4,hairLt);
+  sf(bx-10,hY-6,6,4,hairDk);                       // side bang left
+  sf(bx+8,hY-4,5,3,hair);                          // side bang right
+  // Crown — prominent
+  sl(bx-8,hY-14,bx-10,hY-32,3.5,acc);sl(bx,hY-16,bx,hY-36,4,'#c0f4ff');sl(bx+8,hY-14,bx+10,hY-32,3.5,acc);
+  sc(bx,hY-36,3.5,'#ffffff');sc(bx,hY-36,2,'#c0f4ff');
+  sl(bx-14,hY-8,bx-16,hY-18,2,acc+'80');sl(bx+14,hY-8,bx+16,hY-18,2,acc+'80');
   // Face
-  sf(bx+3,hY-4,6,4,'#3bf0ff');sf(bx+7,hY-5,2,1,'#ffffff');  // eye + highlight
-  sl(bx+2,hY-6,bx+8,hY-7,1.2,out+'70');                      // eyebrow (soft arch)
-  sc(bx+5,hY+1,1.2,out+'40');                                 // nose
-  sf(bx+3,hY+4,4,1.5,'#d09090');                              // lips
-  // Ear
-  se(bx-8,hY,2,3,sk);
+  pixelFace(bx, hY, {
+    eyeColor: '#3bf0ff', eyeW: 4, eyeH: 3,
+    browColor: out+'80', browAngle: -1,  // soft arch
+    mouthColor: '#d09090', mouthW: 4, mouthY: 7,
+    noseColor: skDk, skinDark: skDk, outline: out,
+    expression: 'smile',
+  });
 }
 
 // ============================================================
