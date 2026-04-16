@@ -402,40 +402,74 @@ function computeTargetPose(f) {
       pose.head.x += fc * 2;
     }
     else if(f.attackType === 'throw') {
-      // Ken-style shoulder throw — smooth arm-arc that mirrors the victim's path
-      // 0-3 grab / 4-24 arc / 24 impact / 25-35 recovery
-      if(t <= 3) {
-        // Lunge and reach
-        const p = t / 3;
-        pose.bodyLean = fc * (4 + p * 6);
-        const ext = easeOutCubic(p) * 40;
-        pose.rHand.x = x + fc * ext; pose.rHand.y = y - 78;
-        pose.lHand.x = x + fc * ext; pose.lHand.y = y - 70;
-        pose.rElbow.x = x + fc * ext * 0.5; pose.rElbow.y = y - 78;
-        pose.lElbow.x = x + fc * ext * 0.5; pose.lElbow.y = y - 72;
+      // Phase-synced throw pose — matches the 4-phase system in fighter.js
+      // Uses f.throwPhase + f.throwTimer so the visual is LOCKED to the mechanic
+      const ph = f.throwPhase || 0;
+      const tt = f.throwTimer || 0;
+
+      if(ph === 1) {
+        // PHASE 1: GRAB — lunge forward, both hands reach out to seize defender
+        const p = Math.min(tt / 8, 1);
+        const ep = easeOutCubic(p);
+        pose.bodyLean = fc * (4 + ep * 10);
+        pose.head.x += fc * ep * 6;
+        // Both hands extend to grab point (where defender is: fc * 30-44px ahead)
+        const grabReach = lerp(14, 38, ep);
+        pose.rHand.x = x + fc * grabReach;       pose.rHand.y = y - lerp(60, 72, ep);
+        pose.lHand.x = x + fc * (grabReach - 4); pose.lHand.y = y - lerp(60, 64, ep);
+        pose.rElbow.x = x + fc * grabReach * 0.5; pose.rElbow.y = y - 76;
+        pose.lElbow.x = x + fc * grabReach * 0.4; pose.lElbow.y = y - 70;
+        // Front foot steps forward
+        pose.rFoot.x = x + fc * lerp(12, 22, ep); pose.rFoot.y = y;
+        pose.lFoot.x = x - fc * lerp(12, 6, ep);  pose.lFoot.y = y;
+        pose.rKnee.x = x + fc * lerp(8, 16, ep);
+        pose.lKnee.x = x - fc * lerp(8, 4, ep);
+      } else if(ph === 2) {
+        // PHASE 2: SECURED HOLD — hands clamped on defender, pulling them close
+        // Attacker is braced, visibly controlling the defender
+        const p = Math.min(tt / 10, 1);
+        pose.bodyLean = fc * lerp(14, 8, p);
         pose.head.x += fc * 4;
-      } else if(t <= 24) {
-        // Arms track the victim's arc — hands stay roughly on the victim
-        const raw = (t - 3) / 21;
-        const p = easeInOutCubic(raw);
-        const angle = p * Math.PI;
+        // Hands stay locked at grab position — close to body now
+        const holdDist = lerp(38, 28, p);
+        pose.rHand.x = x + fc * holdDist;         pose.rHand.y = y - lerp(72, 68, p);
+        pose.lHand.x = x + fc * (holdDist - 6);   pose.lHand.y = y - lerp(64, 60, p);
+        pose.rElbow.x = x + fc * holdDist * 0.4;  pose.rElbow.y = y - 74;
+        pose.lElbow.x = x + fc * holdDist * 0.3;  pose.lElbow.y = y - 68;
+        // Braced wide stance
+        pose.rFoot.x = x + fc * 20; pose.rFoot.y = y;
+        pose.lFoot.x = x - fc * 10; pose.lFoot.y = y;
+        pose.rKnee.x = x + fc * 14; pose.rKnee.y = y - 20;
+        pose.lKnee.x = x - fc * 6;  pose.lKnee.y = y - 22;
+        // Slight squat for control
+        pose.pelvis.y = y - 38;
+        pose.neck.y = y - 78;
+        pose.head.y = y - 94;
+      } else if(ph === 3) {
+        // PHASE 3: THROW ARC — arms track the defender's semicircular path
+        const p = Math.min(tt / 14, 1);
+        const ep = easeInOutCubic(p);
+        const angle = ep * Math.PI;  // 0 (front) → π (behind)
+        // Hands track the arc where the defender actually is
         const handX = Math.cos(angle) * 50 * fc;
-        const handY = -Math.sin(angle) * 80 - 55;
+        const handY = -Math.sin(angle) * 75 - 50;
         pose.rHand.x = x + handX;         pose.rHand.y = y + handY;
-        pose.lHand.x = x + handX - fc*4;  pose.lHand.y = y + handY + 8;
-        pose.rElbow.x = x + handX * 0.45; pose.rElbow.y = y - 78 + handY * 0.3;
-        pose.lElbow.x = x + handX * 0.45; pose.lElbow.y = y - 74 + handY * 0.3;
-        // Body leans opposite to the victim — counterbalance
-        pose.bodyLean = fc * lerp(10, -18, p);
-        pose.head.x += fc * (4 - p * 8);
-        // Slight knee bend at apex
-        pose.pelvis.y = y - 42 + Math.sin(angle) * 6;
-      } else {
-        // Recovery — straighten up, arms drop
-        const p = clamp((t - 24) / 11, 0, 1);
-        pose.bodyLean = -fc * (10 - p * 10);
-        pose.rHand.x = x + fc * lerp(8, 14, p);  pose.rHand.y = y - 62 + p * 4;
-        pose.lHand.x = x - fc * lerp(8, 14, p);  pose.lHand.y = y - 62;
+        pose.lHand.x = x + handX - fc*6;  pose.lHand.y = y + handY + 10;
+        pose.rElbow.x = x + handX * 0.4;  pose.rElbow.y = y - 76 + handY * 0.25;
+        pose.lElbow.x = x + handX * 0.35; pose.lElbow.y = y - 72 + handY * 0.25;
+        // Body counterbalances — leans opposite to the throw arc
+        pose.bodyLean = fc * lerp(8, -20, ep);
+        pose.head.x += fc * lerp(4, -8, ep);
+        // Pivot on feet, slight squat at apex
+        pose.pelvis.y = y - 42 + Math.sin(angle) * 8;
+        pose.rFoot.x = x + fc * 14; pose.rFoot.y = y;
+        pose.lFoot.x = x - fc * 14; pose.lFoot.y = y;
+      } else if(ph === 4 || ph === 0) {
+        // PHASE 4 / RECOVERY — straighten up after release
+        const p = clamp(tt / 8, 0, 1);
+        pose.bodyLean = -fc * lerp(20, 0, p);
+        pose.rHand.x = x + fc * lerp(-10, 14, p);  pose.rHand.y = y - lerp(50, 60, p);
+        pose.lHand.x = x - fc * lerp(-6, 14, p);   pose.lHand.y = y - lerp(48, 60, p);
         pose.rElbow.x = x + fc * 8; pose.rElbow.y = y - 72;
         pose.lElbow.x = x - fc * 8; pose.lElbow.y = y - 72;
       }
