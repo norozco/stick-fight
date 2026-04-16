@@ -710,12 +710,38 @@ class Fighter {
 
     if(input.lightPressed) this.startAttack('light');
     if(input.heavyPressed) this.startAttack('heavy');
-    if(input.throwPressed) {
-      // Directional throw: holding back = toss over shoulder (default);
-      // holding forward (or neutral) = slam forward.
-      const holdingBack = (this.facing === 1 && input.left) || (this.facing === -1 && input.right);
-      this.throwDir = holdingBack ? -1 : 1;
-      this.startAttack('throw');
+    if(input.throwPressed && this.state === 'idle' && this.hitStun === 0 && opponent) {
+      // --- 4-PHASE THROW: initiate grab attempt ---
+      const dist = Math.abs(this.x - opponent.x);
+      if(dist < 95 && opponent.state !== 'ko' && opponent.state !== 'knockdown' &&
+         opponent.state !== 'grabbed' && opponent.state !== 'thrown') {
+        // PHASE 1: GRAB — lock both fighters
+        this.state = 'attack';
+        this.attackType = 'throw';
+        this.stateTime = 0;
+        this.throwPhase = 1;
+        this.throwTimer = 0;
+        this.throwTarget = opponent;
+        this.attackHit = true;     // treat as connected immediately
+
+        // Lock defender
+        opponent.state = 'grabbed';
+        opponent.stateTime = 0;
+        opponent.throwBy = this;
+        opponent.vx = 0; opponent.vy = 0;
+        opponent.knockback = 0;
+        opponent.hitStun = 999;    // can't act while grabbed
+        opponent.blocking = false;
+
+        // Snap defender to grab position (in front of attacker)
+        opponent.x = this.x + this.facing * 44;
+        opponent.y = GROUND;
+        opponent.facing = -this.facing;
+
+        // Hitstop on grab contact
+        hitstop = 6;
+        Audio.whoosh();
+      }
     }
     if(input.ultPressed && this.ult >= this.maxUlt && this.state === 'idle') this.startAttack('ult');
     if(input.dashPressed) {
