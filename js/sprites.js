@@ -153,33 +153,101 @@ sl(bx-15,hY-3,bx-23,hY+8,3,band);sl(bx-23,hY+8,bx-28,hY+16,2.5,band+'80');
 sl(bx-6,hY-10,bx-22,hY-38,5.5,'#ff6644');sl(bx-3,hY-12,bx-12,hY-46,6,'#ff3040');sl(bx+1,hY-10,bx-5,hY-38,5,'#ff5533');sl(bx+5,hY-9,bx+2,hY-32,4.5,'#ff4444');sl(bx+8,hY-7,bx+7,hY-24,3.5,'#ff7744');sl(bx+11,hY-4,bx+11,hY-18,3,'#ffaa44');sl(bx+13,hY-2,bx+14,hY-12,2,'#ffcc66');
 pixelFace(bx,hY,{eyeColor:'#ff3860',eyeW:3,eyeH:4,browColor:out,browAngle:3,mouthColor:out,mouthW:7,mouthY:8,noseColor:skDk,skinDark:skDk,outline:out,expression:'grimace'});sf(bx-2,hY+5,6,2,skDk+'30');}
 
-// JADE
-function drawJade(cx,gy,o){const L=o.lean||0,bx=cx+L;const sk='#d8c0a0',skDk='#b8a080';const ar='#2a6640',dk='#1a4430',lt='#44aa66';const pl='#3a8855',plDk='#286838',met='#88cc88',metDk='#558855',gold='#ccaa44',goldDk='#997722',out='#0a2218';
-const lx=bx-12+(o.lLS||0),ly=gy-(o.lFL||0),rx=bx+12+(o.rLS||0),ry=gy-(o.rFL||0);
-shadedLimb(bx-6,gy-48,lx,ly,14,ar,dk,out);shadedLimb(bx+6,gy-48,rx,ry,14,ar,dk,out);
-for(let i=0;i<3;i++){sf(lx-6,ly-22+i*6,13,5,pl);sf(lx-6,ly-22+i*6,13,1,met);sf(rx-6,ry-22+i*6,13,5,pl);sf(rx-6,ry-22+i*6,13,1,met);}
-se((bx-6+lx)/2,(gy-48+ly)/2,5,5,pl);sc((bx-6+lx)/2,(gy-48+ly)/2,3,gold);se((bx+6+rx)/2,(gy-48+ry)/2,5,5,pl);sc((bx+6+rx)/2,(gy-48+ry)/2,3,gold);
-sf(lx-7,ly-4,16,7,dk);sf(lx-7,ly-4,16,2,out);sl(lx-6,ly+1,lx+9,ly+1,1.5,met);sf(lx-1,ly-2,4,3,gold);
-sf(rx-7,ry-4,16,7,dk);sf(rx-7,ry-4,16,2,out);sl(rx-6,ry+1,rx+9,ry+1,1.5,met);sf(rx-1,ry-2,4,3,gold);
-const nY=gy-84,pY=gy-48;se(bx,pY,17,8,ar);
-_s.fillStyle=pl;_s.beginPath();_s.moveTo(bx-15,pY-2);_s.lineTo(bx+15,pY-2);_s.lineTo(bx+17,pY+8);_s.lineTo(bx-17,pY+8);_s.closePath();_s.fill();sf(bx-15,pY-2,30,2,gold);sf(bx-1,pY+1,3,5,met);
-sf(bx-9,pY-16,18,16,ar);st(bx,pY-16,18,bx,nY,28,ar,out);sf(bx-14,nY,14,pY-nY,dk+'50');
-sf(bx-10,nY+5,20,18,pl);sf(bx-10,nY+5,20,3,met);sf(bx-10,nY+20,20,2,gold);
-_s.fillStyle=lt;_s.beginPath();_s.moveTo(bx,nY+9);_s.lineTo(bx-5,nY+15);_s.lineTo(bx,nY+21);_s.lineTo(bx+5,nY+15);_s.closePath();_s.fill();_s.strokeStyle=gold;_s.lineWidth=1;_s.stroke();sc(bx,nY+15,2,'#88ffaa');
-sf(bx-13,pY-3,26,4,gold);sf(bx-13,pY-3,26,1,goldDk);sc(bx,pY-1,3,met);sc(bx,pY-1,1.5,lt);
-se(bx-18,nY+4,11,7,pl);se(bx-18,nY+4,11,2,gold);sf(bx-20,nY-2,5,3,met);sl(bx-18,nY-3,bx-21,nY-12,3,met);sc(bx-21,nY-12,2,gold);
-se(bx+18,nY+4,11,7,pl);se(bx+18,nY+4,11,2,gold);sf(bx+17,nY-2,5,3,met);sl(bx+18,nY-3,bx+21,nY-12,3,met);sc(bx+21,nY-12,2,gold);
-const sY=nY+5;const lax=bx-26-(o.lAE||0),lay=sY+24+Math.sin(o.lAA||0)*16;const rax=bx+26+(o.rAE||0),ray=sY+24+Math.sin(o.rAA||0)*16;
-shadedLimb(bx-18,sY,lax,lay,12,ar,dk,out);sf(lax-5,lay-3,14,10,pl);sf(lax-5,lay-3,14,2,gold);sf(lax-5,lay+5,14,1,gold);
-shadedLimb(lax,lay+7,lax-5,lay+20,10,sk,skDk,out);sc(lax-5,lay+23,6,sk);sc(lax-5,lay+23,6,out+'20');
-shadedLimb(bx+18,sY,rax,ray,12,ar,dk,out);sf(rax-7,ray-3,14,10,pl);sf(rax-7,ray-3,14,2,gold);sf(rax-7,ray+5,14,1,gold);
-shadedLimb(rax,ray+7,rax+5,ray+20,10,sk,skDk,out);sc(rax+5,ray+23,6,sk);sc(rax+5,ray+23,6,out+'20');
-const hY=nY-20+(o.hY||0);sf(bx-4,nY-5,9,8,sk);sc(bx,hY,17,sk);se(bx-14,hY+1,3,4,sk);se(bx+14,hY+1,3,4,sk);
-se(bx,hY-4,19,14,pl);_s.strokeStyle=out;_s.lineWidth=1.5;_s.beginPath();_s.ellipse(bx,hY-4,19,14,0,Math.PI,0);_s.stroke();
-sf(bx-19,hY-5,38,6,met);sf(bx-19,hY-5,38,2,gold);sf(bx-2,hY-22,5,16,met);
-for(let i=0;i<8;i++){sl(bx,hY-22-i*2,bx-4-i*1.5,hY-24-i*2,2,i%2===0?lt:met);}
-se(bx,hY-22,4,3,gold);for(let i=0;i<14;i++){sf(bx-4+Math.sin(i*0.3)*2.5-L*0.3,hY+14+i*2.2,5,2,i%2===0?lt:met);}
-pixelFace(bx,hY,{eyeColor:'#44ff88',eyeW:5,eyeH:4,browColor:out,browAngle:1,mouthColor:'#b09070',mouthW:5,mouthY:9,noseColor:skDk,skinDark:skDk,outline:out,expression:'serious'});sc(bx+7,hY+4,1,out+'60');}
+// JADE — Armored Warrior QUEEN. CLEARLY FEMININE BUT MASSIVE:
+// Wide hourglass with visible curves under armor, valkyrie-style
+// helmet with wing details, huge shoulder pads, battle hammer visible.
+function drawJade(cx,gy,o){const L=o.lean||0,bx=cx+L;
+const sk='#d8c0a0',skDk='#b8a080';const ar='#2a6640',dk='#1a4430',lt='#44aa66';
+const pl='#3a8855',plDk='#286838',met='#88cc88',metDk='#558855',gold='#ccaa44',goldDk='#997722',out='#0a2218';
+
+// === LEGS — powerful, wide stance, armored ===
+const lx=bx-14+(o.lLS||0),ly=gy-(o.lFL||0),rx=bx+14+(o.rLS||0),ry=gy-(o.rFL||0);
+shadedLimb(bx-7,gy-50,lx,ly,15,ar,dk,out);shadedLimb(bx+7,gy-50,rx,ry,15,ar,dk,out);
+// Segmented armor plates on each leg
+for(let i=0;i<3;i++){sf(lx-7,ly-24+i*7,15,6,pl);sf(lx-7,ly-24+i*7,15,1.5,met);
+sf(rx-7,ry-24+i*7,15,6,pl);sf(rx-7,ry-24+i*7,15,1.5,met);}
+// Knee guards (gold)
+se((bx-7+lx)/2,(gy-50+ly)/2,6,6,pl);sc((bx-7+lx)/2,(gy-50+ly)/2,4,gold);
+se((bx+7+rx)/2,(gy-50+ry)/2,6,6,pl);sc((bx+7+rx)/2,(gy-50+ry)/2,4,gold);
+// MASSIVE armored boots
+sf(lx-8,ly-4,18,8,dk);sf(lx-8,ly-4,18,2,out);sl(lx-7,ly+2,lx+10,ly+2,2,met);sf(lx-2,ly-3,5,4,gold);
+sf(rx-8,ry-4,18,8,dk);sf(rx-8,ry-4,18,2,out);sl(rx-7,ry+2,rx+10,ry+2,2,met);sf(rx-2,ry-3,5,4,gold);
+
+// === TORSO — WIDE hourglass under heavy armor ===
+const nY=gy-88,pY=gy-50;
+// Draw feminine armored torso — wider than any other character
+_s.fillStyle=ar;_s.beginPath();
+_s.moveTo(bx-14,nY);_s.lineTo(bx+14,nY);          // wide shoulders
+_s.quadraticCurveTo(bx+16,nY+12,bx+10,nY+20);     // right chest
+_s.quadraticCurveTo(bx+7,nY+24,bx+8,nY+28);       // right waist
+_s.quadraticCurveTo(bx+13,nY+34,bx+16,pY);         // right hip
+_s.lineTo(bx-16,pY);                                // bottom
+_s.quadraticCurveTo(bx-13,nY+34,bx-8,nY+28);      // left hip
+_s.quadraticCurveTo(bx-7,nY+24,bx-10,nY+20);      // left waist
+_s.quadraticCurveTo(bx-16,nY+12,bx-14,nY);         // left chest
+_s.closePath();_s.fill();_s.strokeStyle=out;_s.lineWidth=1.5;_s.stroke();
+sf(bx-14,nY,14,pY-nY,dk+'40');  // shadow
+// Chest armor plate with feminine shaping
+sf(bx-10,nY+5,20,20,pl);sf(bx-10,nY+5,20,3,gold);sf(bx-10,nY+22,20,2,gold);
+// Armor bust definition (two curved panels)
+_s.strokeStyle=met;_s.lineWidth=1;_s.beginPath();_s.arc(bx-4,nY+14,5,0.5,Math.PI-0.5);_s.stroke();
+_s.beginPath();_s.arc(bx+4,nY+14,5,0.5,Math.PI-0.5);_s.stroke();
+// Center gemstone
+_s.fillStyle=lt;_s.beginPath();_s.moveTo(bx,nY+8);_s.lineTo(bx-6,nY+16);_s.lineTo(bx,nY+24);_s.lineTo(bx+6,nY+16);_s.closePath();_s.fill();
+_s.strokeStyle=gold;_s.lineWidth=1.2;_s.stroke();sc(bx,nY+16,3,'#88ffaa');
+// Gold belt
+sf(bx-14,pY-3,28,5,gold);sf(bx-14,pY-3,28,1.5,goldDk);sc(bx,pY-1,3.5,met);sc(bx,pY-1,2,lt);
+// Armored battle skirt (tassets)
+_s.fillStyle=pl;_s.beginPath();_s.moveTo(bx-16,pY+1);_s.lineTo(bx+16,pY+1);
+_s.lineTo(bx+20,pY+12);_s.lineTo(bx-20,pY+12);_s.closePath();_s.fill();
+sf(bx-16,pY+1,32,2,gold);sf(bx-1,pY+3,3,7,met);
+// MASSIVE shoulder armor with WING details
+se(bx-20,nY+5,12,8,pl);se(bx-20,nY+5,12,2.5,gold);
+sl(bx-20,nY-3,bx-24,nY-14,3.5,met);sc(bx-24,nY-14,2.5,gold);
+sl(bx-22,nY-1,bx-28,nY-10,2,met+'80');  // wing accent
+se(bx+20,nY+5,12,8,pl);se(bx+20,nY+5,12,2.5,gold);
+sl(bx+20,nY-3,bx+24,nY-14,3.5,met);sc(bx+24,nY-14,2.5,gold);
+sl(bx+22,nY-1,bx+28,nY-10,2,met+'80');
+
+// === ARMS (powerful, armored gauntlets) ===
+const sY=nY+6;const lax=bx-28-(o.lAE||0),lay=sY+26+Math.sin(o.lAA||0)*16;
+const rax=bx+28+(o.rAE||0),ray=sY+26+Math.sin(o.rAA||0)*16;
+shadedLimb(bx-20,sY,lax,lay,13,ar,dk,out);
+sf(lax-6,lay-3,16,12,pl);sf(lax-6,lay-3,16,3,gold);sf(lax-6,lay+7,16,1.5,gold);
+shadedLimb(lax,lay+9,lax-6,lay+22,11,sk,skDk,out);
+sc(lax-6,lay+26,7,sk);sc(lax-6,lay+26,7,out+'20');
+shadedLimb(bx+20,sY,rax,ray,13,ar,dk,out);
+sf(rax-8,ray-3,16,12,pl);sf(rax-8,ray-3,16,3,gold);sf(rax-8,ray+7,16,1.5,gold);
+shadedLimb(rax,ray+9,rax+6,ray+22,11,sk,skDk,out);
+sc(rax+6,ray+26,7,sk);sc(rax+6,ray+26,7,out+'20');
+
+// === HEAD — valkyrie helmet, clearly feminine face ===
+const hY=nY-22+(o.hY||0);
+sf(bx-4,nY-5,9,8,sk);sc(bx,hY,18,sk);
+se(bx-16,hY+1,3,5,sk);se(bx+16,hY+1,3,5,sk);  // ears
+// Helmet dome
+se(bx,hY-5,20,15,pl);
+_s.strokeStyle=out;_s.lineWidth=2;_s.beginPath();_s.ellipse(bx,hY-5,20,15,0,Math.PI,0);_s.stroke();
+// Visor (gold with green insets)
+sf(bx-20,hY-6,40,7,met);sf(bx-20,hY-6,40,2,gold);sf(bx-20,hY,40,1,gold);
+// Helmet WINGS (valkyrie) — distinctive side wings
+sl(bx-20,hY-8,bx-30,hY-20,3,gold);sl(bx-30,hY-20,bx-26,hY-16,2,met);
+sl(bx-28,hY-18,bx-34,hY-26,2,gold+'80');
+sl(bx+20,hY-8,bx+30,hY-20,3,gold);sl(bx+30,hY-20,bx+26,hY-16,2,met);
+sl(bx+28,hY-18,bx+34,hY-26,2,gold+'80');
+// Crest with plume
+sf(bx-2,hY-24,5,18,met);
+for(let i=0;i<6;i++){sl(bx,hY-24-i*2.5,bx-4-i*2,hY-26-i*2.5,2.5,i%2===0?lt:met);}
+se(bx,hY-24,4,3,gold);
+// Ponytail out back
+for(let i=0;i<16;i++){sf(bx-4+Math.sin(i*0.3)*3-L*0.3,hY+14+i*2.3,6,2.5,i%2===0?lt:met);}
+// Face — big eyes through visor, clearly feminine
+pixelFace(bx,hY,{eyeColor:'#44ff88',eyeW:5,eyeH:5,browColor:out,browAngle:1,
+  mouthColor:'#c09878',mouthW:6,mouthY:10,noseColor:skDk,skinDark:skDk,outline:out,expression:'serious'});
+// Eyelashes visible through visor
+sl(bx-10,hY-7,bx-12,hY-10,1.2,out+'50');sl(bx+9,hY-7,bx+11,hY-10,1.2,out+'50');
+// Beauty mark
+sc(bx+8,hY+5,1.2,out+'50');}
 
 // NOIR
 function drawNoir(cx,gy,o){const L=o.lean||0,bx=cx+L;const sk='#d8c8a8',skDk='#b8a888';const cloak='#2a1840',dk='#180c28',acc='#6030a0',accLt='#8050cc';const glow='#ffcc00',glowLt='#fff8cc',blade='#c0c8d8',bladeDk='#8090a0',out='#0c0618';
