@@ -149,11 +149,20 @@ function drawCharPixelBody(charData, cx, gy, pose) {
   pxRect(rFootX - 2, rFootY - 1, 5, 3, dark);
   pxRect(rFootX - 2, rFootY - 1, 5, 1, outline);
 
-  // -- Torso --
-  for(let row = 0; row < (neckY - pelvisY); row++) {
-    const t = row / (neckY - pelvisY);
-    const w = Math.round(lerp(ww, sw, t));
-    const y = pelvisY + (neckY - pelvisY) - row;
+  // -- Torso (with hourglass curve for female characters) --
+  const hipW = b.female ? Math.round((b.hipW || b.waistW + 4) * 0.45) : ww;
+  const torsoH = neckY - pelvisY;
+  for(let row = 0; row < torsoH; row++) {
+    const t = row / torsoH;  // 0 = bottom (pelvis), 1 = top (neck)
+    let w;
+    if(b.female) {
+      // Hourglass: wide at hips (bottom), narrow at waist (middle), wider at shoulders (top)
+      if(t < 0.4) w = Math.round(lerp(hipW, ww, t / 0.4));       // hips → waist
+      else        w = Math.round(lerp(ww, sw, (t - 0.4) / 0.6)); // waist → shoulders
+    } else {
+      w = Math.round(lerp(ww, sw, t));  // straight taper for males
+    }
+    const y = pelvisY + torsoH - row;
     for(let col = -w; col <= w; col++) {
       const isEdge = Math.abs(col) >= w || row === 0;
       const isShadow = col < 0;
@@ -164,6 +173,18 @@ function drawCharPixelBody(charData, cx, gy, pose) {
   pxRect(cx + lean - ww, pelvisY, ww * 2 + 1, 1, accent);
   // Collar accent
   pxRect(cx + lean - 2, neckY, 5, 1, accent);
+
+  // -- Ponytail / long hair for female characters --
+  if(b.female && b.hairLength > 0) {
+    const hc = b.hairColor || charData.glow;
+    const hx = headX + lean - 1;  // slightly behind head center
+    const hy = headY + headR - 1;  // starts at bottom of head
+    for(let i = 0; i < b.hairLength; i++) {
+      const sway = Math.sin(i * 0.4 + (pose.lean || 0) * 0.1) * 1.5;
+      const w = Math.max(1, 3 - Math.floor(i / 5));  // tapers
+      pxRect(hx + sway - lean * 0.8, hy + i, w, 1, hc);
+    }
+  }
 
   // -- Arms --
   const lElbowX = cx - sw + (pose.lElbowOx || -2);
