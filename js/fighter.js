@@ -600,11 +600,15 @@ class Fighter {
       if(wantRight) targetVx = spd;
     }
 
-    const accel = this.onGround ? 0.8 : 0.4;
+    // ARCADE PHYSICS: high accel, low inertia, stop on a dime.
+    // Ground: 0.92 accel = near-instant response. Air: 0.55 = some drift.
+    const accel = this.onGround ? 0.92 : 0.55;
     this.vx += (targetVx - this.vx) * accel;
+    // Quick stop when no input (arcade feel — no ice skating)
+    if(targetVx === 0 && this.onGround) this.vx *= 0.7;
     this.x += this.vx + this.knockback;
-    this.knockback *= 0.82;
-    if(Math.abs(this.knockback) < 0.15) this.knockback = 0;
+    this.knockback *= 0.78;
+    if(Math.abs(this.knockback) < 0.2) this.knockback = 0;
 
     if(Math.abs(targetVx) > 1 && this.onGround) this.walkPhase += 0.28;
     else this.walkPhase *= 0.92;
