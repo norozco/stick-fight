@@ -35,6 +35,30 @@ else if(a==="block"){o.lAA=-1.4;o.rAA=-1.0;o.lean=-4;o.hY=2;o.lLS=-4;o.rLS=4;}
 else if(a==="dash"){o.lean=16;o.lLS=-20;o.rLS=10;o.lFL=6;o.hY=-3;o.lAA=0.6;o.rAA=-0.4;}
 else if(a==="attack_ult"){if(p<0.25){o.rAA=-1.8;o.lean=-8;o.hY=3;o.lLS=-6;}else if(p<0.65){const ext=(p-0.25)/0.4;o.rAE=44;o.lean=12;o.lLS=-ext*8;o.rLS=ext*12;o.hY=-ext*4;}else{o.rAA=-2.2;o.lean=14;o.hY=-5;o.rLS=8;o.lFL=6;}}
 else if(a==="attack_throw"){if(p<0.3){o.rAE=32;o.lAE=32;o.lean=6;}else{const tp=(p-0.3)/0.7;o.rAA=-Math.PI*tp;o.rAE=24;o.lean=8-tp*16;o.hY=tp*4;}}
+else if(a==="ko"){
+  // Collapsing backward — body tilts, arms go limp, head drops
+  const col=Math.min(p,1);
+  o.lean=-22-col*14;o.hY=8+col*12;o.lAA=0.7+col*0.5;o.rAA=0.6+col*0.4;
+  o.lLS=-6-col*10;o.rLS=6+col*8;o.lFL=col*8;o.rFL=col*4;
+}
+else if(a==="knockdown"){
+  // Flat on ground — splayed, motionless defeated
+  o.lean=-30;o.hY=24;o.lAA=1.2;o.rAA=1.0;
+  o.lLS=-16;o.rLS=16;o.lFL=0;o.rFL=0;
+}
+else if(a==="grabbed"){
+  // Off-balance, pulled forward, arms dangling
+  o.lean=14;o.hY=6;o.lAA=0.5;o.rAA=0.4;
+  o.lLS=-4;o.rLS=8;o.lFL=Math.sin(p*Math.PI)*6;
+}
+else if(a==="thrown"){
+  // Ragdoll tumble through the air
+  const spin=p*Math.PI*1.5;
+  o.lean=-18+Math.sin(spin)*20;o.hY=Math.cos(spin)*8;
+  o.lAA=0.8+Math.sin(spin)*0.5;o.rAA=-0.6+Math.cos(spin)*0.4;
+  o.lLS=-12+Math.sin(spin)*8;o.rLS=12-Math.sin(spin)*8;
+  o.lFL=Math.max(0,Math.sin(spin))*14;o.rFL=Math.max(0,-Math.sin(spin))*14;
+}
 return o;}
 function pixelFace(bx,hY,opts){const{eyeColor,eyeW,eyeH,browColor,browAngle,mouthW,mouthColor,mouthY,noseColor,skinDark,outline,expression}=opts;const o=outline||'#1a1020';sf(bx-8,hY-4,eyeW+3,eyeH+2,'#ffffff');sf(bx-7,hY-3,eyeW,eyeH,eyeColor);sf(bx-6,hY-2,2,2,o);sf(bx-7,hY-4,1,1,'#ffffff');sf(bx+3,hY-4,eyeW+3,eyeH+2,'#ffffff');sf(bx+4,hY-3,eyeW,eyeH,eyeColor);sf(bx+5,hY-2,2,2,o);sf(bx+4,hY-4,1,1,'#ffffff');sl(bx-9,hY-7+browAngle,bx-3,hY-8,2,browColor||o);sl(bx+2,hY-8,bx+8,hY-7-browAngle,2,browColor||o);sf(bx-1,hY+2,3,2,noseColor||skinDark||'#c0a090');const my=mouthY||7;if(expression==='smile'){sf(bx-2,hY+my,5,2,mouthColor||'#d09090');sf(bx-1,hY+my,3,1,'#e8a0a0');}else if(expression==='grimace'){sf(bx-3,hY+my,mouthW||7,3,mouthColor||o);sf(bx-2,hY+my+1,2,1,'#ffffff');sf(bx+1,hY+my+1,2,1,'#ffffff');}else if(expression==='serious'){sf(bx-2,hY+my,mouthW||5,2,mouthColor||'#a07060');}else if(expression!=='hidden'){sf(bx-2,hY+my,mouthW||5,2,mouthColor||'#c08080');}}
 
