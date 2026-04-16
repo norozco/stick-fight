@@ -739,43 +739,91 @@ function drawFighter(f) {
     ctx.globalAlpha = 0.55;
     renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.glow);
     ctx.restore();
-    // Continuous ult particles
+    // Per-character ult aura particles — theme-colored, character-distinct shapes.
+    const theme = (f.ultSeq && f.ultSeq.theme) || { color: f.glow, accent: '#fff', particle: f.glow };
+    const charId = f.character && f.character.id;
+
     if(globalTime % 2 === 0) {
-      spawnParticle({
-        type: 'spark',
-        x: f.x + (Math.random() - 0.5) * 50,
-        y: f.y - 30 - Math.random() * 80,
-        vx: (Math.random() - 0.5) * 2,
-        vy: -Math.random() * 3,
-        life: 26, maxLife: 26,
-        size: Math.random() * 5 + 3,
-        color: f.glow,
-        grav: -0.05,
-      });
+      if(charId === 'aurora') {
+        // Lightning crackle — short bright lines that fork
+        spawnParticle({ type: 'streak', x: f.x + (Math.random()-0.5)*40, y: f.y - 30 - Math.random()*70,
+          vx: (Math.random()-0.5)*6, vy: -Math.random()*3, life: 10, maxLife: 10, length: 20+Math.random()*20, color: theme.accent });
+        spawnParticle({ type: 'spark', x: f.x + (Math.random()-0.5)*50, y: f.y - 50 - Math.random()*40,
+          vx: (Math.random()-0.5)*2, vy: -Math.random()*2, life: 18, maxLife: 18, size: Math.random()*3+2, color: theme.particle, grav: -0.03 });
+      } else if(charId === 'crimson') {
+        // Fire licks — upward-drifting warm sparks
+        spawnParticle({ type: 'spark', x: f.x + (Math.random()-0.5)*44, y: f.y - 10 - Math.random()*60,
+          vx: (Math.random()-0.5)*2, vy: -Math.random()*4-2, life: 28, maxLife: 28, size: Math.random()*5+3, color: theme.particle, grav: -0.06 });
+        spawnParticle({ type: 'spark', x: f.x + (Math.random()-0.5)*30, y: f.y - 5,
+          vx: (Math.random()-0.5)*1, vy: -Math.random()*3-1, life: 20, maxLife: 20, size: Math.random()*4+2, color: theme.accent, grav: -0.04 });
+      } else if(charId === 'jade') {
+        // Earth chunks — heavier, downward drift
+        spawnParticle({ type: 'dust', x: f.x + (Math.random()-0.5)*50, y: GROUND - Math.random()*20,
+          vx: (Math.random()-0.5)*3, vy: -Math.random()*4-1, life: 30, maxLife: 30, size: Math.random()*5+4, color: 'rgba(100,80,50,0.7)', grav: 0.25 });
+        spawnParticle({ type: 'spark', x: f.x + (Math.random()-0.5)*40, y: f.y - 40 - Math.random()*50,
+          vx: (Math.random()-0.5)*2, vy: -Math.random()*2, life: 22, maxLife: 22, size: Math.random()*4+2, color: theme.particle, grav: -0.02 });
+      } else if(charId === 'noir') {
+        // Shadow wisps — dark purple motes that drift outward
+        spawnParticle({ type: 'spark', x: f.x + (Math.random()-0.5)*60, y: f.y - 30 - Math.random()*70,
+          vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*3, life: 24, maxLife: 24, size: Math.random()*5+3, color: theme.particle, grav: 0 });
+        spawnParticle({ type: 'spark', x: f.x + (Math.random()-0.5)*35, y: f.y - 50,
+          vx: (Math.random()-0.5)*2, vy: -Math.random()*2, life: 18, maxLife: 18, size: Math.random()*3+2, color: theme.accent, grav: 0 });
+      } else {
+        // Fallback generic
+        spawnParticle({ type: 'spark', x: f.x + (Math.random()-0.5)*50, y: f.y - 30 - Math.random()*80,
+          vx: (Math.random()-0.5)*2, vy: -Math.random()*3, life: 26, maxLife: 26, size: Math.random()*5+3, color: f.glow, grav: -0.05 });
+      }
     }
-    // Swirling energy ring at feet during windup
+    // Swirling energy ring at feet during windup (uses theme color)
     if(f.stateTime < 16 && globalTime % 2 === 0) {
       const ang = globalTime * 0.3;
       for(let i = 0; i < 3; i++) {
         const a2 = ang + i * Math.PI * 2 / 3;
-        spawnParticle({
-          type: 'spark',
-          x: f.x + Math.cos(a2) * 30,
-          y: GROUND - 2 + Math.sin(a2) * 6,
-          vx: -Math.sin(a2) * 2,
-          vy: -Math.cos(a2) * 0.5,
-          life: 20, maxLife: 20,
-          size: 4,
-          color: f.glow,
-          grav: 0,
-        });
+        spawnParticle({ type: 'spark', x: f.x + Math.cos(a2) * 30, y: GROUND - 2 + Math.sin(a2) * 6,
+          vx: -Math.sin(a2)*2, vy: -Math.cos(a2)*0.5, life: 20, maxLife: 20, size: 4, color: theme.color, grav: 0 });
       }
     }
-    // Motion streaks at impact frames
+    // Motion streaks at impact frames (theme accent)
     const info = currentUltHit(f.stateTime, f.ultSeq);
     if(info && f.stateTime === info.hit.start) {
       for(let i = 0; i < 4; i++) {
-        spawnStreak(f.x + f.facing * 30, f.y - 60 - i * 10, f.facing, f.glow);
+        spawnStreak(f.x + f.facing * 30, f.y - 60 - i * 10, f.facing, theme.color);
+      }
+      // Finisher hit burst — huge per-character explosion
+      if(info.hit.finisher) {
+        const fc = f.facing;
+        const hx = f.x + fc * 30, hy = f.y - 50;
+        if(charId === 'aurora') {
+          // Ice shatter — cyan/white radial burst + ring
+          spawnHitSpark(hx, hy, '#ffffff', 50, 3.5);
+          spawnStar(hx, hy, '#3bf0ff', 5);
+          for(let i = 0; i < 20; i++) spawnParticle({ type: 'spark', x: hx, y: hy,
+            vx: (Math.random()-0.5)*16, vy: (Math.random()-0.5)*16, life: 35, maxLife: 35,
+            size: Math.random()*4+3, color: '#a0f0ff', grav: 0.15 });
+        } else if(charId === 'crimson') {
+          // Inferno explosion — red/orange fireball
+          spawnHitSpark(hx, hy, '#ff4400', 60, 4);
+          spawnStar(hx, hy, '#ff8800', 5);
+          for(let i = 0; i < 30; i++) spawnParticle({ type: 'spark', x: hx, y: hy,
+            vx: (Math.random()-0.5)*14, vy: -Math.random()*10-3, life: 40, maxLife: 40,
+            size: Math.random()*5+3, color: i%2===0 ? '#ff6600' : '#ffcc00', grav: -0.04 });
+        } else if(charId === 'jade') {
+          // Earth spike eruption — green/brown debris flying up from ground
+          spawnHitSpark(hx, GROUND - 4, '#44ff88', 40, 3.5);
+          for(let i = 0; i < 30; i++) { const a = -Math.PI/2 + (Math.random()-0.5)*Math.PI*0.8;
+            spawnParticle({ type: 'dust', x: hx + (Math.random()-0.5)*80, y: GROUND,
+              vx: Math.cos(a)*8, vy: Math.sin(a)*10, life: 50, maxLife: 50,
+              size: Math.random()*6+4, color: i%3===0 ? 'rgba(68,255,136,0.8)' : 'rgba(100,80,50,0.8)', grav: 0.35 }); }
+          // Ground shake ring
+          spawnParticle({ type: 'ring', x: hx, y: GROUND, vx: 0, vy: 0, life: 30, maxLife: 30, size: 12, power: 5, color: '#44ff88' });
+        } else if(charId === 'noir') {
+          // Shadow burst — dark purple implosion then expansion
+          spawnHitSpark(hx, hy, '#8a40cc', 50, 3.5);
+          spawnStar(hx, hy, '#ffcc00', 4);
+          for(let i = 0; i < 25; i++) spawnParticle({ type: 'spark', x: hx, y: hy,
+            vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12, life: 30, maxLife: 30,
+            size: Math.random()*4+3, color: i%2===0 ? '#cc80ff' : '#ffcc00', grav: 0 });
+        }
       }
     }
   }
