@@ -578,22 +578,26 @@ class Fighter {
       const fc = this.facing;
 
       if(this.throwPhase === 1) {
-        // PHASE 1: GRAB (frames 0-8) — brief pause, establish contact
-        def.x = this.x + fc * 44;
+        // PHASE 1: GRAB (frames 0-8) — lunge, hands make contact
+        // Defender snapped CLOSE so hands visibly land on their body
+        const p = Math.min(this.throwTimer / 8, 1);
+        def.x = this.x + fc * lerp(44, 32, easeOutCubic(p));
         def.y = GROUND;
         def.facing = -fc;
         if(this.throwTimer >= 8) {
           this.throwPhase = 2;
           this.throwTimer = 0;
+          hitstop = 4;  // micro-freeze: "I've got you" moment
         }
       } else if(this.throwPhase === 2) {
-        // PHASE 2: ATTACH (frames 0-6) — lift and control
-        const p = this.throwTimer / 6;
-        def.x = this.x + fc * lerp(44, 30, p);
-        def.y = lerp(GROUND, GROUND - 20, p);
+        // PHASE 2: SECURED HOLD (frames 0-10) — attacker visibly controls defender
+        // Defender is pulled close, lifted slightly, held for a readable beat
+        const p = Math.min(this.throwTimer / 10, 1);
+        def.x = this.x + fc * lerp(32, 26, easeOutCubic(p));
+        def.y = lerp(GROUND, GROUND - 14, easeOutCubic(p));
         def.facing = -fc;
         def.onGround = false;
-        if(this.throwTimer >= 6) {
+        if(this.throwTimer >= 10) {
           this.throwPhase = 3;
           this.throwTimer = 0;
         }
