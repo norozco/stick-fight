@@ -728,9 +728,190 @@ function drawCostumeFront(pose, visual, baseLineWidth) {
 }
 
 // ============================================================
-// MAIN POSE RENDERER — uses visual data for proportions + decoration
+// FILLED-SHAPE LIMB — trapezoid between two joints with width at each end
+// ============================================================
+function drawFilledLimb(a, b, wa, wb, fillColor, outlineColor) {
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const len = Math.sqrt(dx*dx + dy*dy) || 1;
+  const nx = -dy / len, ny = dx / len;  // perpendicular normal
+  ctx.beginPath();
+  ctx.moveTo(a.x + nx * wa/2, a.y + ny * wa/2);
+  ctx.lineTo(b.x + nx * wb/2, b.y + ny * wb/2);
+  ctx.lineTo(b.x - nx * wb/2, b.y - ny * wb/2);
+  ctx.lineTo(a.x - nx * wa/2, a.y - ny * wa/2);
+  ctx.closePath();
+  ctx.fillStyle = fillColor;
+  ctx.fill();
+  if(outlineColor) {
+    ctx.strokeStyle = outlineColor;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+}
+
+// Torso — 4-point polygon from shoulders to waist
+function drawTorso(neckX, neckY, pelvisX, pelvisY, shoulderW, waistW, fillColor, darkColor, outlineColor) {
+  const sw = shoulderW / 2, ww = waistW / 2;
+  // Main fill
+  ctx.beginPath();
+  ctx.moveTo(neckX - sw, neckY);
+  ctx.lineTo(neckX + sw, neckY);
+  ctx.lineTo(pelvisX + ww, pelvisY);
+  ctx.lineTo(pelvisX - ww, pelvisY);
+  ctx.closePath();
+  ctx.fillStyle = fillColor;
+  ctx.fill();
+  // Dark shading on one side (left half for "light from right" feel)
+  ctx.beginPath();
+  ctx.moveTo(neckX - sw, neckY);
+  ctx.lineTo(neckX, neckY);
+  ctx.lineTo(pelvisX, pelvisY);
+  ctx.lineTo(pelvisX - ww, pelvisY);
+  ctx.closePath();
+  ctx.fillStyle = darkColor;
+  ctx.fill();
+  // Outline
+  if(outlineColor) {
+    ctx.beginPath();
+    ctx.moveTo(neckX - sw, neckY);
+    ctx.lineTo(neckX + sw, neckY);
+    ctx.lineTo(pelvisX + ww, pelvisY);
+    ctx.lineTo(pelvisX - ww, pelvisY);
+    ctx.closePath();
+    ctx.strokeStyle = outlineColor;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+}
+
+// Filled head — circle with skin color + face features
+function drawFilledHead(hx, hy, radius, skinColor, outlineColor, visual, facing, tilt) {
+  ctx.save();
+  ctx.translate(hx, hy);
+  ctx.rotate(tilt || 0);
+  // Filled head circle
+  ctx.fillStyle = skinColor;
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.fill();
+  if(outlineColor) {
+    ctx.strokeStyle = outlineColor;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // Head decorations (hair, crown, hood)
+  drawHeadDecor(visual, facing);
+  // Eyes
+  drawEyes(visual, facing, outlineColor || '#000');
+  // Mouth — small line
+  const fc = facing || 1;
+  if(fc !== 0) {
+    ctx.strokeStyle = outlineColor || '#000';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(fc * 3, radius * 0.3);
+    ctx.lineTo(fc * 6, radius * 0.25);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Hand — filled circle
+function drawHand(x, y, r, skinColor, outlineColor) {
+  ctx.fillStyle = skinColor;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  if(outlineColor) {
+    ctx.strokeStyle = outlineColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+}
+
+// Foot — rounded rectangle
+function drawFoot(x, y, w, h, facing, fillColor, outlineColor) {
+  const fc = facing || 1;
+  const fx = x + (fc > 0 ? -w * 0.3 : -w * 0.7);
+  ctx.fillStyle = fillColor;
+  ctx.beginPath();
+  ctx.roundRect(fx, y - h, w, h, 2);
+  ctx.fill();
+  if(outlineColor) {
+    ctx.strokeStyle = outlineColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(fx, y - h, w, h, 2);
+    ctx.stroke();
+  }
+}
+
+// ============================================================
+// SNES-QUALITY FILLED POSE RENDERER
+// ============================================================
+function renderFilledPose(pose, visual) {
+  const b = visual.body;
+  const lean = pose.bodyLean || 0;
+  const neckX = pose.neck.x + lean, neckY = pose.neck.y;
+  const fc = pose.facing || 1;
+
+  ctx.save();
+
+  // --- Back-layer costume (capes) ---
+  drawCostumeBack(pose, visual);
+
+  // --- Legs (behind torso) ---
+  drawFilledLimb(pose.pelvis, pose.lKnee, b.thighW, b.shinW, b.outfitColor, b.outlineColor);
+  drawFilledLimb(pose.lKnee, pose.lFoot, b.shinW, b.shinW * 0.8, b.outfitColor, b.outlineColor);
+  drawFilledLimb(pose.pelvis, pose.rKnee, b.thighW, b.shinW, b.outfitColor, b.outlineColor);
+  drawFilledLimb(pose.rKnee, pose.rFoot, b.shinW, b.shinW * 0.8, b.outfitColor, b.outlineColor);
+
+  // Feet
+  drawFoot(pose.lFoot.x, pose.lFoot.y, b.footW, b.footH, fc, b.outfitDark, b.outlineColor);
+  drawFoot(pose.rFoot.x, pose.rFoot.y, b.footW, b.footH, fc, b.outfitDark, b.outlineColor);
+
+  // --- Torso ---
+  drawTorso(neckX, neckY, pose.pelvis.x, pose.pelvis.y,
+            b.shoulderW, b.waistW, b.outfitColor, b.outfitDark, b.outlineColor);
+
+  // --- Arms ---
+  drawFilledLimb({ x: neckX - b.shoulderW/2 * 0.6, y: neckY }, pose.lElbow,
+                 b.upperArmW, b.forearmW, b.outfitColor, b.outlineColor);
+  drawFilledLimb(pose.lElbow, pose.lHand, b.forearmW, b.forearmW * 0.7,
+                 b.skinColor, b.outlineColor);
+  drawFilledLimb({ x: neckX + b.shoulderW/2 * 0.6, y: neckY }, pose.rElbow,
+                 b.upperArmW, b.forearmW, b.outfitColor, b.outlineColor);
+  drawFilledLimb(pose.rElbow, pose.rHand, b.forearmW, b.forearmW * 0.7,
+                 b.skinColor, b.outlineColor);
+
+  // Hands
+  drawHand(pose.lHand.x, pose.lHand.y, b.handR, b.skinColor, b.outlineColor);
+  drawHand(pose.rHand.x, pose.rHand.y, b.handR, b.skinColor, b.outlineColor);
+
+  // --- Costume front (armor, wraps — on top) ---
+  drawCostumeFront(pose, visual, b.upperArmW);
+
+  // --- Head ---
+  const hx = pose.head.x + lean, hy = pose.head.y;
+  drawFilledHead(hx, hy, visual.headRadius || 13,
+                 b.skinColor, b.outlineColor, visual, fc, pose.headTilt);
+
+  ctx.restore();
+}
+
+// ============================================================
+// MAIN POSE RENDERER — dispatches to filled or line-based
 // ============================================================
 function renderStoredPose(pose, color, shadowFactor = 1, visual = null) {
+  // If we have SNES-quality body data, use the filled renderer
+  if(visual && visual.body) {
+    renderFilledPose(pose, visual);
+    return;
+  }
   ctx.save();
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
