@@ -590,29 +590,40 @@ class Fighter {
       spawnDust(this.x - Math.sign(this.vx) * 10, GROUND + 2, -Math.sign(this.vx) * 0.5);
     }
 
-    // Ultimate aerial positioning — attacker rises with opponent
+    // Ultimate aerial positioning — dynamically derived from the character's
+    // ult sequence (each character has different launch/aerial/finisher timing).
     if(this.state === 'attack' && this.attackType === 'ult') {
+      const seq = this.ultSeq;
       const t = this.stateTime;
-      if(t >= 78 && t < 110) {
-        // In the air phase - lift off the ground
-        const phase = (t - 78) / 32;
+      const launchHit   = seq.hits.find(h => h.launch);
+      const finisherHit = seq.hits.find(h => h.finisher);
+      const aerialStart = launchHit ? launchHit.end + 2 : seq.total;
+      const slamStart   = finisherHit ? finisherHit.start - 8 : seq.total;
+      const slamEnd     = finisherHit ? finisherHit.end + 2 : seq.total;
+
+      if(launchHit && t >= aerialStart && t < slamStart) {
+        // In the air — sine arc
+        const phase = (t - aerialStart) / Math.max(1, slamStart - aerialStart);
         this.onGround = false;
-        this.y = GROUND - 40 - Math.sin(phase * Math.PI) * 60;
+        this.y = GROUND - 40 - Math.sin(Math.min(1, phase) * Math.PI) * 60;
         this.vy = 0;
-      } else if(t >= 110 && t < 128) {
+      } else if(finisherHit && t >= slamStart && t < slamEnd) {
         // Slam down
-        const phase = (t - 110) / 18;
+        const phase = (t - slamStart) / Math.max(1, slamEnd - slamStart);
         this.onGround = false;
         this.y = GROUND - 100 + phase * phase * 100;
         this.vy = 0;
-        if(t === 118) {
+        // Dust on contact
+        if(Math.abs(this.y - GROUND) < 8 && !this._ultDustSpawned) {
+          this._ultDustSpawned = true;
           spawnDust(this.x, GROUND + 4);
           spawnDust(this.x - 30, GROUND + 4);
           spawnDust(this.x + 30, GROUND + 4);
         }
-      } else if(t >= 128) {
+      } else if(t >= slamEnd) {
         this.y = GROUND;
         this.onGround = true;
+        this._ultDustSpawned = false;
       }
     } else if(!this.onGround) {
       this.vy += 0.68;
