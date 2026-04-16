@@ -1017,12 +1017,26 @@ function frontFacingFlailPose(f) {
 function drawFighter(f) {
   const vis = f.character && f.character.visual;
 
-  // Try sprite-based rendering first (SNES-quality pixel art).
-  // Falls back to procedural if sprites aren't cached yet or for special states
-  // like ringout/thrown where the sprite can't represent the custom camera work.
-  if(f.state !== 'ringout' && !(f.beingThrown > 0 && f.throwSpin) &&
-     typeof drawFighterSprite === 'function' && drawFighterSprite(f)) {
-    // Shadow (still drawn procedurally — sprites don't include their own shadow)
+  // Sprite-based rendering for ALL states. Special states (thrown, ringout)
+  // apply transforms (rotation, etc.) around the sprite instead of falling
+  // back to the tiny procedural renderer.
+  if(typeof drawFighterSprite === 'function') {
+    // Handle rotation for thrown/ringout states
+    const hasThrowSpin = f.beingThrown > 0 && f.throwSpin;
+    const hasRingoutSpin = f.state === 'ringout' && f.ringoutSpin;
+
+    if(hasThrowSpin || hasRingoutSpin) {
+      const spin = hasThrowSpin ? f.throwSpin : f.ringoutSpin;
+      ctx.save();
+      ctx.translate(f.x, f.y - SPRITE_DRAW_H / 2 + 10);
+      ctx.rotate(spin);
+      ctx.translate(-f.x, -(f.y - SPRITE_DRAW_H / 2 + 10));
+      drawFighterSprite(f);
+      ctx.restore();
+    } else {
+      drawFighterSprite(f);
+    }
+    // Shadow
     const airFactor = Math.max(0, 1 - (GROUND - f.y) / 250);
     if(airFactor > 0.01) {
       ctx.save();
