@@ -698,42 +698,8 @@ class Fighter {
       return;
     }
 
-    // Being thrown — locked through the entire arc up to impact (frame 24)
-    if(this.beingThrown > 0 && opponent &&
-       opponent.state === 'attack' && opponent.attackType === 'throw' &&
-       opponent.stateTime <= 24) {
-      lockVictimToThrow(this, opponent);
-      // Damage + impact effects at impact frame (24)
-      if(opponent.stateTime === 24 && !this.throwDamageApplied) {
-        this.throwDamageApplied = true;
-        const dmgMult = (opponent.dmgMult) || 1;
-        const dmg = 22 * dmgMult;
-        this.hp = Math.max(0, this.hp - dmg);
-        this.hurtFlash = 16;
-        this.hitStun = 20;
-        // Release in the direction of the throw (forward throw = forward, back throw = behind)
-        const throwDir = opponent.throwDir || -1;
-        this._throwReleaseKb = throwDir * opponent.facing * 14;
-        this._throwReleaseUp = -4;
-        spawnDamageNumber(this.x, this.y - 110, dmg, '#ff6600', true);
-        spawnHitSpark(this.x, this.y - 30, '#ffaa44', 22, 1.8);
-        for(let i = 0; i < 16; i++) spawnDust(this.x + (Math.random()-0.5)*60, GROUND + 2, -opponent.facing);
-        shake(10, 14);
-        hitstop = 6;
-        Audio.heavy();
-        if(opponent) opponent.addUlt(12);
-      }
-      return;
-    }
-    // Apply the queued throw-release impulse the frame after the lock ends
-    if(this._throwReleaseKb !== undefined) {
-      this.knockback = this._throwReleaseKb;
-      this.knockUp = this._throwReleaseUp;
-      this.onGround = false;
-      this._throwReleaseKb = undefined;
-      this._throwReleaseUp = undefined;
-    }
-    if(this.throwDamageApplied && this.beingThrown === 0) this.throwDamageApplied = false;
+    // Old throw lock system removed — throws now use the 4-phase system above.
+    // beingThrown is no longer the primary mechanism; 'grabbed'/'thrown' states handle it.
 
     // Face opponent when idle/dash
     if(opponent && (this.state === 'idle' || this.state === 'dash')) {
