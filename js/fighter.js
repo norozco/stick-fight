@@ -384,24 +384,11 @@ class Fighter {
     // Throws beat blocks and parries entirely
     const isThrow = box.type === 'throw';
 
-    // Throw hit — grab and slam choreography
+    // Throws now bypass takeHit entirely — they're initiated directly in the
+    // update() input handler as a 4-phase grab system. This old path is kept
+    // as a safety fallback but shouldn't fire in normal gameplay.
     if(isThrow) {
-      this.beingThrown = 30;           // matches Ken-throw 35-frame total
-      this.state = 'hurt';
-      this.stateTime = 0;
-      this.stateTimeF = 0;
-      this.attackType = null;
-      this.hitStun = 30;
-      this.combo = 0;
-      this.hurtFlash = 8;
-      this.vx = 0; this.vy = 0;
-      this.knockback = 0;
-      this.onGround = false;
-      this.facing = -fromFacing;
-      this.addUlt(box.dmg * 0.6);
-      if(attacker) attacker.throwConnected = true;
-      Audio.whoosh();
-      return 'hit';
+      return 'hit'; // no-op, throw is handled by the 4-phase system
     }
 
     if(!isThrow && this.blocking && this.blockTime < 6 && this.facing === -fromFacing) {
