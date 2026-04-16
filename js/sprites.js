@@ -242,21 +242,21 @@ function drawCrimson(cx,gy,o){
   sl(rax+1,ray+2,rax+3,ray+12,2,wrapDk);sl(rax-1,ray+4,rax+1,ray+10,1.5,wrap);
   sc(rax+4,ray+17,5,sk);sc(rax+4,ray+17,5,out+'25');
 
-  // Head
-  const hY=nY-14+(o.hY||0);
-  sf(bx-3,nY-4,6,6,sk);sc(bx,hY,11,sk);sc(bx,hY,11.5,out+'35');
-  // Headband
-  sf(bx-11,hY-3,22,4,band);sl(bx-11,hY-2,bx-17,hY+6,2.5,band);sl(bx-17,hY+6,bx-20,hY+10,2,band+'80');
-  // Flame hair — BIG dramatic spikes
-  sl(bx-5,hY-8,bx-16,hY-30,4.5,'#ff6644');sl(bx-2,hY-9,bx-8,hY-36,5,'#ff3040');
-  sl(bx+2,hY-8,bx-3,hY-30,4,'#ff5533');sl(bx+5,hY-7,bx+2,hY-24,3.5,'#ff4444');
-  sl(bx+7,hY-5,bx+6,hY-18,3,'#ff7744');sl(bx+9,hY-3,bx+9,hY-12,2,'#ffaa44');
-  // Face
-  sf(bx+2,hY-3,7,2.5,band);                             // eye slit
-  sl(bx+1,hY-6,bx+9,hY-7,2,out);                        // ANGRY eyebrow
-  sc(bx+6,hY+1,1.5,out+'50');                            // nose
-  sl(bx+3,hY+4,bx+9,hY+3,1.5,out+'70');                 // grimace
-  sf(bx+3,hY+3,2,1,sk);                                  // teeth hint
+  // Head — BIG, angry face
+  const hY=nY-18+(o.hY||0);
+  sf(bx-3,nY-5,7,7,sk);sc(bx,hY,15,sk);sc(bx,hY,15.5,out+'35');
+  se(bx-12,hY+1,3,4,sk);
+  sf(bx-15,hY-4,30,5,band);sl(bx-15,hY-3,bx-22,hY+8,3,band);sl(bx-22,hY+8,bx-26,hY+14,2.5,band+'80');
+  sl(bx-6,hY-10,bx-20,hY-36,5,'#ff6644');sl(bx-3,hY-12,bx-10,hY-42,6,'#ff3040');
+  sl(bx+1,hY-10,bx-4,hY-36,5,'#ff5533');sl(bx+5,hY-9,bx+2,hY-30,4,'#ff4444');
+  sl(bx+8,hY-7,bx+7,hY-22,3.5,'#ff7744');sl(bx+11,hY-4,bx+11,hY-16,2.5,'#ffaa44');
+  pixelFace(bx, hY, {
+    eyeColor: '#ff3860', eyeW: 3, eyeH: 3,
+    browColor: out, browAngle: 3,
+    mouthColor: out, mouthW: 6, mouthY: 7,
+    noseColor: skDk, skinDark: skDk, outline: out,
+    expression: 'grimace',
+  });
 }
 
 // ============================================================
@@ -308,22 +308,22 @@ function drawJade(cx,gy,o){
   shadedLimb(rax,ray+6,rax+5,ray+18,10,sk,skDk,out);
   sc(rax+5,ray+21,6,sk);sc(rax+5,ray+21,6,out+'25');
 
-  // Head — helmeted
-  const hY=nY-16+(o.hY||0);
-  sf(bx-4,nY-4,8,7,sk);sc(bx,hY,14,sk);
-  // Helmet
-  se(bx,hY-3,15,11,pl);
-  sf(bx-15,hY-4,30,5,met);sf(bx-15,hY-4,30,1.5,out);  // visor bar
-  sf(bx-2,hY-18,5,13,met);se(bx,hY-18,4,3,lt);          // crest
-  // Helmet outline
-  _s.strokeStyle=out;_s.lineWidth=1.5;_s.beginPath();_s.ellipse(bx,hY-3,15,11,0,Math.PI,0);_s.stroke();
-  // Hair out back
-  for(let i=0;i<14;i++){const sw=Math.sin(i*0.3)*2.5;sf(bx-4+sw-L*0.3,hY+10+i*2,5,2,i%2===0?lt:met);}
-  // Face
-  sc(bx+5,hY-1,3.5,lt);sf(bx+4,hY-2,4,3,ar);sf(bx+7,hY-2,1.5,1,'#fff'); // eye
-  sl(bx+3,hY-6,bx+9,hY-5,1.5,out);                                        // eyebrow
-  sc(bx+5,hY+2,1.2,out+'40');                                              // nose
-  sf(bx+3,hY+5,5,1.5,'#b09070');                                           // mouth
+  // Head — BIG helmeted face
+  const hY=nY-20+(o.hY||0);
+  sf(bx-4,nY-5,9,8,sk);sc(bx,hY,17,sk);
+  se(bx-14,hY+1,3,4,sk);se(bx+14,hY+1,3,4,sk);
+  se(bx,hY-4,18,13,pl);
+  sf(bx-18,hY-5,36,6,met);sf(bx-18,hY-5,36,2,out);
+  sf(bx-2,hY-22,5,15,met);se(bx,hY-22,4,3,lt);
+  _s.strokeStyle=out;_s.lineWidth=1.5;_s.beginPath();_s.ellipse(bx,hY-4,18,13,0,Math.PI,0);_s.stroke();
+  for(let i=0;i<14;i++){const sw=Math.sin(i*0.3)*2.5;sf(bx-4+sw-L*0.3,hY+14+i*2,5,2,i%2===0?lt:met);}
+  pixelFace(bx, hY, {
+    eyeColor: '#44ff88', eyeW: 4, eyeH: 4,
+    browColor: out, browAngle: 1,
+    mouthColor: '#b09070', mouthW: 5, mouthY: 8,
+    noseColor: skDk, skinDark: skDk, outline: out,
+    expression: 'serious',
+  });
 }
 
 // ============================================================
@@ -377,21 +377,20 @@ function drawNoir(cx,gy,o){
   sl(rax+3,ray+14,rax+6,ray+28,2,blade);sl(rax+6,ray+28,rax+7,ray+30,1.5,bladeDk);
   sl(rax+1,ray+14,rax+5,ray+14,2,bladeDk);
 
-  // Head — deep dramatic hood
-  const hY=nY-14+(o.hY||0);
-  sf(bx-2,nY-4,5,6,sk);sc(bx,hY,11,sk);
-  // Hood
-  _s.fillStyle=cloak;_s.beginPath();_s.ellipse(bx,hY-2,18,14,0,Math.PI,0);_s.fill();
-  _s.strokeStyle=acc;_s.lineWidth=2.5;_s.beginPath();_s.ellipse(bx,hY-2,18,14,0,Math.PI,0);_s.stroke();
-  // Pointed tips
-  sl(bx-17,hY-2,bx-22,hY-12,3,acc);sl(bx+17,hY-2,bx+22,hY-12,3,acc);
+  // Head — BIG dramatic hood with glowing eyes
+  const hY=nY-18+(o.hY||0);
+  sf(bx-3,nY-5,6,7,sk);sc(bx,hY,15,sk);
+  // Massive hood
+  _s.fillStyle=cloak;_s.beginPath();_s.ellipse(bx,hY-3,22,17,0,Math.PI,0);_s.fill();
+  _s.strokeStyle=acc;_s.lineWidth=3;_s.beginPath();_s.ellipse(bx,hY-3,22,17,0,Math.PI,0);_s.stroke();
+  sl(bx-21,hY-3,bx-27,hY-15,3.5,acc);sl(bx+21,hY-3,bx+27,hY-15,3.5,acc);
   // Shadow covering lower face
-  se(bx,hY+3,10,6,cloak+'e0');
-  // GLOWING EYES
-  _s.shadowColor=glow;_s.shadowBlur=8;
-  sf(bx-5,hY-3,5,3,glow);sf(bx+2,hY-3,5,3,glow);
-  // Eye inner detail
-  sf(bx-4,hY-2,3,1,'#fff8cc');sf(bx+3,hY-2,3,1,'#fff8cc');
+  se(bx,hY+4,12,8,cloak+'e0');
+  // GLOWING EYES — big, dramatic
+  _s.shadowColor=glow;_s.shadowBlur=10;
+  sf(bx-7,hY-4,6,4,glow);sf(bx+3,hY-4,6,4,glow);
+  sf(bx-6,hY-3,4,2,'#fff8cc');sf(bx+4,hY-3,4,2,'#fff8cc');
+  sf(bx-5,hY-2,2,1,'#ffffff');sf(bx+5,hY-2,2,1,'#ffffff');
   _s.shadowBlur=0;_s.shadowColor='transparent';
 }
 
