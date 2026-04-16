@@ -47,7 +47,7 @@ function drawReplay() {
       ctx.translate(s.x, s.y - 55);
       ctx.rotate(s.ringoutSpin || 0);
       ctx.translate(-s.x, -(s.y - 55));
-      renderStoredPose({ ...s.pose, facing: s.facing }, s.color);
+      renderStoredPose({ ...s.pose, facing: s.facing }, s.color, 1, s.visual);
       ctx.restore();
     } else if(s.pose) {
       // Shadow
@@ -64,7 +64,7 @@ function drawReplay() {
       ctx.save();
       ctx.shadowColor = s.color;
       ctx.shadowBlur = 4;
-      renderStoredPose({ ...s.pose, facing: s.facing }, col);
+      renderStoredPose({ ...s.pose, facing: s.facing }, col, 1, s.visual);
       ctx.restore();
     }
   }
