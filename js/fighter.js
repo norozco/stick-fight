@@ -716,13 +716,19 @@ class Fighter {
     }
 
     // Pushback
+    // Push-apart: only when BOTH grounded, NEITHER dashing/attacking/thrown/ulting.
+    // Previously interfered with jumps, dashes, throws, and crossups.
     if(opponent) {
       const dx = this.x - opponent.x;
-      const minDist = 50;
+      const minDist = 44;
+      const thisActive = this.state === 'attack' || this.state === 'dash' ||
+                         this.beingThrown > 0 || this.beingUlted > 0 ||
+                         (this.state === 'attack' && this.attackType === 'ult');
+      const oppActive  = opponent.state === 'attack' || opponent.state === 'dash' ||
+                         opponent.beingThrown > 0 || opponent.beingUlted > 0;
       if(Math.abs(dx) < minDist && this.onGround && opponent.onGround &&
-         !(this.state === 'attack' && this.attackType === 'ult') &&
-         !(opponent.beingUlted > 0)) {
-        const push = (minDist - Math.abs(dx)) / 2;
+         !thisActive && !oppActive && this.state !== 'hurt' && opponent.state !== 'hurt') {
+        const push = (minDist - Math.abs(dx)) * 0.4;
         const s = Math.sign(dx) || (this.isP2 ? 1 : -1);
         this.x += s * push;
         opponent.x -= s * push;
