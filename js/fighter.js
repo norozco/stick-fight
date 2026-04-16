@@ -424,6 +424,13 @@ class Fighter {
     if(this.beingThrown > 0) this.beingThrown--;
     if(this.juggleWindow > 0) this.juggleWindow--;
 
+    // Safety: recover from hurt/stagger if hitStun expired (even if main check below
+    // was skipped by an early return or slowMo gating on a previous frame)
+    if((this.state === 'hurt' || this.state === 'stagger') && this.hitStun <= 0 &&
+       this.beingUlted <= 0 && this.beingThrown <= 0) {
+      this.state = 'idle'; this.stateTime = 0; this.stateTimeF = 0;
+    }
+
     // ---- Secondary physics integration ----
     // Impact impulses decay toward zero
     this.impactVx *= 0.82;
