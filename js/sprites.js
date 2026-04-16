@@ -219,11 +219,90 @@ shadedLimb(bx+12,sY,rax,ray,10,sk,skDk,out);sl(bx+12+(rax-bx-12)*0.35,sY+(ray-sY
 sf(rax-4,ray-2,8,5,wrapDk);sf(rax-4,ray-2,8,1.5,'#444');sl(rax,ray-4,rax,ray-7,1.5,'#666');sl(rax-3,ray-4,rax-3,ray-7,1.5,'#666');
 shadedLimb(rax,ray+3,rax+4,ray+16,8,wrap,wrapDk,out);sl(rax+1,ray+4,rax+3,ray+14,1.5,wrapDk);sl(rax-1,ray+6,rax+1,ray+12,1,wrap);
 sc(rax+4,ray+19,5,sk);sc(rax+4,ray+19,5,out+'20');
-const hY=nY-18+(o.hY||0);sf(bx-3,nY-5,7,7,sk);sc(bx,hY,15,sk);sc(bx,hY,15.5,out+'30');se(bx-12,hY+1,3,4,sk);
-sf(bx-15,hY-4,30,5,band);sf(bx-15,hY-4,30,1,bandDk);sc(bx+2,hY-2,3,bandDk);sc(bx+2,hY-2,1.5,'#ffaa44');
-sl(bx-15,hY-3,bx-23,hY+8,3,band);sl(bx-23,hY+8,bx-28,hY+16,2.5,band+'80');
-sl(bx-6,hY-10,bx-22,hY-38,5.5,'#ff6644');sl(bx-3,hY-12,bx-12,hY-46,6,'#ff3040');sl(bx+1,hY-10,bx-5,hY-38,5,'#ff5533');sl(bx+5,hY-9,bx+2,hY-32,4.5,'#ff4444');sl(bx+8,hY-7,bx+7,hY-24,3.5,'#ff7744');sl(bx+11,hY-4,bx+11,hY-18,3,'#ffaa44');sl(bx+13,hY-2,bx+14,hY-12,2,'#ffcc66');
-pixelFace(bx,hY,{eyeColor:'#ff3860',eyeW:3,eyeH:4,browColor:out,browAngle:3,mouthColor:out,mouthW:7,mouthY:8,noseColor:skDk,skinDark:skDk,outline:out,expression:'grimace'});sf(bx-2,hY+5,6,2,skDk+'30');}
+// === HEAD — BIG, fierce anime male face ===
+const hY=nY-22+(o.hY||0);
+const sk1='#ffe8d8',sk3='#c8a080',sk4='#a08060';
+// Neck (thicker than Aurora — masculine)
+sf(bx-3,nY-5,6,7,sk);
+// Head — angular oval (taller than wide — masculine jaw)
+se(bx,hY,18,20,sk);
+// Jaw definition (darker on sides)
+_s.fillStyle=sk3+'50';_s.beginPath();_s.ellipse(bx-8,hY+6,8,10,0,0,Math.PI*2);_s.fill();
+_s.fillStyle=sk1+'30';_s.beginPath();_s.ellipse(bx+4,hY-4,10,12,0,0,Math.PI*2);_s.fill();
+_s.strokeStyle=out+'20';_s.lineWidth=1;_s.beginPath();_s.ellipse(bx,hY,18,20,0,0,Math.PI*2);_s.stroke();
+// Ear
+se(bx-16,hY+2,3,5,sk);
+
+// === HEADBAND (prominent, with flame emblem) ===
+sf(bx-18,hY-5,36,6,band);sf(bx-18,hY-5,36,1.5,bandDk);
+// Flame emblem on headband
+sc(bx+2,hY-2,3.5,bandDk);sc(bx+2,hY-2,2,'#ffaa44');sc(bx+2,hY-3,1,'#ffee88');
+// Trailing tails
+sl(bx-18,hY-3,bx-26,hY+10,3.5,band);sl(bx-26,hY+10,bx-32,hY+20,3,band+'80');sl(bx-32,hY+20,bx-35,hY+26,2,band+'40');
+
+// === FLAME HAIR — MASSIVE (biggest silhouette element) ===
+sl(bx-7,hY-12,bx-24,hY-42,6,'#ff6644');
+sl(bx-4,hY-14,bx-14,hY-50,7,'#ff3040');          // tallest spike
+sl(bx+1,hY-12,bx-6,hY-42,5.5,'#ff5533');
+sl(bx+5,hY-11,bx+2,hY-36,5,'#ff4444');
+sl(bx+8,hY-9,bx+7,hY-28,4,'#ff7744');
+sl(bx+11,hY-6,bx+11,hY-20,3.5,'#ffaa44');
+sl(bx+14,hY-3,bx+15,hY-14,2.5,'#ffcc66');
+// Fire glow at tips
+_s.shadowColor='#ff440060';_s.shadowBlur=4;
+sc(bx-14,hY-48,3,'#ff604440');sc(bx-24,hY-40,2.5,'#ff664440');
+_s.shadowBlur=0;_s.shadowColor='transparent';
+
+// === FACE — fierce anime male eyes ===
+// Male anime eyes: narrower, more angular, intense stare
+
+// --- LEFT EYE (angular, fierce — 8x5 area) ---
+// White sclera (slightly angular shape using polygon)
+_s.fillStyle='#ffffff';_s.beginPath();
+_s.moveTo(bx-12,hY-1);_s.lineTo(bx-4,hY-4);_s.lineTo(bx-2,hY-1);
+_s.lineTo(bx-4,hY+2);_s.lineTo(bx-12,hY+1);_s.closePath();_s.fill();
+// Iris (fiery red-orange, smaller than Aurora's — intense)
+se(bx-7,hY-1,4,4,'#e83048');
+se(bx-7,hY,4,3,'#c82030');
+// Pupil
+sc(bx-6,hY,2.5,'#401018');
+// Single sharp highlight (males get 1, not 2)
+sc(bx-8,hY-2,2,'#ffffff');
+// Thick upper lid (sharp, angular)
+_s.strokeStyle='#2a0810';_s.lineWidth=2.5;_s.beginPath();
+_s.moveTo(bx-13,hY);_s.lineTo(bx-8,hY-4);_s.lineTo(bx-2,hY-1);_s.stroke();
+
+// --- RIGHT EYE (mirror) ---
+_s.fillStyle='#ffffff';_s.beginPath();
+_s.moveTo(bx+12,hY-1);_s.lineTo(bx+4,hY-4);_s.lineTo(bx+2,hY-1);
+_s.lineTo(bx+4,hY+2);_s.lineTo(bx+12,hY+1);_s.closePath();_s.fill();
+se(bx+7,hY-1,4,4,'#e83048');
+se(bx+7,hY,4,3,'#c82030');
+sc(bx+6,hY,2.5,'#401018');
+sc(bx+8,hY-2,2,'#ffffff');
+_s.strokeStyle='#2a0810';_s.lineWidth=2.5;_s.beginPath();
+_s.moveTo(bx+13,hY);_s.lineTo(bx+8,hY-4);_s.lineTo(bx+2,hY-1);_s.stroke();
+
+// Eyebrows (THICK, angled DOWN = angry)
+_s.strokeStyle='#3a1810';_s.lineWidth=2.5;_s.lineCap='round';
+_s.beginPath();_s.moveTo(bx-13,hY-5);_s.lineTo(bx-4,hY-8);_s.stroke();
+_s.beginPath();_s.moveTo(bx+4,hY-8);_s.lineTo(bx+13,hY-5);_s.stroke();
+
+// Nose (angular, more defined than Aurora — masculine)
+sl(bx,hY+3,bx+1,hY+6,1.2,sk3);
+sc(bx+1,hY+6,0.8,sk4);
+
+// Mouth (grimace with teeth showing)
+sf(bx-4,hY+9,9,4,out);                           // dark mouth opening
+sf(bx-3,hY+10,3,1.5,'#ffffff');sf(bx+1,hY+10,3,1.5,'#ffffff');  // teeth
+sl(bx-4,hY+9,bx+5,hY+9,1,out);                  // upper lip line
+
+// Stubble (shadow on jaw)
+se(bx-4,hY+13,10,4,sk3+'30');
+
+// Chin/jaw definition
+sl(bx-10,hY+10,bx-14,hY+16,1,sk3+'40');
+sl(bx+10,hY+10,bx+14,hY+16,1,sk3+'40');}
 
 // JADE — Armored Warrior QUEEN. CLEARLY FEMININE BUT MASSIVE:
 // Wide hourglass with visible curves under armor, valkyrie-style
