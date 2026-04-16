@@ -652,7 +652,10 @@ class Fighter {
         this._ultDustSpawned = false;
       }
     } else if(!this.onGround) {
-      this.vy += 0.68;
+      // ARCADE JUMP: floaty on the way up (low gravity), fast fall after peak
+      // (high gravity). Gives hang time at the apex for jump attacks.
+      const grav = this.vy < 0 ? 0.52 : 0.95;  // rising vs falling
+      this.vy += grav;
       if(this.knockUp) { this.vy += this.knockUp; this.knockUp = 0; }
       this.y += this.vy;
       if(this.y >= GROUND) {
