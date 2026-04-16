@@ -196,7 +196,7 @@ class Fighter {
   attackBox() {
     if(this.state !== 'attack') return null;
     if(this.attackType === 'ult') {
-      const info = currentUltHit(this.stateTime);
+      const info = currentUltHit(this.stateTime, this.ultSeq);
       if(!info) return null;
       const h = info.hit;
       const reach = h.reach;
@@ -455,7 +455,7 @@ class Fighter {
     // If being ulted by opponent — freeze own physics and let attacker control position
     if(this.beingUlted > 0 && opponent &&
        opponent.state === 'attack' && opponent.attackType === 'ult' &&
-       opponent.stateTime < ULT_SEQUENCE.total) {
+       opponent.stateTime < opponent.ultSeq.total) {
       lockVictimToUlt(this, opponent);
       this.vx = 0; this.vy = 0;
       this.knockback = 0; this.knockUp = 0;
@@ -640,7 +640,7 @@ class Fighter {
     // Attack lifecycle
     if(this.state === 'attack') {
       if(this.attackType === 'ult') {
-        if(this.stateTime >= ULT_SEQUENCE.total) {
+        if(this.stateTime >= this.ultSeq.total) {
           this.state = 'idle';
           this.attackType = null;
           this.stateTime = 0;
@@ -722,7 +722,7 @@ class Fighter {
     if(this.state === 'attack') {
       const isUlt = this.attackType === 'ult';
       if(isUlt) {
-        const info = currentUltHit(this.stateTime);
+        const info = currentUltHit(this.stateTime, this.ultSeq);
         if(info && info.index !== this.ultHitIndex) {
           // New hit window
           const box = this.attackBox();

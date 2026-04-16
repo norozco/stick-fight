@@ -772,7 +772,7 @@ function drawFighter(f) {
       }
     }
     // Motion streaks at impact frames
-    const info = currentUltHit(f.stateTime);
+    const info = currentUltHit(f.stateTime, f.ultSeq);
     if(info && f.stateTime === info.hit.start) {
       for(let i = 0; i < 4; i++) {
         spawnStreak(f.x + f.facing * 30, f.y - 60 - i * 10, f.facing, f.glow);
