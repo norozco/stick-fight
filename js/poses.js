@@ -24,12 +24,47 @@ function computeTargetPose(f) {
   const fc = f.facing;
   const pose = makePose(x, y);
 
-  // Idle breathing
-  const breath = Math.sin(globalTime * 0.05) * 1.5;
+  // Per-character idle breathing + stance
+  const vis = f.character && f.character.visual;
+  const ia = vis && vis.idleAnim;
+  const ba = (ia && ia.breathAmp) || 1.5;
+  const breath = Math.sin(globalTime * 0.05) * ba;
   pose.neck.y -= breath * 0.3;
   pose.head.y -= breath * 0.3;
   pose.lHand.y += breath * 0.5;
   pose.rHand.y -= breath * 0.5;
+
+  // Character-specific secondary idle motion
+  if(ia && ia.motion === 'float') {
+    // Aurora: gentle up-down float
+    const fl = Math.sin(globalTime * (ia.swayFreq || 0.03)) * 3;
+    pose.head.y -= fl; pose.neck.y -= fl * 0.8;
+    pose.lHand.y -= fl * 0.5; pose.rHand.y -= fl * 0.5;
+  } else if(ia && ia.motion === 'bounce') {
+    // Crimson: rhythmic boxer bounce
+    const bn = Math.abs(Math.sin(globalTime * (ia.swayFreq || 0.07))) * 4;
+    pose.pelvis.y += bn; pose.neck.y += bn * 0.5; pose.head.y += bn * 0.3;
+    if(Math.sin(globalTime * (ia.swayFreq || 0.07)) > 0) pose.lFoot.y -= 3;
+    else pose.rFoot.y -= 3;
+  } else if(ia && ia.motion === 'flicker') {
+    // Noir: subtle micro-teleport jitter
+    if(Math.random() < 0.03) {
+      pose.head.x += (Math.random() - 0.5) * 6;
+      pose.pelvis.x += (Math.random() - 0.5) * 3;
+    }
+  }
+
+  // Per-character idle stance offsets (only when idle on ground)
+  const is = vis && vis.idleStance;
+  if(is && f.state === 'idle' && f.onGround) {
+    pose.lHand.x += (is.lHandX || 0) * fc;
+    pose.lHand.y += (is.lHandY || 0);
+    pose.rHand.x += (is.rHandX || 0) * fc;
+    pose.rHand.y += (is.rHandY || 0);
+    pose.lFoot.x += (is.lFootX || 0) * fc;
+    pose.rFoot.x += (is.rFootX || 0) * fc;
+    pose.bodyLean += (is.lean || 0) * fc;
+  }
 
   // Walking
   if(f.onGround && Math.abs(f.vx) > 1 && f.state !== 'attack' && f.state !== 'hurt' && f.state !== 'dash') {
@@ -798,6 +833,7 @@ function frontFacingFlailPose(f) {
 }
 
 function drawFighter(f) {
+  const vis = f.character && f.character.visual;
   // Ring-out: phase-driven rendering. The cinematic uses HARD CUTS between
   // distinct camera/pose moments — see RINGOUT_PHASES in ringout.js.
   if(f.state === 'ringout') {
@@ -812,7 +848,7 @@ function drawFighter(f) {
       ctx.translate(f.x, f.y - 55);
       ctx.scale(scale, scale);
       ctx.translate(-f.x, -(f.y - 55));
-      renderStoredPose(pose, f.color);
+      renderStoredPose(pose, f.color, 1, vis);
       ctx.restore();
       return;
     }
@@ -830,7 +866,7 @@ function drawFighter(f) {
       ctx.translate(f.x, f.y - 55);
       ctx.rotate(f.ringoutSpin || 0);
       ctx.translate(-f.x, -(f.y - 55));
-      renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
+      renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color, 1, vis);
       ctx.restore();
       return;
     }
@@ -857,7 +893,7 @@ function drawFighter(f) {
       ctx.translate(f.x, f.y - 10);
       ctx.scale(scale, scale);
       ctx.translate(-f.x, -(f.y - 10));
-      renderStoredPose(splayed, f.color);
+      renderStoredPose(splayed, f.color, 1, vis);
       ctx.restore();
       return;
     }
@@ -870,7 +906,7 @@ function drawFighter(f) {
     ctx.translate(f.x, f.y - 55);
     ctx.rotate(f.ringoutSpin || 0);
     ctx.translate(-f.x, -(f.y - 55));
-    renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
+    renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color, 1, vis);
     ctx.restore();
     return;
   }
@@ -885,7 +921,7 @@ function drawFighter(f) {
     const target = computeTargetPose(f);
     if(!f.smoothPose) f.smoothPose = clonePose(target);
     smoothPose(f.smoothPose, target, 0.4);
-    renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color);
+    renderStoredPose({ ...f.smoothPose, facing: f.facing }, f.color, 1, vis);
     ctx.restore();
     return;
   }
@@ -1035,6 +1071,6 @@ function drawFighter(f) {
   ctx.save();
   ctx.shadowColor = f.color;
   ctx.shadowBlur = 4;
-  renderStoredPose({ ...f.smoothPose, facing: f.facing }, col);
+  renderStoredPose({ ...f.smoothPose, facing: f.facing }, col, 1, vis);
   ctx.restore();
 }
