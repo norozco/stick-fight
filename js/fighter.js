@@ -672,8 +672,11 @@ class Fighter {
         }
       }
     }
-    if(this.state === 'hurt' && this.hitStun === 0) { this.state = 'idle'; this.stateTime = 0; this.stateTimeF = 0; }
-    if(this.state === 'stagger' && this.hitStun === 0) { this.state = 'idle'; this.stateTime = 0; this.stateTimeF = 0; }
+    // Hurt/stagger recovery — also checked in the timer section at top of update()
+    // as a safety net in case slowMo/hitstop prevented it from running here.
+    if(this.state === 'hurt' && this.hitStun <= 0) { this.state = 'idle'; this.stateTime = 0; this.stateTimeF = 0; }
+    if(this.state === 'stagger' && this.hitStun <= 0) { this.state = 'idle'; this.stateTime = 0; this.stateTimeF = 0; }
+    if(this.state === 'wallsplat' && this.hitStun <= 0) { this.state = 'hurt'; this.hitStun = 8; this.vy = 4; this.onGround = false; }
 
     // Wall splat — heavy knockback into a wall sticks the fighter briefly
     const WALL_SPLAT_KB = 9;
