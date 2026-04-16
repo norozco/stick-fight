@@ -590,7 +590,8 @@ _s.shadowBlur=0;_s.shadowColor='transparent';
 sl(bx-12,hY-5,bx-4,hY-8,2.5,dk);
 sl(bx+4,hY-8,bx+12,hY-5,2.5,dk);
 
-// No nose, no mouth — all hidden behind wraps. The eyes ARE the face.}
+// No nose, no mouth — all hidden behind wraps. The eyes ARE the face.
+}
 
 // GEN + DRAW + INIT
 function generateSpritesForCharacter(c){const id=c.id;spriteCache[id]={};const fn=id==='aurora'?drawAurora:id==='crimson'?drawCrimson:id==='jade'?drawJade:id==='noir'?drawNoir:drawAurora;for(const[a,d]of Object.entries(SPRITE_ANIMS)){spriteCache[id][a]=[];for(let f=0;f<d.frames;f++){const cv=document.createElement('canvas');cv.width=SPRITE_W;cv.height=SPRITE_H;_s=cv.getContext('2d');_s.imageSmoothingEnabled=false;fn(SPRITE_W/2,SPRITE_H-14,gp(a,f,d.frames));spriteCache[id][a].push(cv);}}_s=null;}
