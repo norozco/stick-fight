@@ -399,19 +399,22 @@ function drawFighterSprite(f) {
     ctx.translate(-f.x, 0);
   }
 
-  // Hurt flash tint
-  if(f.hurtFlash > 0 && Math.floor(f.hurtFlash / 2) % 2 === 0) {
-    ctx.globalAlpha = 0.5;
-  }
-
-  ctx.drawImage(spriteCanvas, dx, dy, SPRITE_DRAW_W, SPRITE_DRAW_H);
-
-  if(f.hurtFlash > 0 && Math.floor(f.hurtFlash / 2) % 2 === 0) {
-    ctx.globalCompositeOperation = 'source-atop';
-    ctx.fillStyle = 'rgba(255,80,80,0.5)';
-    ctx.fillRect(dx, dy, SPRITE_DRAW_W, SPRITE_DRAW_H);
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = 1;
+  // Hurt flash — blink the sprite white by compositing on an off-screen canvas
+  // so the tint conforms to the character silhouette (no visible squares).
+  const isFlashing = f.hurtFlash > 0 && Math.floor(f.hurtFlash / 2) % 2 === 0;
+  if(isFlashing) {
+    // Composite the sprite + white tint on a temp canvas so only character pixels tint
+    const tmp = document.createElement('canvas');
+    tmp.width = spriteCanvas.width;
+    tmp.height = spriteCanvas.height;
+    const tc = tmp.getContext('2d');
+    tc.drawImage(spriteCanvas, 0, 0);
+    tc.globalCompositeOperation = 'source-atop';
+    tc.fillStyle = 'rgba(255,200,200,0.65)';
+    tc.fillRect(0, 0, tmp.width, tmp.height);
+    ctx.drawImage(tmp, dx, dy, SPRITE_DRAW_W, SPRITE_DRAW_H);
+  } else {
+    ctx.drawImage(spriteCanvas, dx, dy, SPRITE_DRAW_W, SPRITE_DRAW_H);
   }
 
   ctx.imageSmoothingEnabled = true;
