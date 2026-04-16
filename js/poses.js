@@ -498,17 +498,222 @@ function applyPosePhysics(f, pose) {
   }
 }
 
-function renderStoredPose(pose, color, shadowFactor = 1) {
+// ============================================================
+// HEAD DECORATIONS — hair, crowns, hoods (drawn in head-local space)
+// ============================================================
+function drawHeadDecor(visual, facing) {
+  if(!visual || !visual.headDecor) return;
+  const fc = facing || 1;
+  for(const d of visual.headDecor) {
+    if(d.type === 'line') {
+      ctx.strokeStyle = d.color;
+      ctx.lineWidth = d.width || 2;
+      ctx.beginPath();
+      ctx.moveTo(d.x1 * fc, d.y1);
+      ctx.lineTo(d.x2 * fc, d.y2);
+      ctx.stroke();
+    } else if(d.type === 'diamond') {
+      ctx.fillStyle = d.color;
+      const s = d.size;
+      ctx.beginPath();
+      ctx.moveTo(d.cx, d.cy - s);
+      ctx.lineTo(d.cx + s, d.cy);
+      ctx.lineTo(d.cx, d.cy + s);
+      ctx.lineTo(d.cx - s, d.cy);
+      ctx.closePath();
+      ctx.fill();
+    } else if(d.type === 'rect') {
+      if(d.fill) { ctx.fillStyle = d.fill; ctx.fillRect(d.x, d.y, d.w, d.h); }
+      if(d.border) { ctx.strokeStyle = d.border; ctx.lineWidth = 1.5; ctx.strokeRect(d.x, d.y, d.w, d.h); }
+    } else if(d.type === 'arc') {
+      // Hood — half-ellipse over the top of head
+      ctx.beginPath();
+      ctx.ellipse(0, -2, d.rx || 16, d.ry || 14, 0, Math.PI, 0);
+      if(d.fill) { ctx.fillStyle = d.fill; ctx.fill(); }
+      if(d.border) { ctx.strokeStyle = d.border; ctx.lineWidth = d.width || 2; ctx.stroke(); }
+    }
+  }
+}
+
+// ============================================================
+// EYES — per-character expression system
+// ============================================================
+function drawEyes(visual, facing, color) {
+  const eyes = visual && visual.eyes;
+  const fc = facing || 1;
+  if(!eyes) {
+    // Fallback: classic dot
+    if(fc !== 0) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(fc * 5, -2, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    return;
+  }
+  const drawOne = (ex) => {
+    if(eyes.type === 'wide') {
+      ctx.fillStyle = eyes.color;
+      ctx.beginPath();
+      ctx.ellipse(ex, -2, eyes.w / 2, eyes.h / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      if(eyes.highlight) {
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(ex + 1, -3, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if(eyes.type === 'slit') {
+      ctx.save();
+      ctx.translate(ex, -2);
+      ctx.rotate(eyes.angle || 0);
+      ctx.fillStyle = eyes.color;
+      ctx.fillRect(-eyes.w / 2, -eyes.h / 2, eyes.w, eyes.h);
+      ctx.restore();
+    } else if(eyes.type === 'dot') {
+      ctx.fillStyle = eyes.color;
+      ctx.beginPath();
+      ctx.arc(ex, -1, eyes.radius || 2, 0, Math.PI * 2);
+      ctx.fill();
+    } else if(eyes.type === 'glow') {
+      ctx.save();
+      ctx.shadowColor = eyes.color;
+      ctx.shadowBlur = eyes.glowRadius || 6;
+      ctx.fillStyle = eyes.color;
+      ctx.beginPath();
+      ctx.ellipse(ex, -2, eyes.w / 2, eyes.h / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  };
+  if(fc === 0) {
+    // Camera-facing (ringout) — draw both eyes symmetrically
+    drawOne(-4);
+    drawOne(4);
+  } else {
+    drawOne(fc * 5);
+  }
+}
+
+// ============================================================
+// COSTUME ELEMENTS — capes, armor, wraps
+// ============================================================
+function drawCostumeBack(pose, visual) {
+  // Drawn BEFORE the body so capes / cloaks appear behind
+  if(!visual || !visual.costume) return;
+  const lean = pose.bodyLean || 0;
+  const neckX = pose.neck.x + lean;
+  const neckY = pose.neck.y;
+  for(const c of visual.costume) {
+    if(c.attach === 'cape') {
+      // Simple bezier cape trailing behind the body lean
+      const tipX = neckX - lean * 2.5;
+      const tipY = neckY + c.length;
+      ctx.beginPath();
+      ctx.moveTo(neckX - 4, neckY);
+      ctx.quadraticCurveTo(neckX - lean * 1.8, neckY + c.length * 0.6, tipX, tipY);
+      ctx.lineTo(neckX + 4, neckY);
+      ctx.closePath();
+      ctx.fillStyle = c.color;
+      ctx.fill();
+      if(c.border) {
+        ctx.strokeStyle = c.border;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(neckX - 4, neckY);
+        ctx.quadraticCurveTo(neckX - lean * 1.8, neckY + c.length * 0.6, tipX, tipY);
+        ctx.stroke();
+      }
+    }
+    if(c.attach === 'sash') {
+      // Short trailing line from pelvis
+      const px = pose.pelvis.x, py = pose.pelvis.y;
+      ctx.strokeStyle = c.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.quadraticCurveTo(px - lean * 1.5, py + c.length * 0.5, px - lean * 2, py + c.length);
+      ctx.stroke();
+    }
+  }
+}
+
+function drawCostumeFront(pose, visual, baseLineWidth) {
+  // Drawn AFTER the body for overlays: shoulder pads, chest plate, limb wraps
+  if(!visual || !visual.costume) return;
+  const lean = pose.bodyLean || 0;
+  const neckX = pose.neck.x + lean;
+  const neckY = pose.neck.y;
+  for(const c of visual.costume) {
+    if(c.attach === 'shoulders') {
+      // Dome pads on each shoulder
+      const lsx = neckX - 8, rsx = neckX + 8;
+      ctx.fillStyle = c.color;
+      ctx.beginPath();
+      ctx.arc(lsx, neckY, c.radius, Math.PI, 0);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(rsx, neckY, c.radius, Math.PI, 0);
+      ctx.fill();
+      if(c.border) {
+        ctx.strokeStyle = c.border;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(lsx, neckY, c.radius, Math.PI, 0); ctx.stroke();
+        ctx.beginPath(); ctx.arc(rsx, neckY, c.radius, Math.PI, 0); ctx.stroke();
+      }
+    }
+    if(c.attach === 'chest') {
+      // Filled rect on torso midpoint
+      const mx = (pose.pelvis.x + neckX) / 2;
+      const my = (pose.pelvis.y + neckY) / 2;
+      ctx.fillStyle = c.color;
+      ctx.fillRect(mx - c.width / 2, my - 10, c.width, 20);
+      if(c.border) {
+        ctx.strokeStyle = c.border;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(mx - c.width / 2, my - 10, c.width, 20);
+      }
+    }
+    if(c.attach === 'forearms') {
+      // Thicker overlay on elbow→hand limbs
+      ctx.strokeStyle = c.color;
+      ctx.lineWidth = baseLineWidth + c.extraWidth;
+      drawLimb(pose.lElbow, pose.lHand);
+      drawLimb(pose.rElbow, pose.rHand);
+    }
+    if(c.attach === 'shins') {
+      // Thicker overlay on knee→foot limbs
+      ctx.strokeStyle = c.color;
+      ctx.lineWidth = baseLineWidth + c.extraWidth;
+      drawLimb(pose.lKnee, pose.lFoot);
+      drawLimb(pose.rKnee, pose.rFoot);
+    }
+  }
+}
+
+// ============================================================
+// MAIN POSE RENDERER — uses visual data for proportions + decoration
+// ============================================================
+function renderStoredPose(pose, color, shadowFactor = 1, visual = null) {
   ctx.save();
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
-  ctx.lineWidth = 4.5;
+  const lw = (visual && visual.lineWidth) || 4.5;
+  const headR = (visual && visual.headRadius) || 13;
+  ctx.lineWidth = lw;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
   const lean = pose.bodyLean;
   const neckX = pose.neck.x + lean;
   const neckY = pose.neck.y;
+
+  // Layer 1: costume back (capes, cloaks — behind the body)
+  drawCostumeBack(pose, visual);
+
+  // Layer 2: stick figure body
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
 
   // Legs
   drawLimb(pose.pelvis, pose.lKnee);
@@ -528,6 +733,13 @@ function renderStoredPose(pose, color, shadowFactor = 1) {
   drawLimb({ x: neckX, y: neckY }, pose.rElbow);
   drawLimb(pose.rElbow, pose.rHand);
 
+  // Layer 3: costume front (armor, wraps — on top of limbs)
+  drawCostumeFront(pose, visual, lw);
+
+  // Reset stroke for head
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+
   // Head
   const hx = pose.head.x + lean;
   const hy = pose.head.y;
@@ -535,15 +747,14 @@ function renderStoredPose(pose, color, shadowFactor = 1) {
   ctx.save();
   ctx.translate(hx, hy);
   ctx.rotate(tilt);
+  // Head circle
   ctx.beginPath();
-  ctx.arc(0, 0, 13, 0, Math.PI * 2);
+  ctx.arc(0, 0, headR, 0, Math.PI * 2);
   ctx.stroke();
-  if(pose.facing) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(pose.facing * 5, -2, 2, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // Head decorations (hair, crown, hood)
+  drawHeadDecor(visual, pose.facing);
+  // Eyes
+  drawEyes(visual, pose.facing, color);
   ctx.restore();
 
   ctx.restore();
