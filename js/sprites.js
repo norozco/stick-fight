@@ -5,7 +5,17 @@ const SPRITE_W=112,SPRITE_H=180,SPRITE_SCALE=1.9;
 const SPRITE_DRAW_W=Math.round(SPRITE_W*SPRITE_SCALE),SPRITE_DRAW_H=Math.round(SPRITE_H*SPRITE_SCALE);
 const spriteCache={};
 const SPRITE_ANIMS={idle:{frames:6,rate:10},walk:{frames:8,rate:4},attack_light:{frames:6,rate:3},attack_heavy:{frames:6,rate:5},hurt:{frames:3,rate:6},jump:{frames:3,rate:8},block:{frames:2,rate:8},dash:{frames:3,rate:3},attack_ult:{frames:8,rate:6},attack_throw:{frames:6,rate:4}};
-function getSpriteAnim(f){if(f.state==='attack'){if(f.attackType==='ult')return'attack_ult';if(f.attackType==='throw')return'attack_throw';if(f.attackType==='heavy')return'attack_heavy';return'attack_light';}if(f.state==='hurt'||f.state==='stagger'||f.state==='wallsplat')return'hurt';if(f.state==='dash')return'dash';if(f.state==='ringout')return'hurt';if(f.blocking)return'block';if(!f.onGround)return'jump';if(Math.abs(f.vx)>1.5)return'walk';return'idle';}
+function getSpriteAnim(f){
+  if(f.state==='ko')return'hurt';        // KO uses hurt sprite (falling)
+  if(f.state==='knockdown')return'hurt';  // downed uses hurt sprite
+  if(f.state==='grabbed')return'hurt';    // grabbed looks stunned
+  if(f.state==='thrown')return'hurt';     // airborne after throw
+  if(f.state==='attack'){if(f.attackType==='ult')return'attack_ult';if(f.attackType==='throw')return'attack_throw';if(f.attackType==='heavy')return'attack_heavy';return'attack_light';}
+  if(f.state==='hurt'||f.state==='stagger'||f.state==='wallsplat')return'hurt';
+  if(f.state==='dash')return'dash';if(f.state==='ringout')return'hurt';
+  if(f.blocking)return'block';if(!f.onGround)return'jump';
+  if(Math.abs(f.vx)>1.5)return'walk';return'idle';
+}
 function getSpriteFrame(f,a){const d=SPRITE_ANIMS[a]||SPRITE_ANIMS.idle;return Math.floor((f.stateTime||globalTime)/d.rate)%d.frames;}
 let _s=null;
 function sf(x,y,w,h,c){_s.fillStyle=c;_s.fillRect(x|0,y|0,w|0,h|0);}
