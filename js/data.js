@@ -22,10 +22,10 @@ function easeOutBack(t) { const c = 2.2; return 1 + c * Math.pow(t - 1, 3) + c *
 // CHARACTER & STAGE ROSTERS
 // ============================================================
 const CHARACTERS = [
-  { id: 'aurora',  name: 'AURORA',  color: '#e8f4ff', glow: '#3bf0ff', hp: 100, speed: 1.00, dmg: 1.00, desc: 'BALANCED',     ultName: 'AURORA STORM' },
-  { id: 'crimson', name: 'CRIMSON', color: '#ffe0e8', glow: '#ff3860', hp:  92, speed: 1.10, dmg: 1.08, desc: 'GLASS · QUICK', ultName: 'CRIMSON BLAZE' },
-  { id: 'jade',    name: 'JADE',    color: '#dfffe0', glow: '#44ff88', hp: 125, speed: 0.88, dmg: 0.95, desc: 'TANK · SLOW',   ultName: 'JADE QUAKE' },
-  { id: 'noir',    name: 'NOIR',    color: '#fff0c0', glow: '#ffcc00', hp:  88, speed: 1.18, dmg: 1.12, desc: 'BERSERKER',     ultName: 'NOIR SHROUD' },
+  { id: 'aurora',  name: 'AURORA',  color: '#e8f4ff', glow: '#3bf0ff', hp: 100, speed: 1.00, dmg: 1.00, desc: 'BALANCED',     ultName: 'AURORA STORM',  ultSeq: 'aurora'  },
+  { id: 'crimson', name: 'CRIMSON', color: '#ffe0e8', glow: '#ff3860', hp:  92, speed: 1.10, dmg: 1.08, desc: 'GLASS · QUICK', ultName: 'CRIMSON BLAZE', ultSeq: 'crimson' },
+  { id: 'jade',    name: 'JADE',    color: '#dfffe0', glow: '#44ff88', hp: 125, speed: 0.88, dmg: 0.95, desc: 'TANK · SLOW',   ultName: 'JADE QUAKE',    ultSeq: 'jade'    },
+  { id: 'noir',    name: 'NOIR',    color: '#fff0c0', glow: '#ffcc00', hp:  88, speed: 1.18, dmg: 1.12, desc: 'BERSERKER',     ultName: 'NOIR SHROUD',   ultSeq: 'noir'    },
 ];
 const STAGES = [
   { id: 'twilight', name: 'TWILIGHT TOWER' },
