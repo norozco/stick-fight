@@ -137,6 +137,24 @@ class Fighter {
       Audio.whoosh();
       return true;
     }
+    // ARCADE CANCEL: during attack recovery (after active frames end),
+    // allow canceling into a DIFFERENT move type. This keeps gameplay fluid:
+    // light→heavy, light→throw, light→jump, heavy→ult, etc.
+    if(this.state === 'attack' && this.attackHit) {
+      const data = this.attackData();
+      if(data && this.stateTime > data.start + data.active && type !== this.attackType) {
+        this.state = 'attack';
+        this.stateTime = 0;
+        this.stateTimeF = 0;
+        this.attackType = type;
+        this.attackHit = false;
+        this.comboStep = 0;
+        this.comboWindow = 0;
+        this.juggleWindow = 0;
+        Audio.whoosh();
+        return true;
+      }
+    }
     // Air combo cancel: if last hit launched the opponent, allow canceling
     // recovery into another attack (juggle window)
     if(this.state === 'attack' && this.juggleWindow > 0 && (type === 'light' || type === 'heavy')) {
