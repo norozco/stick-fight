@@ -584,6 +584,86 @@ class Fighter {
       return;
     }
 
+    // --- 4-PHASE THROW UPDATE (attacker side) ---
+    if(this.state === 'attack' && this.attackType === 'throw' && this.throwPhase > 0 && this.throwTarget) {
+      this.throwTimer++;
+      const def = this.throwTarget;
+      const fc = this.facing;
+
+      if(this.throwPhase === 1) {
+        // PHASE 1: GRAB (frames 0-8) — brief pause, establish contact
+        def.x = this.x + fc * 44;
+        def.y = GROUND;
+        def.facing = -fc;
+        if(this.throwTimer >= 8) {
+          this.throwPhase = 2;
+          this.throwTimer = 0;
+        }
+      } else if(this.throwPhase === 2) {
+        // PHASE 2: ATTACH (frames 0-6) — lift and control
+        const p = this.throwTimer / 6;
+        def.x = this.x + fc * lerp(44, 30, p);
+        def.y = lerp(GROUND, GROUND - 20, p);
+        def.facing = -fc;
+        def.onGround = false;
+        if(this.throwTimer >= 6) {
+          this.throwPhase = 3;
+          this.throwTimer = 0;
+        }
+      } else if(this.throwPhase === 3) {
+        // PHASE 3: THROW MOTION (frames 0-14) — smooth arc over the attacker
+        // Defender follows a controlled semicircular path, NOT free rotation
+        const p = this.throwTimer / 14;
+        const ep = easeInOutCubic ? easeInOutCubic(p) : p;
+        const angle = ep * Math.PI;  // 0 (front) → π (behind)
+        const radius = 55;
+        def.x = this.x + Math.cos(angle) * radius * fc;
+        def.y = GROUND - Math.sin(angle) * 80 - 10;
+        def.facing = -fc;
+        def.onGround = false;
+        if(this.throwTimer >= 14) {
+          this.throwPhase = 4;
+          this.throwTimer = 0;
+        }
+      } else if(this.throwPhase === 4) {
+        // PHASE 4: RELEASE — detach, apply force, defender becomes 'thrown'
+        const dmgMult = this.dmgMult || 1;
+        const dmg = 22 * dmgMult;
+        def.hp = Math.max(0, def.hp - dmg);
+        def.state = 'thrown';
+        def.stateTime = 0;
+        def.throwBy = null;
+        def.hitStun = 0;
+        def.vx = fc * -14;       // launched in throw direction
+        def.vy = -8;
+        def.onGround = false;
+        def.hurtFlash = 16;
+        // Effects
+        spawnDamageNumber(def.x, def.y - 80, dmg, '#ff6600', true);
+        spawnHitSpark(def.x, def.y - 40, '#ffaa44', 22, 1.8);
+        for(let i = 0; i < 12; i++) spawnDust(def.x + (Math.random()-0.5)*50, GROUND + 2, -fc);
+        shake(10, 14);
+        hitstop = 8;
+        Audio.heavy();
+        this.addUlt(14);
+        // Attacker recovers
+        this.throwPhase = 0;
+        this.throwTarget = null;
+        this.state = 'idle';
+        this.stateTime = 0;
+        this.attackType = null;
+        // Check KO
+        if(def.hp <= 0) {
+          def.state = 'ko';
+          def.koVx = fc * -12;
+          def.koVy = -6;
+          def.koLanded = false;
+        }
+      }
+      this.stateTime++;
+      return; // throw overrides normal update for the attacker
+    }
+
     // Safety: recover from hurt/stagger if hitStun expired (even if main check below
     // was skipped by an early return or slowMo gating on a previous frame)
     if((this.state === 'hurt' || this.state === 'stagger') && this.hitStun <= 0 &&
