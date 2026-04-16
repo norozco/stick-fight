@@ -966,6 +966,11 @@ function loop(now) {
   }
 
   if(state !== 'replay') {
+    // Character ground aura (colored light pool beneath each fighter)
+    if(typeof drawCharacterAura === 'function') {
+      if(p1) drawCharacterAura(p1);
+      if(p2) drawCharacterAura(p2);
+    }
     if(p1) drawFighter(p1);
     if(p2) drawFighter(p2);
   }
