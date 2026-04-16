@@ -651,6 +651,8 @@ class Fighter {
           def.koVx = fc * -12;
           def.koVy = -6;
           def.koLanded = false;
+          def.koLandFrame = 0;
+          def.lastHitDir = fc;  // throw direction → KO fall direction
         }
       }
       this.stateTime++;
