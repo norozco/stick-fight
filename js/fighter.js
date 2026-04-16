@@ -622,7 +622,7 @@ class Fighter {
         if(t >= 56 && t < 64 && t % 2 === 0) spawnAfterimage(this, 0.4);
       }
     } else {
-      const spd = 5.5 * (this.speedMult || 1);
+      const spd = 6.5 * (this.speedMult || 1);  // faster walk for arcade feel
       if(wantLeft) targetVx = -spd;
       if(wantRight) targetVx = spd;
     }
