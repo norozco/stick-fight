@@ -93,6 +93,12 @@ const CHARACTERS = [
       ],
       idleStance: { lHandY: 4, rHandY: 4, lHandX: -6, rHandX: 6, lFootX: -8, rFootX: 8, lean: 0 },
       idleAnim: { breathAmp: 1.0, swayFreq: 0.02, motion: 'none' },
+      body: {
+        shoulderW: 24, waistW: 20, upperArmW: 10, forearmW: 8, thighW: 12, shinW: 10,
+        handR: 5, footW: 13, footH: 6,
+        skinColor: '#c8b898', outfitColor: '#2a6640', outfitDark: '#1a4430',
+        outfitAccent: '#44aa66', outlineColor: '#0a2218',
+      },
     },
   },
   { id: 'noir', name: 'NOIR', color: '#fff0c0', glow: '#ffcc00', hp: 88, speed: 1.18, dmg: 1.12,
