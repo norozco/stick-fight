@@ -42,10 +42,12 @@ const CHARACTERS = [
       idleAnim: { breathAmp: 1.5, swayFreq: 0.03, motion: 'float' },
       // SNES-quality filled body
       body: {
-        shoulderW: 18, waistW: 14, upperArmW: 7, forearmW: 6, thighW: 9, shinW: 7,
-        handR: 4, footW: 10, footH: 5,
-        skinColor: '#e8d8cc', outfitColor: '#4488cc', outfitDark: '#2a5580',
+        female: true,
+        shoulderW: 14, waistW: 10, hipW: 14, upperArmW: 5, forearmW: 4, thighW: 8, shinW: 6,
+        handR: 3, footW: 9, footH: 4,
+        skinColor: '#f0ddd0', outfitColor: '#4488cc', outfitDark: '#2a5580',
         outfitAccent: '#66bbee', outlineColor: '#1a3050',
+        hairColor: '#a0e8ff', hairLength: 14,
       },
     },
   },
