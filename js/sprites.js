@@ -372,33 +372,106 @@ sf(rax-8,ray-3,16,12,pl);sf(rax-8,ray-3,16,3,gold);sf(rax-8,ray+7,16,1.5,gold);
 shadedLimb(rax,ray+9,rax+6,ray+22,11,sk,skDk,out);
 sc(rax+6,ray+26,7,sk);sc(rax+6,ray+26,7,out+'20');
 
-// === HEAD — valkyrie helmet, clearly feminine face ===
-const hY=nY-22+(o.hY||0);
-sf(bx-4,nY-5,9,8,sk);sc(bx,hY,18,sk);
-se(bx-16,hY+1,3,5,sk);se(bx+16,hY+1,3,5,sk);  // ears
-// Helmet dome
-se(bx,hY-5,20,15,pl);
-_s.strokeStyle=out;_s.lineWidth=2;_s.beginPath();_s.ellipse(bx,hY-5,20,15,0,Math.PI,0);_s.stroke();
-// Visor (gold with green insets)
-sf(bx-20,hY-6,40,7,met);sf(bx-20,hY-6,40,2,gold);sf(bx-20,hY,40,1,gold);
-// Helmet WINGS (valkyrie) — distinctive side wings
-sl(bx-20,hY-8,bx-30,hY-20,3,gold);sl(bx-30,hY-20,bx-26,hY-16,2,met);
-sl(bx-28,hY-18,bx-34,hY-26,2,gold+'80');
-sl(bx+20,hY-8,bx+30,hY-20,3,gold);sl(bx+30,hY-20,bx+26,hY-16,2,met);
-sl(bx+28,hY-18,bx+34,hY-26,2,gold+'80');
-// Crest with plume
-sf(bx-2,hY-24,5,18,met);
-for(let i=0;i<6;i++){sl(bx,hY-24-i*2.5,bx-4-i*2,hY-26-i*2.5,2.5,i%2===0?lt:met);}
-se(bx,hY-24,4,3,gold);
-// Ponytail out back
-for(let i=0;i<16;i++){sf(bx-4+Math.sin(i*0.3)*3-L*0.3,hY+14+i*2.3,6,2.5,i%2===0?lt:met);}
-// Face — big eyes through visor, clearly feminine
-pixelFace(bx,hY,{eyeColor:'#44ff88',eyeW:5,eyeH:5,browColor:out,browAngle:1,
-  mouthColor:'#c09878',mouthW:6,mouthY:10,noseColor:skDk,skinDark:skDk,outline:out,expression:'serious'});
-// Eyelashes visible through visor
-sl(bx-10,hY-7,bx-12,hY-10,1.2,out+'50');sl(bx+9,hY-7,bx+11,hY-10,1.2,out+'50');
+// === HEAD — BIG, valkyrie helmet, fierce feminine warrior face ===
+const hY=nY-24+(o.hY||0);
+const sk1='#efe0cc',sk3='#c0a080',sk4='#a08868';
+// Neck (medium — strong but feminine)
+sf(bx-3,nY-6,6,8,sk);
+// Head — wide oval (feminine but strong jawline)
+se(bx,hY,20,19,sk);
+// Face shading
+_s.fillStyle=sk3+'40';_s.beginPath();_s.ellipse(bx-7,hY+3,10,14,0,0,Math.PI*2);_s.fill();
+_s.fillStyle=sk1+'30';_s.beginPath();_s.ellipse(bx+5,hY-3,10,12,0,0,Math.PI*2);_s.fill();
+_s.strokeStyle=sk4+'20';_s.lineWidth=1;_s.beginPath();_s.ellipse(bx,hY,20,19,0,0,Math.PI*2);_s.stroke();
+// Ears
+se(bx-18,hY+2,3,5,sk);se(bx+18,hY+2,3,5,sk);
+
+// === HELMET (massive, ornate, with wings) ===
+// Dome
+se(bx,hY-6,22,16,pl);
+_s.strokeStyle=out;_s.lineWidth=2;_s.beginPath();_s.ellipse(bx,hY-6,22,16,0,Math.PI,0);_s.stroke();
+// Visor bar (wide, gold-trimmed)
+sf(bx-22,hY-7,44,8,met);sf(bx-22,hY-7,44,2.5,gold);sf(bx-22,hY-1,44,1.5,gold);
+// Helmet visor shadow (dark strip above eyes for depth)
+sf(bx-18,hY-5,36,3,dk+'40');
+// WINGS (valkyrie — the big silhouette element)
+// Left wing (3 feather strokes)
+sl(bx-22,hY-9,bx-34,hY-24,3.5,gold);sl(bx-34,hY-24,bx-30,hY-18,2,met);
+sl(bx-30,hY-20,bx-38,hY-30,2.5,gold+'80');sl(bx-26,hY-16,bx-32,hY-24,1.5,gold+'50');
+// Right wing
+sl(bx+22,hY-9,bx+34,hY-24,3.5,gold);sl(bx+34,hY-24,bx+30,hY-18,2,met);
+sl(bx+30,hY-20,bx+38,hY-30,2.5,gold+'80');sl(bx+26,hY-16,bx+32,hY-24,1.5,gold+'50');
+// Crest (tall, with ornate plume)
+sf(bx-2,hY-26,5,20,met);
+for(let i=0;i<8;i++){sl(bx,hY-26-i*2.5,bx-5-i*2,hY-28-i*2.5,2.5,i%2===0?lt:met);}
+se(bx,hY-26,4.5,3.5,gold);sc(bx,hY-26,2,lt);
+
+// Ponytail out back (thick, warrior braid)
+for(let i=0;i<18;i++){const sw=Math.sin(i*0.28)*3;
+sf(bx-4+sw-L*0.3,hY+16+i*2.4,7,3,i%3===0?met:i%2===0?lt:met);}
+// Braid ties
+sc(bx-2,hY+22,2,gold);sc(bx-1,hY+40,2,gold);
+
+// === FACE — anime warrior queen, big determined eyes through visor ===
+// Eyes are framed by the visor — visible in the gap between visor and cheek
+
+// --- LEFT EYE (big, fierce, feminine — 8x6 area) ---
+se(bx-8,hY-1,7,5.5,'#ffffff');                   // white sclera
+// Iris — emerald green gradient (3 tones)
+se(bx-7,hY,5.5,5,'#50e080');                     // light green top
+se(bx-7,hY+1,5.5,4,'#30c060');                   // mid green
+se(bx-7,hY+2,4,3,'#20a048');                     // deep green bottom
+// Pupil
+sc(bx-6,hY+1,2.5,'#0a3820');
+// Highlights (2 — fierce but still feminine)
+sc(bx-9,hY-2,2,'#ffffff');                        // main sparkle
+sc(bx-4,hY+2,1.2,'#ffffff');                      // secondary
+sc(bx-8,hY+3,0.8,'#88ffbb');                     // green reflection
+// Upper eyelid (thick, defined — strong)
+_s.strokeStyle='#0a2818';_s.lineWidth=2;_s.beginPath();
+_s.ellipse(bx-7,hY-2,7.5,3.5,0,Math.PI+0.2,2*Math.PI-0.2);_s.stroke();
+// Lower lid (subtle)
+_s.strokeStyle='#0a281840';_s.lineWidth=0.8;_s.beginPath();
+_s.ellipse(bx-7,hY+2,6,2.5,0,0.2,Math.PI-0.2);_s.stroke();
+
+// --- RIGHT EYE (mirror) ---
+se(bx+8,hY-1,7,5.5,'#ffffff');
+se(bx+9,hY,5.5,5,'#50e080');
+se(bx+9,hY+1,5.5,4,'#30c060');
+se(bx+9,hY+2,4,3,'#20a048');
+sc(bx+10,hY+1,2.5,'#0a3820');
+sc(bx+7,hY-2,2,'#ffffff');
+sc(bx+12,hY+2,1.2,'#ffffff');
+sc(bx+8,hY+3,0.8,'#88ffbb');
+_s.strokeStyle='#0a2818';_s.lineWidth=2;_s.beginPath();
+_s.ellipse(bx+9,hY-2,7.5,3.5,0,Math.PI+0.2,2*Math.PI-0.2);_s.stroke();
+_s.strokeStyle='#0a281840';_s.lineWidth=0.8;_s.beginPath();
+_s.ellipse(bx+9,hY+2,6,2.5,0,0.2,Math.PI-0.2);_s.stroke();
+
+// Eyelashes (visible through visor — feminine warrior)
+sl(bx-14,hY-3,bx-17,hY-7,1.8,'#0a2818');
+sl(bx-12,hY-4,bx-14,hY-7,1,'#0a281880');
+sl(bx+15,hY-3,bx+18,hY-7,1.8,'#0a2818');
+sl(bx+13,hY-4,bx+15,hY-7,1,'#0a281880');
+
+// Eyebrows (strong, determined — slightly angled but not angry)
+_s.strokeStyle='#5a4030';_s.lineWidth=2;_s.lineCap='round';
+_s.beginPath();_s.moveTo(bx-14,hY-7);_s.quadraticCurveTo(bx-8,hY-10,bx-2,hY-8);_s.stroke();
+_s.beginPath();_s.moveTo(bx+2,hY-8);_s.quadraticCurveTo(bx+8,hY-10,bx+14,hY-7);_s.stroke();
+
+// Nose (small, feminine)
+sc(bx+1,hY+5,1,sk3);
+
+// Mouth (determined, slight smile — confident warrior)
+_s.strokeStyle='#b08868';_s.lineWidth=1.5;_s.lineCap='round';
+_s.beginPath();_s.moveTo(bx-3,hY+9);_s.quadraticCurveTo(bx,hY+10.5,bx+4,hY+9);_s.stroke();
+sc(bx+1,hY+10,0.8,'#c8a088');                    // lower lip hint
+
 // Beauty mark
-sc(bx+8,hY+5,1.2,out+'50');}
+sc(bx+9,hY+6,1.2,sk4+'60');
+
+// Blush (subtle, warrior doesn't blush much)
+se(bx-11,hY+5,4,2.5,'#ddaa9920');se(bx+12,hY+5,4,2.5,'#ddaa9920');}
 
 // NOIR
 function drawNoir(cx,gy,o){const L=o.lean||0,bx=cx+L;const sk='#d8c8a8',skDk='#b8a888';const cloak='#2a1840',dk='#180c28',acc='#6030a0',accLt='#8050cc';const glow='#ffcc00',glowLt='#fff8cc',blade='#c0c8d8',bladeDk='#8090a0',out='#0c0618';
