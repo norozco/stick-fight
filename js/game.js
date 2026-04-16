@@ -441,6 +441,79 @@ function showSetup() {
   });
 }
 
+function charPreviewSVG(c) {
+  const v = c.visual || {};
+  const col = c.color;
+  const glow = c.glow;
+  const sw = v.lineWidth || 4;
+  const hr = v.headRadius || 10;
+  // Base stick figure centered at (43, 50) in a 86×100 viewBox
+  let svg = `<svg width="86" height="100" viewBox="0 0 86 100">`;
+  svg += `<g stroke="${col}" stroke-width="${sw}" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 0 4px ${glow})">`;
+  // Head
+  svg += `<circle cx="43" cy="20" r="${hr}"/>`;
+  // Body
+  svg += `<line x1="43" y1="${20+hr}" x2="43" y2="60"/>`;
+  // Arms
+  svg += `<line x1="43" y1="${28+hr*0.4}" x2="28" y2="50"/>`;
+  svg += `<line x1="43" y1="${28+hr*0.4}" x2="58" y2="50"/>`;
+  // Legs
+  svg += `<line x1="43" y1="60" x2="32" y2="84"/>`;
+  svg += `<line x1="43" y1="60" x2="54" y2="84"/>`;
+  svg += `</g>`;
+
+  // Head decorations
+  if(v.headDecor) {
+    for(const d of v.headDecor) {
+      if(d.type === 'line') {
+        svg += `<line x1="${43+d.x1}" y1="${20+d.y1}" x2="${43+d.x2}" y2="${20+d.y2}" stroke="${d.color}" stroke-width="${d.width||2}" stroke-linecap="round"/>`;
+      } else if(d.type === 'diamond') {
+        const s = d.size;
+        svg += `<polygon points="${43+d.cx},${20+d.cy-s} ${43+d.cx+s},${20+d.cy} ${43+d.cx},${20+d.cy+s} ${43+d.cx-s},${20+d.cy}" fill="${d.color}"/>`;
+      } else if(d.type === 'rect') {
+        svg += `<rect x="${43+d.x}" y="${20+d.y}" width="${d.w}" height="${d.h}" fill="${d.fill||'none'}" stroke="${d.border||'none'}" stroke-width="1"/>`;
+      } else if(d.type === 'arc') {
+        // Hood — approximate with an ellipse path
+        svg += `<ellipse cx="43" cy="18" rx="${d.rx||16}" ry="${d.ry||14}" fill="${d.fill||'none'}" stroke="${d.border||'none'}" stroke-width="${d.width||2}" clip-path="inset(0 0 50% 0)"/>`;
+      }
+    }
+  }
+
+  // Eyes
+  if(v.eyes) {
+    const ey = 18;
+    if(v.eyes.type === 'wide') {
+      svg += `<ellipse cx="47" cy="${ey}" rx="${v.eyes.w/2}" ry="${v.eyes.h/2}" fill="${v.eyes.color}"/>`;
+      if(v.eyes.highlight) svg += `<circle cx="48" cy="${ey-1}" r="1" fill="#fff"/>`;
+    } else if(v.eyes.type === 'slit') {
+      svg += `<rect x="44" y="${ey-1}" width="${v.eyes.w}" height="${v.eyes.h}" fill="${v.eyes.color}" transform="rotate(${(v.eyes.angle||0)*57.3} 47 ${ey})"/>`;
+    } else if(v.eyes.type === 'dot') {
+      svg += `<circle cx="47" cy="${ey}" r="${v.eyes.radius||2}" fill="${v.eyes.color}"/>`;
+    } else if(v.eyes.type === 'glow') {
+      svg += `<circle cx="47" cy="${ey}" r="${v.eyes.w/2}" fill="${v.eyes.color}" filter="drop-shadow(0 0 ${v.eyes.glowRadius||4}px ${v.eyes.color})"/>`;
+    }
+  }
+
+  // Costume highlights
+  if(v.costume) {
+    for(const co of v.costume) {
+      if(co.attach === 'shoulders') {
+        svg += `<path d="M${43-8},${20+hr} A${co.radius},${co.radius} 0 0,1 ${43-8+co.radius*2},${20+hr}" fill="${co.color}" stroke="${co.border||'none'}" stroke-width="1"/>`;
+        svg += `<path d="M${43+8-co.radius*2},${20+hr} A${co.radius},${co.radius} 0 0,1 ${43+8},${20+hr}" fill="${co.color}" stroke="${co.border||'none'}" stroke-width="1"/>`;
+      }
+      if(co.attach === 'cape') {
+        svg += `<path d="M41,${20+hr} Q38,${20+hr+co.length*0.6} 36,${20+hr+co.length} L45,${20+hr}" fill="${co.color}" stroke="${co.border||'none'}" stroke-width="0.5"/>`;
+      }
+      if(co.attach === 'chest') {
+        svg += `<rect x="${43-co.width/2}" y="38" width="${co.width}" height="18" fill="${co.color}" stroke="${co.border||'none'}" stroke-width="1" rx="2"/>`;
+      }
+    }
+  }
+
+  svg += `</svg>`;
+  return svg;
+}
+
 function stagePreviewSVG(s) {
   if(s.id === 'twilight') return `<svg width="180" height="80" viewBox="0 0 180 80"><defs><linearGradient id="t1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2040"/><stop offset="1" stop-color="#5a3060"/></linearGradient></defs><rect width="180" height="80" fill="url(#t1)"/><circle cx="140" cy="22" r="8" fill="#ffe8cc"/><polygon points="0,80 30,50 60,80" fill="#1a1f35"/><polygon points="60,80 90,40 130,80" fill="#1a1f35"/><polygon points="130,80 160,55 180,80" fill="#1a1f35"/></svg>`;
   if(s.id === 'dojo') return `<svg width="180" height="80" viewBox="0 0 180 80"><rect width="180" height="80" fill="#3a2410"/><rect y="60" width="180" height="20" fill="#5a3818"/><rect x="20" y="20" width="140" height="40" fill="#2a1808" stroke="#7a5828" stroke-width="2"/><line x1="20" y1="40" x2="160" y2="40" stroke="#7a5828" stroke-width="1"/><line x1="60" y1="20" x2="60" y2="60" stroke="#7a5828"/><line x1="120" y1="20" x2="120" y2="60" stroke="#7a5828"/></svg>`;
