@@ -823,18 +823,22 @@ class Fighter {
       if(wantRight) targetVx = spd;
     }
 
-    // ARCADE PHYSICS: high accel, low inertia, stop on a dime.
-    // Ground: 0.92 accel = near-instant response. Air: 0.55 = some drift.
-    const accel = this.onGround ? 0.92 : 0.55;
+    // FLUID PHYSICS: smooth ramp-up, weighted stop, brief pivot on direction reversal.
+    // Ground: 0.55 accel = ~4 frames to full speed (responsive but not instant-snap).
+    // Air: 0.62 = good drift without feeling sticky.
+    // Direction reversal gets a lower factor (0.38) so there's a brief pivot crossover
+    // rather than snapping straight through zero.
+    const reversing = this.onGround && targetVx !== 0 && Math.sign(targetVx) !== Math.sign(this.vx) && Math.abs(this.vx) > 1;
+    const accel = this.onGround ? (reversing ? 0.38 : 0.55) : 0.62;
     this.vx += (targetVx - this.vx) * accel;
-    // Quick stop when no input (arcade feel — no ice skating)
-    if(targetVx === 0 && this.onGround) this.vx *= 0.7;
+    // Smooth stop — 0.80 friction gives ~6 frames to halt (was 0.70 = 3 frames)
+    if(targetVx === 0 && this.onGround) this.vx *= 0.80;
     this.x += this.vx + this.knockback;
     this.knockback *= 0.78;
     if(Math.abs(this.knockback) < 0.2) this.knockback = 0;
 
     if(Math.abs(targetVx) > 1 && this.onGround) this.walkPhase += 0.28;
-    else this.walkPhase *= 0.92;
+    else this.walkPhase *= 0.86;
     if(this.onGround && Math.abs(this.vx) > 4 && globalTime % 8 === 0) {
       spawnDust(this.x - Math.sign(this.vx) * 10, GROUND + 2, -Math.sign(this.vx) * 0.5);
     }
