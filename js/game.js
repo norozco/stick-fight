@@ -422,20 +422,10 @@ function showSetup() {
     const card = document.createElement('div');
     card.className = 'card';
     card.style.setProperty('--card-glow', c.glow);
-    card.innerHTML = `
-      <svg width="86" height="100" viewBox="0 0 86 100">
-        <g stroke="${c.color}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 0 4px ${c.glow})">
-          <circle cx="43" cy="20" r="10"/>
-          <line x1="43" y1="30" x2="43" y2="60"/>
-          <line x1="43" y1="38" x2="28" y2="50"/>
-          <line x1="43" y1="38" x2="58" y2="50"/>
-          <line x1="43" y1="60" x2="32" y2="84"/>
-          <line x1="43" y1="60" x2="54" y2="84"/>
-        </g>
-      </svg>
-      <div class="card-name" style="color:${c.glow}">${c.name}</div>
-      <div class="card-stats">${c.desc}<br>HP ${c.hp} · SPD ${(c.speed*100|0)}% · DMG ${(c.dmg*100|0)}%</div>
-    `;
+    card.innerHTML = charPreviewSVG(c) +
+      `<div class="card-name" style="color:${c.glow}">${c.name}</div>
+      <div class="card-stats">${c.desc}<br>HP ${c.hp} · SPD ${(c.speed*100|0)}% · DMG ${(c.dmg*100|0)}%</div>`;
+
     card.onclick = () => pickCharacter(c, card);
     grid.appendChild(card);
   });
