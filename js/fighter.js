@@ -55,9 +55,26 @@ class Fighter {
     this.combo = 0;
     this.comboTimer = 0;
 
-    this.suspended = 0;          // opponent suspended/juggled during ult
+    this.suspended = 0;
     this.beingUlted = 0;
-    this.beingThrown = 0;        // locked in opponent's throw choreography
+    this.beingThrown = 0;
+
+    // --- KO SYSTEM ---
+    // 'ko' state: fighter lost, falling with momentum from last hit
+    // 'knockdown': on the ground after KO or throw, stays down
+    this.koVx = 0;               // KO launch velocity
+    this.koVy = 0;
+    this.koLanded = false;       // true once KO body hits the ground
+    this.lastHitDir = 1;         // direction of last hit received (+1 right, -1 left)
+    this.lastHitUp = 0;          // vertical component of last hit
+
+    // --- THROW SYSTEM (4-phase) ---
+    // Phase tracking: 0=none, 1=grab, 2=attach, 3=motion, 4=release
+    this.throwPhase = 0;
+    this.throwTarget = null;     // reference to the defender being thrown
+    this.throwBy = null;         // reference to the attacker throwing this fighter
+    this.throwTimer = 0;         // frames within current throw phase
+    this.grabOffset = { x: 0, y: 0 }; // defender's position relative to attacker
 
     // Smoothed animation pose (lerped each frame)
     this.smoothPose = null;
