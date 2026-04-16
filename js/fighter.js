@@ -221,11 +221,24 @@ class Fighter {
     if(!data) return null;
     const st = this.stateTime;
     if(st < data.start || st > data.start + data.active) return null;
+    // When airborne attacking a grounded opponent, extend the hitbox downward
+    // so jump attacks can actually connect. Without this, the hitbox sits entirely
+    // above the opponent at max jump height (boxY=-70, boxH=26 → box at y-70 to
+    // y-44, but opponent's hurtbox starts at y-100 from GROUND=470 → 370).
+    let boxY = data.boxY;
+    let boxH = data.boxH;
+    if(!this.onGround) {
+      // Extend hitbox down to reach grounded opponents
+      const airHeight = GROUND - this.y;
+      if(airHeight > 20) {
+        boxH = Math.max(boxH, airHeight + 30);
+      }
+    }
     return {
       x: this.x + this.facing * 10 - (this.facing < 0 ? data.reach : 0),
-      y: this.y + data.boxY,
+      y: this.y + boxY,
       w: data.reach,
-      h: data.boxH,
+      h: boxH,
       dmg: data.dmg,
       kb: data.kb,
       up: data.up,
