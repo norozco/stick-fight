@@ -65,6 +65,7 @@ class Fighter {
     this.koVx = 0;               // KO launch velocity
     this.koVy = 0;
     this.koLanded = false;       // true once KO body hits the ground
+    this.koLandFrame = 0;        // stateTime at the moment of KO ground contact
     this.lastHitDir = 1;         // direction of last hit received (+1 right, -1 left)
     this.lastHitUp = 0;          // vertical component of last hit
 
