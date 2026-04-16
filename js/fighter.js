@@ -106,12 +106,14 @@ class Fighter {
   // Non-ultimate attack data
   attackData() {
     if(this.attackType === 'light') {
-      if(this.comboStep === 0) return { start: 4, active: 8, total: 18, dmg: 5, kb: 4, up: 0, reach: 55, boxH: 26, boxY: -70, ult: 6, canCombo: true };
-      if(this.comboStep === 1) return { start: 4, active: 9, total: 20, dmg: 6, kb: 5, up: 0, reach: 60, boxH: 26, boxY: -70, ult: 7, canCombo: true };
-      return { start: 5, active: 10, total: 26, dmg: 8, kb: 8, up: -2, reach: 68, boxH: 32, boxY: -65, ult: 8, canCombo: false };
+      // ARCADE: short startup (2-3 frames), generous active, some recovery for commitment
+      if(this.comboStep === 0) return { start: 2, active: 8, total: 16, dmg: 5, kb: 5, up: 0, reach: 60, boxH: 30, boxY: -75, ult: 6, canCombo: true };
+      if(this.comboStep === 1) return { start: 2, active: 9, total: 18, dmg: 6, kb: 6, up: 0, reach: 64, boxH: 30, boxY: -75, ult: 7, canCombo: true };
+      return { start: 3, active: 10, total: 24, dmg: 8, kb: 9, up: -3, reach: 70, boxH: 36, boxY: -70, ult: 8, canCombo: false };
     }
     if(this.attackType === 'heavy') {
-      return { start: 10, active: 14, total: 40, dmg: 14, kb: 14, up: -5, reach: 78, boxH: 36, boxY: -65, ult: 12, canCombo: false };
+      // Slower startup (commitment) but bigger reward
+      return { start: 8, active: 12, total: 34, dmg: 14, kb: 16, up: -6, reach: 82, boxH: 40, boxY: -70, ult: 12, canCombo: false };
     }
     if(this.attackType === 'throw') {
       // Ken-style shoulder throw — tight 35-frame sequence.
