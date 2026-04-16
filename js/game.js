@@ -815,12 +815,15 @@ function loop(now) {
     if(mode !== 'training') replaySnapshot();
 
     if(mode !== 'training') {
-      if(p1.hp <= 0 && p2.hp <= 0) {
-        endRound(0);
-      } else if(p1.hp <= 0) {
+      // KO detection — fighter enters 'ko' state in takeHit when HP<=0.
+      // We wait for the KO fall to complete (koLanded) before transitioning
+      // to the end-round flow. This gives the defeat animation time to play.
+      if(p1.state === 'ko' && p1.koLanded && p1.stateTime > 30) {
         handleKO(p1, p2, 2);
-      } else if(p2.hp <= 0) {
+      } else if(p2.state === 'ko' && p2.koLanded && p2.stateTime > 30) {
         handleKO(p2, p1, 1);
+      } else if(p1.hp <= 0 && p2.hp <= 0 && p1.state !== 'ko' && p2.state !== 'ko') {
+        endRound(0);
       }
     }
   } else if(state === 'ringout' && doUpdate) {
