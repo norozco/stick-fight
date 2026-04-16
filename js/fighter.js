@@ -159,7 +159,7 @@ class Fighter {
     this.comboWindow = 0;
     if(type === 'ult') {
       this.ult = 0;
-      this.invuln = ULT_SEQUENCE.total;  // fully invincible during ult
+      this.invuln = this.ultSeq.total;   // fully invincible during ult
       this.ultHitIndex = -1;
       flashTime = 30;
       flashAlpha = 0.7;
