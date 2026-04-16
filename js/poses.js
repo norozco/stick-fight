@@ -1371,6 +1371,10 @@ function drawFighter(f) {
   if(f.state === 'hurt') factor = 0.5;
   if(f.state === 'stagger') factor = 0.4;
   if(f.state === 'attack' && f.attackType === 'ult') factor = 0.45;
+  if(f.state === 'ko') factor = 0.5;          // snappy collapse
+  if(f.state === 'knockdown') factor = 0.25;  // stay flat, minimal drift
+  if(f.state === 'grabbed') factor = 0.45;    // quick snap into grabbed pose
+  if(f.state === 'thrown') factor = 0.5;       // responsive ragdoll
   smoothPose(f.smoothPose, target, factor);
 
   // ---- Apply secondary physics to the rendered pose ----
