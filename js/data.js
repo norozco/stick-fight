@@ -75,6 +75,7 @@ const CHARACTERS = [
         handR: 3.5, footW: 9, footH: 4,
         skinColor: '#f0d0b8', outfitColor: '#cc2244', outfitDark: '#881430',
         outfitAccent: '#ff5566', outlineColor: '#440a18',
+        hairColor: '#ff4422', hairLength: 0,
       },
     },
   },
