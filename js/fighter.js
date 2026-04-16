@@ -540,7 +540,7 @@ class Fighter {
     if(input.jumpPressed) this.jumpBuffer = 8;
     if(this.jumpBuffer > 0) {
       if(this.onGround || this.coyote > 0) {
-        this.vy = -14;
+        this.vy = -15;     // slightly stronger jump for arcade height
         this.onGround = false;
         this.jumpsLeft = 1;
         this.jumpBuffer = 0;
