@@ -510,6 +510,7 @@ class Fighter {
         if(this.y >= GROUND) {
           this.y = GROUND;
           this.koLanded = true;
+          this.koLandFrame = this.stateTime;  // record for pose settle animation
           this.koVy = 0;
           this.koVx *= 0.3;       // friction on landing
           // Impact effects
