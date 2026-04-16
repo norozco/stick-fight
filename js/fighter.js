@@ -3,6 +3,11 @@
 // ============================================================
 // ============================================================
 class Fighter {
+  // Returns this character's ult sequence (or the default Aurora one as fallback)
+  get ultSeq() {
+    return (this.character && ULT_SEQUENCES[this.character.ultSeq]) || ULT_SEQUENCE;
+  }
+
   constructor(x, color, facing, isP2, glow) {
     this.x = x;
     this.y = GROUND;
