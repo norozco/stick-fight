@@ -94,94 +94,106 @@ shadedLimb(rax,ray,rax+3,ray+12,5,sk,skDk,out);
 sf(rax-1,ray-1,5,3,accLt);sc(rax+1,ray,2,'#fff');
 sc(rax+3,ray+14,3.5,sk);sc(rax+3,ray+14,3.5,out+'20');
 
-// === HEAD — attractive feminine face, hand-drawn not generic ===
-const hY=nY-22+(o.hY||0);
-// Neck (slender)
-sf(bx-2,nY-5,4,7,'#f5e0d0');
-// Head — slightly oval (wider than tall for softer look)
-se(bx,hY,19,17,'#f5e0d0');                       // warm natural skin
-_s.strokeStyle=out+'18';_s.lineWidth=1;_s.beginPath();_s.ellipse(bx,hY,19,17,0,0,Math.PI*2);_s.stroke();
+// === HEAD — BIG (3-head chibi ratio), anime-style face ===
+// Research: head should be ~1/3 of total height, eyes should DOMINATE the face
+const hY=nY-24+(o.hY||0);
+const sk1='#fff0e8',sk2='#f0d8c8',sk3='#d8b8a0',sk4='#c09880'; // 4-tone skin ramp
+
+// Neck (very thin — feminine)
+sf(bx-2,nY-6,4,8,sk2);
+
+// Head — BIG oval (wider than tall, soft feminine shape)
+se(bx,hY,22,20,sk2);                             // base skin
+// Skin shading — left side shadow, right highlight
+_s.fillStyle=sk3+'60';_s.beginPath();_s.ellipse(bx-6,hY+2,12,16,0,0,Math.PI*2);_s.fill(); // cheek shadow
+_s.fillStyle=sk1+'40';_s.beginPath();_s.ellipse(bx+6,hY-4,10,12,0,0,Math.PI*2);_s.fill(); // highlight
+// Subtle head outline
+_s.strokeStyle=sk4+'30';_s.lineWidth=1;_s.beginPath();_s.ellipse(bx,hY,22,20,0,0,Math.PI*2);_s.stroke();
+
 // Ears
-se(bx-17,hY+2,3,5,'#f5e0d0');se(bx+17,hY+2,3,5,'#f5e0d0');
-// Crystal earrings (dangling)
-sc(bx-17,hY+7,2.5,acc);sc(bx-17,hY+7,1.2,'#fff');sc(bx-17,hY+10,1.5,accLt);
-sc(bx+17,hY+7,2.5,acc);sc(bx+17,hY+7,1.2,'#fff');sc(bx+17,hY+10,1.5,accLt);
+se(bx-20,hY+2,3,5,sk2);se(bx+20,hY+2,3,5,sk2);
+// Dangling crystal earrings
+sc(bx-20,hY+7,2.5,acc);sc(bx-20,hY+7,1,'#fff');sc(bx-20,hY+10,2,accLt);sc(bx-20,hY+10,0.8,'#fff');
+sc(bx+20,hY+7,2.5,acc);sc(bx+20,hY+7,1,'#fff');sc(bx+20,hY+10,2,accLt);sc(bx+20,hY+10,0.8,'#fff');
 
-// === HAIR — massive voluminous bangs ===
-se(bx+1,hY-14,19,10,hair);                       // main bang volume
-se(bx-7,hY-15,10,7,hairDk);                      // left dark layer
-se(bx+10,hY-12,8,6,hairLt);                      // right highlight
-sf(bx-16,hY-6,9,7,hairDk);                       // left side bang
-sf(bx+12,hY-4,8,6,hair);                         // right side bang
-// Hair strand detail
-sl(bx-8,hY-14,bx-12,hY-4,1,hairDk+'80');
-sl(bx+6,hY-13,bx+10,hY-4,1,hairLt+'60');
+// === HUGE VOLUMINOUS HAIR (the big silhouette element) ===
+se(bx,hY-16,24,12,hair);                         // main dome
+se(bx-8,hY-17,12,8,hairDk);                      // left shadow
+se(bx+12,hY-14,9,7,hairLt);                      // right highlight
+sf(bx-18,hY-8,10,10,hairDk);                     // left side bang (BIG)
+sf(bx+14,hY-6,9,8,hair);                         // right side bang
+// Hair shine streak
+sl(bx+4,hY-20,bx+8,hY-8,1.5,hairLt+'80');
 
-// === ICE CROWN ===
-sl(bx-9,hY-17,bx-12,hY-36,3.5,acc);
-sl(bx-4,hY-18,bx-6,hY-31,3,accLt);
-sl(bx,hY-19,bx,hY-40,4.5,'#c0f4ff');
-sl(bx+4,hY-18,bx+6,hY-31,3,accLt);
-sl(bx+9,hY-17,bx+12,hY-36,3.5,acc);
-sc(bx,hY-40,4,'#ffffff');sc(bx,hY-40,2.5,'#c0f4ff');
-sf(bx-12,hY-17,24,3,acc);                        // tiara band
-sl(bx-15,hY-9,bx-17,hY-18,2,acc+'70');           // side crystal
-sl(bx+15,hY-9,bx+17,hY-18,2,acc+'70');
+// === ICE CROWN (taller, more ornate) ===
+sl(bx-10,hY-18,bx-14,hY-40,4,acc);
+sl(bx-5,hY-20,bx-7,hY-34,3,accLt);
+sl(bx,hY-21,bx,hY-44,5,'#c0f4ff');
+sl(bx+5,hY-20,bx+7,hY-34,3,accLt);
+sl(bx+10,hY-18,bx+14,hY-40,4,acc);
+sc(bx,hY-44,4.5,'#ffffff');sc(bx,hY-44,3,'#c0f4ff');sc(bx,hY-44,1.5,'#fff');
+sf(bx-14,hY-19,28,3,acc);                        // tiara band
+sl(bx-18,hY-10,bx-20,hY-20,2.5,acc+'70');
+sl(bx+18,hY-10,bx+20,hY-20,2.5,acc+'70');
 
-// === FACE — hand-drawn attractive features ===
-// Eye shadow (subtle ice-blue tint above eyes)
-se(bx-7,hY-5,7,3,acc+'18');se(bx+7,hY-5,7,3,acc+'18');
+// === FACE — ANIME EYES (the #1 feature, everything revolves around these) ===
+// Eyes placed at vertical CENTER of head (halfway between top and chin)
 
-// LEFT EYE — large, round, expressive
-se(bx-7,hY-2,6,5,'#ffffff');                      // white sclera (ellipse)
-se(bx-6,hY-1,4.5,4,'#28c8e8');                   // iris (teal-cyan, not neon)
-sc(bx-5,hY,2.5,'#1068a0');                        // pupil (deep blue)
-sc(bx-7,hY-3,1.5,'#ffffff');                      // catch light (upper left)
-sc(bx-4,hY+1,0.8,'#ffffff');                      // secondary highlight
-// Upper eyelid line
-_s.strokeStyle='#2a4060';_s.lineWidth=1.5;_s.beginPath();
-_s.ellipse(bx-7,hY-3,6.5,3,0,Math.PI+0.3,2*Math.PI-0.3);_s.stroke();
-// Lower lash line (subtle)
-_s.strokeStyle=out+'40';_s.lineWidth=0.8;_s.beginPath();
-_s.ellipse(bx-7,hY+1,5,2.5,0,0.3,Math.PI-0.3);_s.stroke();
+// --- LEFT EYE (BIG — 9x7 pixel area) ---
+// White sclera
+se(bx-8,hY-1,8,6,'#ffffff');
+// Iris — gradient effect: lighter at top, deeper at bottom
+se(bx-7,hY,6,5.5,'#40d0f0');                     // light cyan upper
+se(bx-7,hY+1,6,4.5,'#20a8d0');                   // medium mid
+se(bx-7,hY+2,5,3,'#1880a8');                     // deep lower
+// Pupil (large, centered)
+sc(bx-6,hY+1,3,'#0c4060');
+// Catch light (BIG — this is what makes anime eyes sparkle)
+sc(bx-9,hY-2,2.5,'#ffffff');                      // main highlight (upper-left, BRIGHT)
+sc(bx-4,hY+2,1.5,'#ffffff');                      // secondary highlight (lower-right)
+sc(bx-8,hY+3,0.8,'#c0f0ff');                     // colored reflection
+// Upper eyelid (thick, defines the eye shape)
+_s.strokeStyle='#1a3858';_s.lineWidth=2;_s.beginPath();
+_s.ellipse(bx-7,hY-2,8.5,4,0,Math.PI+0.2,2*Math.PI-0.2);_s.stroke();
+// Lower lash (thin, subtle)
+_s.strokeStyle='#1a385840';_s.lineWidth=0.8;_s.beginPath();
+_s.ellipse(bx-7,hY+2,7,3,0,0.2,Math.PI-0.2);_s.stroke();
 
-// RIGHT EYE — mirror
-se(bx+7,hY-2,6,5,'#ffffff');
-se(bx+8,hY-1,4.5,4,'#28c8e8');
-sc(bx+9,hY,2.5,'#1068a0');
-sc(bx+7,hY-3,1.5,'#ffffff');
-sc(bx+10,hY+1,0.8,'#ffffff');
-_s.strokeStyle='#2a4060';_s.lineWidth=1.5;_s.beginPath();
-_s.ellipse(bx+7,hY-3,6.5,3,0,Math.PI+0.3,2*Math.PI-0.3);_s.stroke();
-_s.strokeStyle=out+'40';_s.lineWidth=0.8;_s.beginPath();
-_s.ellipse(bx+7,hY+1,5,2.5,0,0.3,Math.PI-0.3);_s.stroke();
+// --- RIGHT EYE (mirror) ---
+se(bx+8,hY-1,8,6,'#ffffff');
+se(bx+9,hY,6,5.5,'#40d0f0');
+se(bx+9,hY+1,6,4.5,'#20a8d0');
+se(bx+9,hY+2,5,3,'#1880a8');
+sc(bx+10,hY+1,3,'#0c4060');
+sc(bx+7,hY-2,2.5,'#ffffff');
+sc(bx+12,hY+2,1.5,'#ffffff');
+sc(bx+8,hY+3,0.8,'#c0f0ff');
+_s.strokeStyle='#1a3858';_s.lineWidth=2;_s.beginPath();
+_s.ellipse(bx+9,hY-2,8.5,4,0,Math.PI+0.2,2*Math.PI-0.2);_s.stroke();
+_s.strokeStyle='#1a385840';_s.lineWidth=0.8;_s.beginPath();
+_s.ellipse(bx+9,hY+2,7,3,0,0.2,Math.PI-0.2);_s.stroke();
 
-// Eyelashes (elegant, extending outward)
-sl(bx-12,hY-4,bx-15,hY-8,1.5,'#2a4060');        // outer lash left
-sl(bx-10,hY-5,bx-12,hY-8,1,'#2a406080');         // second lash
-sl(bx+12,hY-4,bx+15,hY-8,1.5,'#2a4060');
-sl(bx+10,hY-5,bx+12,hY-8,1,'#2a406080');
+// Eyelashes (long, elegant, extending outward+upward)
+sl(bx-14,hY-3,bx-18,hY-8,2,'#1a3858');
+sl(bx-12,hY-4,bx-15,hY-8,1.2,'#1a385890');
+sl(bx+15,hY-3,bx+19,hY-8,2,'#1a3858');
+sl(bx+13,hY-4,bx+16,hY-8,1.2,'#1a385890');
 
-// Eyebrows (thin, elegant arch)
+// Eyebrows (thin arched — feminine)
 _s.strokeStyle='#8a7060';_s.lineWidth=1.5;_s.lineCap='round';
-_s.beginPath();_s.moveTo(bx-11,hY-7);_s.quadraticCurveTo(bx-7,hY-10,bx-3,hY-8);_s.stroke();
-_s.beginPath();_s.moveTo(bx+3,hY-8);_s.quadraticCurveTo(bx+7,hY-10,bx+11,hY-7);_s.stroke();
+_s.beginPath();_s.moveTo(bx-14,hY-8);_s.quadraticCurveTo(bx-8,hY-12,bx-2,hY-9);_s.stroke();
+_s.beginPath();_s.moveTo(bx+3,hY-9);_s.quadraticCurveTo(bx+9,hY-12,bx+15,hY-8);_s.stroke();
 
-// Nose (tiny, delicate — just a small shadow and highlight)
-sc(bx,hY+3,1.2,'#dcc0b0');                       // nose shadow
-sc(bx+1,hY+2,0.7,'#fff8f0');                     // nose highlight
+// Nose (minimalist — just a tiny shadow, less is more at this scale)
+sc(bx+1,hY+5,1,sk3);
 
-// Mouth (soft lips — two-tone)
-se(bx,hY+8,4,1.8,'#cc7878');                     // upper lip (darker)
-se(bx,hY+9.5,3.5,1.5,'#e89898');                 // lower lip (lighter, glossy)
-sc(bx+1,hY+9,0.7,'#ffbbbb');                     // lip highlight
+// Mouth (small, soft — curved smile)
+_s.strokeStyle='#cc8888';_s.lineWidth=1.5;_s.lineCap='round';
+_s.beginPath();_s.moveTo(bx-3,hY+9);_s.quadraticCurveTo(bx,hY+11,bx+3,hY+9);_s.stroke();
+sc(bx,hY+10,0.8,'#e8a0a0');                      // lower lip hint
 
-// Blush (warm, visible)
-se(bx-10,hY+4,4.5,3,'#ffaaaa20');se(bx+10,hY+4,4.5,3,'#ffaaaa20');
-
-// Chin definition (very subtle shadow)
-_s.strokeStyle='#e0c8b8';_s.lineWidth=0.8;_s.beginPath();
-_s.ellipse(bx,hY+13,8,2,0,0.2,Math.PI-0.2);_s.stroke();}
+// Blush (visible, warm)
+se(bx-11,hY+5,5,3,'#ffaaaa25');se(bx+11,hY+5,5,3,'#ffaaaa25');}
 
 // CRIMSON
 function drawCrimson(cx,gy,o){const L=o.lean||0,bx=cx+L;const sk='#f0d0b8',skDk='#d0a890',skLt='#ffe0d0';const gi='#cc2244',giDk='#881430',giLt='#ee4466',giVLt='#ff6688';const wrap='#ff8866',wrapDk='#cc5533',band='#ff5566',bandDk='#cc3344',out='#3a0a14';
