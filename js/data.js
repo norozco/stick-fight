@@ -68,6 +68,12 @@ const CHARACTERS = [
       ],
       idleStance: { lHandY: -12, rHandY: -6, lHandX: 8, rHandX: 12, lFootX: -6, rFootX: 6, lean: 4 },
       idleAnim: { breathAmp: 2.0, swayFreq: 0.07, motion: 'bounce' },
+      body: {
+        shoulderW: 16, waistW: 12, upperArmW: 6, forearmW: 5, thighW: 8, shinW: 6,
+        handR: 3.5, footW: 9, footH: 4,
+        skinColor: '#f0d0b8', outfitColor: '#cc2244', outfitDark: '#881430',
+        outfitAccent: '#ff5566', outlineColor: '#440a18',
+      },
     },
   },
   { id: 'jade', name: 'JADE', color: '#dfffe0', glow: '#44ff88', hp: 125, speed: 0.88, dmg: 0.95,
