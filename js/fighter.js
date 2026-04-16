@@ -743,7 +743,11 @@ class Fighter {
 
     if(input.lightPressed) this.startAttack('light');
     if(input.heavyPressed) this.startAttack('heavy');
-    if(input.throwPressed && this.state === 'idle' && this.hitStun === 0 && opponent) {
+    // Throw: works from idle OR during attack recovery (after hit landed).
+    // This makes throw feel responsive — you don't need to wait for full recovery.
+    const canThrow = (this.state === 'idle') ||
+                     (this.state === 'attack' && this.attackHit && this.attackType !== 'throw' && this.attackType !== 'ult');
+    if(input.throwPressed && canThrow && this.hitStun === 0 && opponent) {
       // --- 4-PHASE THROW: initiate grab attempt ---
       const dist = Math.abs(this.x - opponent.x);
       if(dist < 95 && opponent.state !== 'ko' && opponent.state !== 'knockdown' &&
