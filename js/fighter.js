@@ -509,6 +509,81 @@ class Fighter {
     if(this.beingThrown > 0) this.beingThrown--;
     if(this.juggleWindow > 0) this.juggleWindow--;
 
+    // --- KO STATE UPDATE: physics-driven fall with momentum ---
+    if(this.state === 'ko') {
+      this.stateTime++;
+      // Apply KO velocity (directional momentum from the killing blow)
+      this.x += this.koVx;
+      this.koVx *= 0.94;          // air drag
+      if(!this.koLanded) {
+        // Airborne: apply gravity, let them fall
+        this.koVy += 0.85;        // heavier gravity than normal jump — body has weight
+        this.y += this.koVy;
+        // Ground contact → land in knockdown
+        if(this.y >= GROUND) {
+          this.y = GROUND;
+          this.koLanded = true;
+          this.koVy = 0;
+          this.koVx *= 0.3;       // friction on landing
+          // Impact effects
+          shake(8, 12);
+          spawnDust(this.x, GROUND + 2);
+          spawnDust(this.x - 15, GROUND + 2);
+          spawnDust(this.x + 15, GROUND + 2);
+          try { Audio.land(); } catch(e) {}
+        }
+      } else {
+        // On ground: slide to a stop
+        this.y = GROUND;
+        this.koVx *= 0.85;
+        if(Math.abs(this.koVx) < 0.3) this.koVx = 0;
+      }
+      // Clamp to stage
+      if(this.x < 40) this.x = 40;
+      if(this.x > W - 40) this.x = W - 40;
+      return; // KO overrides everything
+    }
+
+    // --- KNOCKDOWN STATE: on the ground, stays down ---
+    if(this.state === 'knockdown') {
+      this.stateTime++;
+      this.y = GROUND;
+      this.onGround = true;
+      return; // stays down until round ends
+    }
+
+    // --- GRABBED STATE: locked by attacker's throw, no input ---
+    if(this.state === 'grabbed' && this.throwBy) {
+      this.stateTime++;
+      // Position is controlled by the attacker's throw update
+      // Just stay put — no physics, no input
+      this.vx = 0; this.vy = 0;
+      this.knockback = 0;
+      return;
+    }
+
+    // --- THROWN STATE: airborne after throw release ---
+    if(this.state === 'thrown') {
+      this.stateTime++;
+      this.vy += 0.85;
+      this.x += this.vx;
+      this.y += this.vy;
+      this.vx *= 0.98;
+      if(this.y >= GROUND) {
+        this.y = GROUND;
+        this.state = 'knockdown';
+        this.stateTime = 0;
+        this.onGround = true;
+        this.hitStun = 30;
+        shake(6, 10);
+        spawnDust(this.x, GROUND + 2);
+        try { Audio.land(); } catch(e) {}
+      }
+      if(this.x < 40) this.x = 40;
+      if(this.x > W - 40) this.x = W - 40;
+      return;
+    }
+
     // Safety: recover from hurt/stagger if hitStun expired (even if main check below
     // was skipped by an early return or slowMo gating on a previous frame)
     if((this.state === 'hurt' || this.state === 'stagger') && this.hitStun <= 0 &&
