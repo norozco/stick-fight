@@ -106,7 +106,7 @@ class Fighter {
     this.combo = 0; this.comboTimer = 0;
     this.invuln = 0;
     this.suspended = 0; this.beingUlted = 0; this.beingThrown = 0;
-    this.koVx = 0; this.koVy = 0; this.koLanded = false;
+    this.koVx = 0; this.koVy = 0; this.koLanded = false; this.koLandFrame = 0;
     this.lastHitDir = 1; this.lastHitUp = 0;
     this.throwPhase = 0; this.throwTarget = null; this.throwBy = null; this.throwTimer = 0;
     this.impactVx = 0; this.impactVy = 0;
