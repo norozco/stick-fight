@@ -830,7 +830,12 @@ function loop(now) {
     if(hitstop === 0) updateRingout();
   }
 
-  for(const k in keyPressed) keyPressed[k] = false;
+  // Only clear keyPressed after inputs were actually consumed by getP1Input().
+  // Previously this ran every frame — during slowMo skip-frames the press was
+  // eaten before it could ever be read, making throw (and any fast tap) fail ~50%.
+  if(doUpdate) {
+    for(const k in keyPressed) keyPressed[k] = false;
+  }
 
   // Always tick stateTimeF (float animation time) for smoothness
   // even if physics is paused
