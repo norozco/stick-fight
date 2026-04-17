@@ -299,6 +299,11 @@ function pixelFace(bx,hY,opts){const{eyeColor,eyeW,eyeH,browColor,browAngle,mout
 // AURORA — Ice Princess. Professional pixel-art with bezier contours,
 // tapered limbs, flowing hair, 3-tone shading throughout.
 function drawAurora(cx,gy,o){const L=o.lean||0,bx=cx+L;
+// Scale up to match Jade's art-style size (same 1.35× factor)
+_s.save();
+_s.translate(cx,gy);
+_s.scale(1.35,1.35);
+_s.translate(-cx,-gy);
 const tw=o.torsoTwist||0,hr=o.hipRot||0;
 const sk='#f2ddd0',skDk='#d4b8a8',skLt='#fff0e8',skMid='#e8d0c0';
 const hair='#80d8ee',hairDk='#50a8cc',hairLt='#b0f0ff';
@@ -306,7 +311,8 @@ const top='#3a78b0',topDk='#224870',topLt='#5898d0',topMid='#4888c0';
 const bot='#2858a0',bootC='#1a3860',bootDk='#0e2440',bootSole='#0a1830';
 const out='#102838',acc='#60ccee',accLt='#90e0ff';
 const twOff=tw*0.3;
-const nY=gy-88,pY=gy-44;
+// Raise neck + pelvis to match Jade's taller proportions (nY gy-100, pY gy-52)
+const nY=gy-100,pY=gy-52;
 
 // === FLOWING HAIR — BEHIND BODY (pixel strands) ===
 // Long flowing hair built from staggered pixel rows
@@ -677,7 +683,9 @@ sf(bx,hY+5,2,2,'#d8b8a0');
 sf(bx-3,hY+9,2,1,'#cc8888');sf(bx-1,hY+10,4,1,'#cc8888');sf(bx+3,hY+9,2,1,'#cc8888');
 sf(bx,hY+10,2,1,'#e8a0a0');
 // Blush — pixel blocks
-sf(bx-14,hY+4,6,3,'#ffaaaa25');sf(bx+8,hY+4,6,3,'#ffaaaa25');}
+sf(bx-14,hY+4,6,3,'#ffaaaa25');sf(bx+8,hY+4,6,3,'#ffaaaa25');
+_s.restore(); // match scale(1.35) saved at top of drawAurora
+}
 
 // CRIMSON — Flame Fighter. Professional pixel-art with bezier contours,
 // tapered limbs, flame hair, 3-tone shading throughout.
