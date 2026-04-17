@@ -225,7 +225,7 @@ else if(a==="hurt"){o.lean=-12;o.hY=6;o.lAA=0.5;o.rAA=0.5;o.lLS=-4;o.rLS=4;}
 else if(a==="jump"){o.lFL=16;o.rFL=18;o.hY=-6;o.lAA=-0.6;o.rAA=-0.6;o.lLS=-4;o.rLS=4;}
 else if(a==="block"){o.lAA=-1.4;o.rAA=-1.0;o.lean=-4;o.hY=2;o.lLS=-4;o.rLS=4;}
 else if(a==="dash"){o.lean=16;o.lLS=-20;o.rLS=10;o.lFL=6;o.hY=-3;o.lAA=0.6;o.rAA=-0.4;}
-else if(a==="attack_ult"){if(p<0.25){o.rAA=-1.8;o.lean=-8;o.hY=3;o.lLS=-6;}else if(p<0.65){const ext=(p-0.25)/0.4;o.rAE=44;o.lean=12;o.lLS=-ext*8;o.rLS=ext*12;o.hY=-ext*4;}else{o.rAA=-2.2;o.lean=14;o.hY=-5;o.rLS=8;o.lFL=6;}}
+else if(a==="attack_ult"){if(p<0.25){o.rAA=-1.8;o.lean=-8;o.hY=3;o.lLS=-6;o.rFist=1;o.torsoTwist=-6;o.hipRot=-3;}else if(p<0.65){const ext=(p-0.25)/0.4;o.rAE=44;o.lean=12;o.lLS=-ext*8;o.rLS=ext*12;o.hY=-ext*4;o.rFist=1;o.torsoTwist=8;o.hipRot=ext*8;}else{o.rAA=-2.2;o.lean=14;o.hY=-5;o.rLS=8;o.lFL=6;o.rFist=0.5;o.hipRot=6;}}
 else if(a==="attack_throw"){if(p<0.3){o.rAE=32;o.lAE=32;o.lean=6;}else{const tp=(p-0.3)/0.7;o.rAA=-Math.PI*tp;o.rAE=24;o.lean=8-tp*16;o.hY=tp*4;}}
 else if(a==="ko"){
   // Collapsing backward — body tilts, arms go limp, head drops
