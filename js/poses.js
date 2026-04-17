@@ -307,7 +307,9 @@ function computeTargetPose(f) {
     pose.rKnee.y = y - lerp(22, 34, tumble);
   }
 
-  // Attacks
+  // ============================================================
+  // ATTACKS — proper anticipation → strike → recovery with body mechanics
+  // ============================================================
   if(f.state === 'attack' && f.attackType) {
     const t = f.stateTimeF;
     if(f.attackType === 'light') {
@@ -316,90 +318,253 @@ function computeTargetPose(f) {
                   : t < data.start + data.active ? 'active'
                   : 'recovery';
 
-      if(f.comboStep < 2) {
-        // Alternating punches
-        let ext = 0;
+      if(f.comboStep === 0) {
+        // ---- JAB (lead hand) — fast, compact, straight punch ----
+        // Anticipation: shoulder pulls back, fist chambers at chin
+        // Strike: fist drives FORWARD at chin height, shoulder rotates in
+        // Recovery: fist retracts to guard
         if(phase === 'startup') {
-          const pp = t / data.start;
-          ext = -18 + easeOutCubic(pp) * 5;
+          const pp = easeOutCubic(t / data.start);
+          // Chamber — pull lead fist back to chin, rear hand guards face
+          pose.rHand.x = x + fc * lerp(14, -4, pp);    // fist retracts to chin
+          pose.rHand.y = y - lerp(60, 78, pp);          // rises to chin level
+          pose.rElbow.x = x + fc * lerp(10, -2, pp);
+          pose.rElbow.y = y - 72;
+          pose.lHand.x = x - fc * 8;                    // rear guard at face
+          pose.lHand.y = y - 74;
+          pose.lElbow.x = x - fc * 6;
+          pose.lElbow.y = y - 66;
+          // Slight torso rotation — loading the shoulder
+          pose.bodyLean = fc * lerp(0, -4, pp);
+          pose.head.x += -fc * pp * 2;
+          // Feet planted, weight shifts to rear
+          pose.rFoot.x = x + fc * 10; pose.lFoot.x = x - fc * 14;
+          pose.pelvis.y = y - 40;  // slight squat
         } else if(phase === 'active') {
-          const at = (t - data.start) / data.active;
-          ext = lerp(-13, 48, easeOutCubic(clamp(at * 1.4, 0, 1)));
+          const at = easeOutCubic(clamp((t - data.start) / data.active * 1.3, 0, 1));
+          // PUNCH — fist drives forward from chin, shoulder rotates into it
+          const fistExt = lerp(-4, 52, at);
+          pose.rHand.x = x + fc * fistExt;
+          pose.rHand.y = y - 74;                        // stays at chin/face height
+          pose.rElbow.x = x + fc * Math.max(4, fistExt * 0.4);
+          pose.rElbow.y = y - 76;
+          // Body drives forward — shoulder rotation, weight transfer
+          pose.bodyLean = fc * lerp(-4, 10, at);
+          pose.head.x += fc * lerp(-2, 4, at);
+          pose.pelvis.x = x + fc * lerp(0, 3, at);     // hip pushes forward
+          pose.neck.x = x + fc * lerp(0, 4, at);       // torso follows
+          // Rear hand stays guarding chin
+          pose.lHand.x = x - fc * 10;   pose.lHand.y = y - 72;
+          pose.lElbow.x = x - fc * 8;   pose.lElbow.y = y - 66;
+          // Front foot steps into punch
+          pose.rFoot.x = x + fc * lerp(10, 16, at); pose.rFoot.y = y;
+          pose.rKnee.x = x + fc * lerp(8, 12, at);
+          pose.lFoot.x = x - fc * 14; pose.lFoot.y = y;
+          pose.pelvis.y = y - 40;
         } else {
-          const rt = (t - data.start - data.active) / (data.total - data.start - data.active);
-          ext = lerp(48, 8, easeOutQuad(clamp(rt, 0, 1)));
+          // Recovery — retract fist, body settles back
+          const rt = easeOutQuad(clamp((t - data.start - data.active) / (data.total - data.start - data.active), 0, 1));
+          pose.rHand.x = x + fc * lerp(52, 14, rt);
+          pose.rHand.y = y - lerp(74, 62, rt);
+          pose.rElbow.x = x + fc * lerp(20, 10, rt);
+          pose.rElbow.y = y - 74;
+          pose.bodyLean = fc * lerp(10, 2, rt);
+          pose.head.x += fc * lerp(4, 0, rt);
+          pose.lHand.x = x - fc * 10;   pose.lHand.y = y - lerp(72, 62, rt);
+          pose.lElbow.x = x - fc * 8;   pose.lElbow.y = y - 66;
+          pose.rFoot.x = x + fc * lerp(16, 12, rt);
+          pose.lFoot.x = x - fc * 14;
+          pose.pelvis.y = y - lerp(40, 42, rt);
         }
-        const useRight = (f.comboStep % 2 === 0);
-        const mainHand = useRight ? 'rHand' : 'lHand';
-        const mainElbow = useRight ? 'rElbow' : 'lElbow';
-        const offHand = useRight ? 'lHand' : 'rHand';
-        pose[mainHand].x = x + fc * ext;
-        pose[mainHand].y = y - 72 + Math.sin(t * 0.6) * 1;
-        pose[mainElbow].x = x + fc * Math.max(6, ext * 0.45);
-        pose[mainElbow].y = y - 76;
-        pose[offHand].x = x - fc * 14;
-        pose[offHand].y = y - 60;
-        pose.bodyLean = fc * (4 + (phase === 'active' ? 4 : 0));
-        pose.head.x += fc * 2;
+      } else if(f.comboStep === 1) {
+        // ---- CROSS (rear hand) — stronger straight, more hip rotation ----
+        if(phase === 'startup') {
+          const pp = easeOutCubic(t / data.start);
+          // Rear hand chambers at chin, lead hand drops to guard body
+          pose.lHand.x = x + fc * lerp(-14, -6, pp);
+          pose.lHand.y = y - lerp(60, 76, pp);
+          pose.lElbow.x = x - fc * lerp(10, 4, pp);
+          pose.lElbow.y = y - 70;
+          pose.rHand.x = x + fc * 10;  pose.rHand.y = y - 68;  // lead guards mid
+          pose.rElbow.x = x + fc * 6;  pose.rElbow.y = y - 64;
+          // Load rear hip — torso twists away
+          pose.bodyLean = fc * lerp(0, -8, pp);
+          pose.head.x += -fc * pp * 3;
+          pose.pelvis.y = y - 40;
+          // Rear foot pivots
+          pose.lFoot.x = x - fc * lerp(12, 8, pp);
+          pose.rFoot.x = x + fc * 12;
+        } else if(phase === 'active') {
+          const at = easeOutCubic(clamp((t - data.start) / data.active * 1.3, 0, 1));
+          // CROSS — rear fist drives through, BIG hip rotation
+          const fistExt = lerp(-6, 56, at);
+          pose.lHand.x = x + fc * fistExt;
+          pose.lHand.y = y - 74;
+          pose.lElbow.x = x + fc * Math.max(2, fistExt * 0.35);
+          pose.lElbow.y = y - 76;
+          // Full body rotates into the cross
+          pose.bodyLean = fc * lerp(-8, 14, at);
+          pose.head.x += fc * lerp(-3, 5, at);
+          pose.pelvis.x = x + fc * lerp(0, 6, at);   // big hip push
+          pose.neck.x = x + fc * lerp(0, 5, at);
+          // Lead hand drops to body guard
+          pose.rHand.x = x + fc * 8;    pose.rHand.y = y - 64;
+          pose.rElbow.x = x + fc * 6;   pose.rElbow.y = y - 60;
+          // Rear foot pivots hard — weight transfers
+          pose.lFoot.x = x - fc * lerp(8, 2, at);
+          pose.lKnee.x = x - fc * lerp(6, 2, at);
+          pose.rFoot.x = x + fc * lerp(12, 16, at);
+          pose.pelvis.y = y - 40;
+        } else {
+          const rt = easeOutQuad(clamp((t - data.start - data.active) / (data.total - data.start - data.active), 0, 1));
+          pose.lHand.x = x + fc * lerp(56, -12, rt);
+          pose.lHand.y = y - lerp(74, 62, rt);
+          pose.lElbow.x = x + fc * lerp(18, -8, rt);
+          pose.lElbow.y = y - 72;
+          pose.bodyLean = fc * lerp(14, 2, rt);
+          pose.head.x += fc * lerp(5, 0, rt);
+          pose.rHand.x = x + fc * 8;    pose.rHand.y = y - lerp(64, 62, rt);
+          pose.lFoot.x = x - fc * lerp(2, 12, rt);
+          pose.rFoot.x = x + fc * lerp(16, 12, rt);
+          pose.pelvis.y = y - lerp(40, 42, rt);
+        }
       } else {
-        // Finisher spin kick
-        let legExt = 0;
-        let spin = 0;
+        // ---- FINISHER ROUNDHOUSE KICK — big chamber, full extension, clean arc ----
         if(phase === 'startup') {
-          spin = t / data.start * 0.3;
-          legExt = 10;
+          const pp = easeOutCubic(t / data.start);
+          // CHAMBER — kicking leg pulls up and back, body loads
+          pose.rFoot.x = x + fc * lerp(12, -4, pp);       // foot pulls BEHIND body
+          pose.rFoot.y = y - lerp(0, 30, pp);              // knee rises
+          pose.rKnee.x = x + fc * lerp(8, 4, pp);
+          pose.rKnee.y = y - lerp(22, 42, pp);             // knee up = chamber
+          // Support leg braces — slight bend
+          pose.lFoot.x = x - fc * 10; pose.lFoot.y = y;
+          pose.lKnee.x = x - fc * 6;  pose.lKnee.y = y - 20;
+          // Body leans back to counterbalance chamber
+          pose.bodyLean = -fc * lerp(0, 14, pp);
+          pose.pelvis.y = y - lerp(42, 38, pp);            // squat into it
+          // Arms come up for balance
+          pose.rHand.x = x + fc * 6;    pose.rHand.y = y - lerp(60, 72, pp);
+          pose.lHand.x = x - fc * 16;   pose.lHand.y = y - lerp(60, 76, pp);
+          pose.rElbow.x = x + fc * 4;   pose.rElbow.y = y - 68;
+          pose.lElbow.x = x - fc * 10;  pose.lElbow.y = y - 70;
+          pose.head.x += -fc * pp * 3;
         } else if(phase === 'active') {
-          const at = (t - data.start) / data.active;
-          spin = 0.3 + at * 0.9;
-          legExt = lerp(15, 58, easeOutCubic(clamp(at * 1.3, 0, 1)));
+          const at = easeOutCubic(clamp((t - data.start) / data.active * 1.2, 0, 1));
+          // KICK — leg drives forward and UP in a clean arc
+          const kickExt = lerp(-4, 60, at);
+          pose.rFoot.x = x + fc * kickExt;
+          pose.rFoot.y = y - lerp(30, 48, at);            // high kick — mid/head height
+          pose.rKnee.x = x + fc * lerp(4, kickExt * 0.45, at);
+          pose.rKnee.y = y - lerp(42, 44, at);
+          // Support leg stays planted, slight pivot
+          pose.lFoot.x = x - fc * 10; pose.lFoot.y = y;
+          pose.lKnee.x = x - fc * 6;  pose.lKnee.y = y - 20;
+          // Body leans opposite to kick for counterbalance — clear silhouette
+          pose.bodyLean = fc * lerp(-14, 8, at);           // body rotates into kick
+          pose.pelvis.y = y - 38;
+          pose.pelvis.x = x + fc * lerp(0, 4, at);        // hip drives forward
+          // Arms counterbalance — away from kick direction
+          pose.lHand.x = x - fc * lerp(16, 26, at);  pose.lHand.y = y - 70;
+          pose.rHand.x = x + fc * lerp(6, -8, at);   pose.rHand.y = y - 64;
+          pose.lElbow.x = x - fc * lerp(10, 18, at); pose.lElbow.y = y - 68;
+          pose.rElbow.x = x + fc * 2;                pose.rElbow.y = y - 66;
+          pose.head.x += fc * lerp(-3, 4, at);
         } else {
-          const rt = (t - data.start - data.active) / (data.total - data.start - data.active);
-          spin = 1.2 - rt * 0.4;
-          legExt = lerp(58, 12, rt);
+          const rt = easeOutQuad(clamp((t - data.start - data.active) / (data.total - data.start - data.active), 0, 1));
+          // RECOVERY — leg returns, body settles, noticeable follow-through
+          pose.rFoot.x = x + fc * lerp(60, 14, rt);
+          pose.rFoot.y = y - lerp(48, 0, rt);
+          pose.rKnee.x = x + fc * lerp(28, 8, rt);
+          pose.rKnee.y = y - lerp(44, 22, rt);
+          pose.lFoot.x = x - fc * 10; pose.lFoot.y = y;
+          pose.lKnee.x = x - fc * 6;  pose.lKnee.y = y - 22;
+          pose.bodyLean = fc * lerp(8, 0, rt);
+          pose.pelvis.y = y - lerp(38, 42, rt);
+          pose.lHand.x = x - fc * lerp(26, 14, rt);  pose.lHand.y = y - lerp(70, 62, rt);
+          pose.rHand.x = x + fc * lerp(-8, 14, rt);  pose.rHand.y = y - lerp(64, 62, rt);
+          pose.lElbow.x = x - fc * lerp(18, 10, rt); pose.lElbow.y = y - 68;
+          pose.rElbow.x = x + fc * lerp(2, 10, rt);  pose.rElbow.y = y - 68;
+          pose.head.x += fc * lerp(4, 0, rt);
         }
-        pose.rFoot.x = x + fc * legExt * Math.cos(spin * 0.6);
-        pose.rFoot.y = y - 50 - Math.sin(spin * 0.5) * 10;
-        pose.rKnee.x = x + fc * legExt * 0.5;
-        pose.rKnee.y = y - 48;
-        pose.lFoot.x = x - fc * 6; pose.lFoot.y = y;
-        pose.lKnee.x = x - fc * 4; pose.lKnee.y = y - 22;
-        pose.lHand.x = x - fc * 18; pose.lHand.y = y - 68;
-        pose.rHand.x = x + fc * 4; pose.rHand.y = y - 56;
-        pose.bodyLean = -fc * 10;
       }
     }
     else if(f.attackType === 'heavy') {
+      // ---- HEAVY CROSS / HAYMAKER — big windup, full body commitment ----
       const data = f.attackData();
       const phase = t < data.start ? 'startup'
                   : t < data.start + data.active ? 'active'
                   : 'recovery';
-      let ext = 0, vertical = 0;
       if(phase === 'startup') {
-        const pp = t / data.start;
-        ext = lerp(-10, -34, easeOutCubic(pp));
-        vertical = lerp(0, -16, easeOutCubic(pp));
-        pose.bodyLean = -fc * 14 * pp;
+        const pp = easeOutCubic(t / data.start);
+        // BIG WINDUP — rear shoulder pulls way back, hips load, body coils
+        // Fist pulls back behind head, torso twists away from target
+        pose.rHand.x = x + fc * lerp(14, -28, pp);       // fist goes BEHIND body
+        pose.rHand.y = y - lerp(60, 88, pp);              // up near ear
+        pose.rElbow.x = x + fc * lerp(10, -16, pp);
+        pose.rElbow.y = y - lerp(72, 80, pp);
+        // Lead hand guards face
+        pose.lHand.x = x + fc * lerp(-14, 8, pp);
+        pose.lHand.y = y - lerp(60, 76, pp);
+        pose.lElbow.x = x + fc * lerp(-8, 2, pp);
+        pose.lElbow.y = y - 70;
+        // Big torso coil — twist away, then unwind
+        pose.bodyLean = -fc * lerp(0, 18, pp);
+        pose.head.x += -fc * pp * 5;
+        pose.pelvis.y = y - lerp(42, 36, pp);             // deep squat for power
+        // Rear foot pivots — loading the hip
+        pose.rFoot.x = x + fc * 12;
+        pose.lFoot.x = x - fc * lerp(12, 6, pp);
+        pose.lKnee.x = x - fc * lerp(8, 4, pp);
+        pose.rKnee.y = y - lerp(22, 18, pp);              // rear knee bends
       } else if(phase === 'active') {
-        const at = (t - data.start) / data.active;
-        ext = lerp(-34, 72, easeOutCubic(clamp(at * 1.4, 0, 1)));
-        vertical = lerp(-16, 16, easeOutCubic(clamp(at * 1.4, 0, 1)));
-        pose.bodyLean = fc * (14 - at * 4);
+        const at = easeOutCubic(clamp((t - data.start) / data.active * 1.2, 0, 1));
+        // STRIKE — fist EXPLODES forward from behind, full body uncoils
+        const fistExt = lerp(-28, 68, at);
+        pose.rHand.x = x + fc * fistExt;
+        pose.rHand.y = y - lerp(88, 72, at);              // drops to face height
+        pose.rElbow.x = x + fc * lerp(-16, fistExt * 0.4, at);
+        pose.rElbow.y = y - lerp(80, 76, at);
+        // Full body uncoils — hips drive, torso rotates through
+        pose.bodyLean = fc * lerp(-18, 18, at);            // massive rotation
+        pose.head.x += fc * lerp(-5, 8, at);
+        pose.pelvis.x = x + fc * lerp(0, 8, at);          // hips drive forward
+        pose.neck.x = x + fc * lerp(0, 7, at);
+        pose.pelvis.y = y - lerp(36, 40, at);             // rises from squat
+        // Lead hand drops to guard body
+        pose.lHand.x = x - fc * lerp(-8, 14, at);
+        pose.lHand.y = y - lerp(76, 58, at);
+        pose.lElbow.x = x - fc * lerp(-2, 8, at);
+        pose.lElbow.y = y - 66;
+        // Rear foot pivots HARD — full weight transfer
+        pose.lFoot.x = x - fc * lerp(6, -2, at);          // rear foot almost crosses
+        pose.lKnee.x = x - fc * lerp(4, 0, at);
+        pose.rFoot.x = x + fc * lerp(12, 18, at);         // front foot braces
+        pose.rKnee.x = x + fc * lerp(8, 14, at);
       } else {
-        const rt = (t - data.start - data.active) / (data.total - data.start - data.active);
-        ext = lerp(72, 8, easeOutQuad(rt));
-        vertical = lerp(16, 0, rt);
-        pose.bodyLean = fc * (10 - rt * 12);
+        const rt = easeOutQuad(clamp((t - data.start - data.active) / (data.total - data.start - data.active), 0, 1));
+        // RECOVERY — extended follow-through, slow retract
+        pose.rHand.x = x + fc * lerp(68, 14, rt);
+        pose.rHand.y = y - lerp(72, 62, rt);
+        pose.rElbow.x = x + fc * lerp(28, 10, rt);
+        pose.rElbow.y = y - lerp(76, 72, rt);
+        // Body settles back from rotation
+        pose.bodyLean = fc * lerp(18, 2, rt);
+        pose.head.x += fc * lerp(8, 0, rt);
+        pose.pelvis.x = x + fc * lerp(8, 0, rt);
+        pose.neck.x = x + fc * lerp(7, 0, rt);
+        pose.pelvis.y = y - lerp(40, 42, rt);
+        // Hands return to guard
+        pose.lHand.x = x - fc * lerp(-14, 14, rt);
+        pose.lHand.y = y - lerp(58, 62, rt);
+        pose.lElbow.x = x - fc * lerp(-8, 10, rt);
+        pose.lElbow.y = y - 68;
+        // Feet return
+        pose.lFoot.x = x - fc * lerp(-2, 12, rt);
+        pose.lKnee.x = x - fc * lerp(0, 8, rt);
+        pose.rFoot.x = x + fc * lerp(18, 12, rt);
+        pose.rKnee.x = x + fc * lerp(14, 8, rt);
       }
-      pose.rHand.x = x + fc * ext;
-      pose.rHand.y = y - 90 + vertical;
-      pose.rElbow.x = x + fc * ext * 0.5;
-      pose.rElbow.y = y - 80 + vertical * 0.4;
-      pose.lHand.x = x - fc * 16; pose.lHand.y = y - 60;
-      pose.lElbow.x = x - fc * 8; pose.lElbow.y = y - 68;
-      // Slight pivot foot
-      pose.rFoot.x = x + fc * 8;
-      pose.lFoot.x = x - fc * 14;
-      pose.head.x += fc * 2;
     }
     else if(f.attackType === 'throw') {
       // Phase-synced throw pose — matches the 4-phase system in fighter.js
