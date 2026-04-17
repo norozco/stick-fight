@@ -25,29 +25,41 @@ const CHARACTERS = [
   { id: 'aurora', name: 'AURORA', color: '#e8f4ff', glow: '#3bf0ff', hp: 100, speed: 1.00, dmg: 1.00,
     desc: 'BALANCED', ultName: 'AURORA STORM', ultSeq: 'aurora',
     visual: {
-      headRadius: 13, lineWidth: 4.5, bodyScale: 1.0,
+      // Jade-scale proportions with full winter-armour look
+      headRadius: 15, lineWidth: 6.5, bodyScale: 1.15,
       headDecor: [
-        // Ice crystal crown — 3 spikes + diamond
-        { type: 'line', x1: -6, y1: -10, x2: -8, y2: -22, color: '#a0e8ff', width: 2 },
-        { type: 'line', x1: 0,  y1: -12, x2: 0,  y2: -26, color: '#c0f4ff', width: 2.5 },
-        { type: 'line', x1: 6,  y1: -10, x2: 8,  y2: -22, color: '#a0e8ff', width: 2 },
-        { type: 'diamond', cx: 0, cy: -26, size: 3, color: '#ffffff' },
+        // Fur-trimmed hood rim — arc behind the head
+        { type: 'arc', rx: 18, ry: 16, fill: 'rgba(200,230,255,0.22)', border: '#a0cce8', width: 2 },
+        // Ice-crown — 5 spikes, tallest in centre
+        { type: 'line', x1: -10, y1: -11, x2: -14, y2: -24, color: '#80ccee', width: 2 },
+        { type: 'line', x1: -4,  y1: -13, x2: -6,  y2: -30, color: '#b0e4ff', width: 2.5 },
+        { type: 'line', x1: 0,   y1: -15, x2: 0,   y2: -36, color: '#ddf4ff', width: 3 },
+        { type: 'line', x1: 4,   y1: -13, x2: 6,   y2: -30, color: '#b0e4ff', width: 2.5 },
+        { type: 'line', x1: 10,  y1: -11, x2: 14,  y2: -24, color: '#80ccee', width: 2 },
+        // Jewel at crown tip
+        { type: 'diamond', cx: 0, cy: -36, size: 4, color: '#ffffff' },
       ],
-      eyes: { type: 'wide', w: 4, h: 3, color: '#3bf0ff', highlight: true },
+      eyes: { type: 'wide', w: 5, h: 3, color: '#3bf0ff', highlight: true },
       costume: [
-        { attach: 'cape', length: 35, color: 'rgba(59,240,255,0.22)', border: '#3bf0ff' },
-        { attach: 'shoulders', radius: 6, color: 'rgba(59,240,255,0.3)', border: '#3bf0ff' },
+        // Wide winter cloak — longer + more opaque than original cape
+        { attach: 'cape', length: 48, color: 'rgba(160,220,255,0.32)', border: '#5ab8e8' },
+        // Heavy pauldrons — same as Jade but icy
+        { attach: 'shoulders', radius: 12, color: 'rgba(100,200,240,0.45)', border: '#3bf0ff' },
+        // Chest plate
+        { attach: 'chest', width: 18, color: 'rgba(80,180,230,0.28)', border: '#3bf0ff' },
+        // Armoured greaves
+        { attach: 'shins', extraWidth: 4, color: '#6aaac8' },
       ],
-      idleStance: { lHandY: -8, rHandY: -8, lHandX: -4, rHandX: 4, lFootX: 2, rFootX: -2, lean: 0 },
-      idleAnim: { breathAmp: 1.5, swayFreq: 0.03, motion: 'float' },
-      // SNES-quality filled body
+      idleStance: { lHandY: 4, rHandY: 4, lHandX: -6, rHandX: 6, lFootX: -8, rFootX: 8, lean: 0 },
+      idleAnim: { breathAmp: 1.0, swayFreq: 0.02, motion: 'float' },
       body: {
         female: true,
-        shoulderW: 14, waistW: 10, hipW: 14, upperArmW: 5, forearmW: 4, thighW: 8, shinW: 6,
-        handR: 3, footW: 9, footH: 4,
-        skinColor: '#f0ddd0', outfitColor: '#4488cc', outfitDark: '#2a5580',
-        outfitAccent: '#66bbee', outlineColor: '#1a3050',
-        hairColor: '#a0e8ff', hairLength: 14,
+        // Jade-weight limbs, winter palette
+        shoulderW: 22, waistW: 14, hipW: 18, upperArmW: 8, forearmW: 6, thighW: 10, shinW: 8,
+        handR: 4, footW: 12, footH: 5,
+        skinColor: '#e8d4c8', outfitColor: '#3a7898', outfitDark: '#1e4c66',
+        outfitAccent: '#5ab8e8', outlineColor: '#0a2030',
+        hairColor: '#d8f0ff', hairLength: 12,
       },
     },
   },
