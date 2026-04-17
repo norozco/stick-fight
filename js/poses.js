@@ -1271,6 +1271,8 @@ function drawFighter(f) {
       const pivotX = f.x;
       const pivotY = (f.state === 'knockdown' || (f.state === 'ko' && f.koLanded))
                    ? f.y - 20   // lower pivot for ground states
+                   : (f.state === 'grabbed')
+                   ? f.y - SPRITE_DRAW_H * 0.35  // pivot at waist when grabbed
                    : f.y - SPRITE_DRAW_H / 2 + 10;
       ctx.translate(pivotX, pivotY);
       ctx.rotate(spin);
