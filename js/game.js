@@ -309,11 +309,15 @@ function getP1Input() {
     i.lightPressed = !!keyPressed['j'];
     i.heavyPressed = !!keyPressed['k'];
     i.throwPressed = !!keyPressed['h'];
+    i.kickLightPressed = !!keyPressed['u'];
+    i.kickHeavyPressed = !!keyPressed['o'];
   } else {
     i.block = !!keys['s'];
     i.lightPressed = !!keyPressed['f'];
     i.heavyPressed = !!keyPressed['g'];
     i.throwPressed = !!keyPressed['t'];
+    i.kickLightPressed = !!keyPressed['e'];
+    i.kickHeavyPressed = !!keyPressed['c'];
   }
   return i;
 }
