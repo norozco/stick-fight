@@ -1470,8 +1470,11 @@ function drawFighter(f) {
     }
 
     // Knockdown: settle from impact rotation into flat, then recover to upright
+    // Skip rotation if character has real sprite frames (the art handles the collapse)
+    const charId = f.character && f.character.id;
+    const hasRealFrames = charId && spriteSheets[charId];
     let knockdownRotation = 0;
-    if(f.state === 'knockdown') {
+    if(f.state === 'knockdown' && !(hasRealFrames && hasRealFrames['knockdown'])) {
       const t = f.stateTime;
       if(t < 5) {
         // First 5 frames: settle from impact tumble into flat (~90°)
