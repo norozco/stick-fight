@@ -227,6 +227,48 @@ else if(a==="block"){o.lAA=-1.4;o.rAA=-1.0;o.lean=-4;o.hY=2;o.lLS=-4;o.rLS=4;}
 else if(a==="dash"){o.lean=16;o.lLS=-20;o.rLS=10;o.lFL=6;o.hY=-3;o.lAA=0.6;o.rAA=-0.4;}
 else if(a==="attack_ult"){if(p<0.25){o.rAA=-1.8;o.lean=-8;o.hY=3;o.lLS=-6;o.rFist=1;o.torsoTwist=-6;o.hipRot=-3;}else if(p<0.65){const ext=(p-0.25)/0.4;o.rAE=44;o.lean=12;o.lLS=-ext*8;o.rLS=ext*12;o.hY=-ext*4;o.rFist=1;o.torsoTwist=8;o.hipRot=ext*8;}else{o.rAA=-2.2;o.lean=14;o.hY=-5;o.rLS=8;o.lFL=6;o.rFist=0.5;o.hipRot=6;}}
 else if(a==="attack_throw"){if(p<0.3){o.rAE=32;o.lAE=32;o.lean=6;}else{const tp=(p-0.3)/0.7;o.rAA=-Math.PI*tp;o.rAE=24;o.lean=8-tp*16;o.hY=tp*4;}}
+else if(a==="kick_light"){
+  // Quick chamber and snap — 3 phases
+  if(p<0.2){
+    // Chamber — knee rises, body braces
+    const pp=p/0.2;
+    o.rFL=pp*28; o.rLS=-pp*6; o.lean=-pp*6;
+    o.hY=pp*2; o.lAA=-0.3; o.rAA=0.3;
+    o.hipRot=-pp*3;
+  }else if(p<0.5){
+    // Snap — leg extends forward, hip drives
+    const sp=(p-0.2)/0.3;
+    o.rFL=28-sp*14; o.rLS=-6+sp*30; o.lean=-6+sp*14;
+    o.hY=2-sp*3; o.lAA=-0.4; o.rAA=0.5;
+    o.hipRot=-3+sp*10;
+  }else{
+    // Recovery — leg returns
+    const rp=(p-0.5)/0.5;
+    o.rFL=14-rp*14; o.rLS=24-rp*24; o.lean=8-rp*8;
+    o.hY=-1+rp; o.hipRot=7-rp*7;
+  }
+}
+else if(a==="kick_heavy"){
+  // Bigger arc, more commitment — roundhouse style
+  if(p<0.25){
+    // Deep chamber — big windup
+    const pp=p/0.25;
+    o.rFL=pp*34; o.rLS=-pp*10; o.lean=-pp*10;
+    o.hY=pp*4; o.lAA=-0.5; o.rAA=0.6;
+    o.hipRot=-pp*6; o.torsoTwist=-pp*4;
+  }else if(p<0.55){
+    // Full extension — sweeping arc
+    const sp=(p-0.25)/0.3;
+    o.rFL=34-sp*18; o.rLS=-10+sp*42; o.lean=-10+sp*22;
+    o.hY=4-sp*6; o.lAA=-0.6; o.rAA=0.7;
+    o.hipRot=-6+sp*16; o.torsoTwist=-4+sp*10;
+  }else{
+    // Follow-through + recovery
+    const rp=(p-0.55)/0.45;
+    o.rFL=16-rp*16; o.rLS=32-rp*32; o.lean=12-rp*12;
+    o.hY=-2+rp*2; o.hipRot=10-rp*10; o.torsoTwist=6-rp*6;
+  }
+}
 else if(a==="ko"){
   // Collapsing backward — body tilts, arms go limp, head drops
   const col=Math.min(p,1);
