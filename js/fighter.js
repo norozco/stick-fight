@@ -579,6 +579,8 @@ class Fighter {
         this.stateTime = 0;
         this.onGround = true;
         this.hitStun = 30;
+        // Set lastHitDir from throw velocity so knockdown rotation matches
+        this.lastHitDir = (this.vx > 0) ? 1 : -1;
         shake(6, 10);
         spawnDust(this.x, GROUND + 2);
         try { Audio.land(); } catch(e) {}
