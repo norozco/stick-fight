@@ -551,8 +551,14 @@ class Fighter {
     }
 
     // --- GRABBED STATE: locked by attacker's throw, no input ---
-    if(this.state === 'grabbed' && this.throwBy) {
+    if(this.state === 'grabbed') {
       this.stateTime++;
+      // Safety: if throwBy is gone or attacker dropped the throw, escape
+      if(!this.throwBy || (this.throwBy.state !== 'attack' || this.throwBy.attackType !== 'throw')) {
+        this.state = 'idle'; this.stateTime = 0; this.stateTimeF = 0;
+        this.throwBy = null; this.hitStun = 0;
+        return;
+      }
       // Position is controlled by the attacker's throw update
       // Just stay put — no physics, no input
       this.vx = 0; this.vy = 0;
