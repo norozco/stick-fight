@@ -117,7 +117,7 @@ function drawGroundCracks() {
 // Triggered when the hit that ends a round was (a) the ult finisher or
 // (b) the capstone of a combo ≥ 5. Drives ~2.7s of camera cuts, flashes,
 // slow-mo, shake, text overlays, and fire particles around the winner.
-// Non-epic KOs skip this and go straight to the existing replay system.
+// Non-epic KOs skip this and go straight to endRound.
 
 // Character-specific battle cries, used as the mid-cinematic Beat-2 taunt.
 const FATAL_TAUNTS = {
