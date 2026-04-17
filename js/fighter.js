@@ -798,6 +798,8 @@ class Fighter {
 
     if(input.lightPressed) this.startAttack('light');
     if(input.heavyPressed) this.startAttack('heavy');
+    if(input.kickLightPressed) this.startAttack('kick_light');
+    if(input.kickHeavyPressed) this.startAttack('kick_heavy');
     // Throw: works from idle OR during attack recovery (after hit landed).
     // This makes throw feel responsive — you don't need to wait for full recovery.
     const canThrow = (this.state === 'idle') ||
