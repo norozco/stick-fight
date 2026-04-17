@@ -1455,6 +1455,10 @@ function drawFighter(f) {
     const hasRingoutSpin = f.state === 'ringout' && f.ringoutSpin;
     const dir = f.lastHitDir || -f.facing;
 
+    // Check if character has real sprite sheet frames (skip engine rotation if so)
+    const charId = f.character && f.character.id;
+    const hasRealFrames = typeof spriteSheets !== 'undefined' && charId && spriteSheets[charId];
+
     // KO: tumble rotation while airborne, then tilt flat when landed
     // Skip if character has real sprite frames for KO
     let koRotation = 0;
