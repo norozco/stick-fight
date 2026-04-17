@@ -944,12 +944,7 @@ function loop(now) {
   ctx.translate(-cx - (cameraX - cx) * (cameraZoom - 1) / cameraZoom,
                 -cy - (cameraY - cy) * (cameraZoom - 1) / cameraZoom);
 
-  if(state === 'replay') {
-    drawReplay();
-  } else {
-    // During the FREEFALL phase of a ring-out, the normal stage scene is
-    // replaced with the streaking-bands parallax backdrop (rushing-up walls)
-    // for the cinematic descent feel.
+  {
     const ringoutPhName = (state === 'ringout' && RINGOUT_PHASES[ringoutPhaseIdx])
                           ? RINGOUT_PHASES[ringoutPhaseIdx].name : null;
     if(ringoutPhName === 'FREEFALL') {
