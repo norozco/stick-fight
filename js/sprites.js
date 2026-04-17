@@ -1389,5 +1389,10 @@ function generateSpritesForCharacter(c){
 }
 function drawFighterSprite(f){const id=f.character&&f.character.id;if(!id||!spriteCache[id])return false;const an=getSpriteAnim(f),am=spriteCache[id][an];if(!am||!am.length)return false;const fr=am[Math.min(getSpriteFrame(f,an),am.length-1)];if(!fr)return false;ctx.save();ctx.imageSmoothingEnabled=false;const dx=f.x-SPRITE_DRAW_W/2,dy=f.y-SPRITE_DRAW_H+22;if(f.facing<0){ctx.translate(f.x,0);ctx.scale(-1,1);ctx.translate(-f.x,0);}if(f.hurtFlash>0&&Math.floor(f.hurtFlash/2)%2===0){const t=document.createElement('canvas');t.width=fr.width;t.height=fr.height;const tc=t.getContext('2d');tc.drawImage(fr,0,0);tc.globalCompositeOperation='source-atop';tc.fillStyle='rgba(255,200,200,0.55)';tc.fillRect(0,0,t.width,t.height);ctx.drawImage(t,dx,dy,SPRITE_DRAW_W,SPRITE_DRAW_H);}else{ctx.drawImage(fr,dx,dy,SPRITE_DRAW_W,SPRITE_DRAW_H);}ctx.imageSmoothingEnabled=true;ctx.restore();return true;}
 function drawCharacterAura(f){if(!f||!f.character)return;const g=f.character.glow||'#fff';const p=0.3+Math.abs(Math.sin(globalTime*0.06))*0.2;const gr=ctx.createRadialGradient(f.x,GROUND+4,0,f.x,GROUND+4,45);gr.addColorStop(0,g.slice(0,7)+(Math.round(p*60).toString(16).padStart(2,'0')));gr.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=gr;ctx.fillRect(f.x-45,GROUND-2,90,20);}
-function initSpriteCache(){for(const c of CHARACTERS)generateSpritesForCharacter(c);}
+function initSpriteCache(){
+  for(const c of CHARACTERS) generateSpritesForCharacter(c);
+  // Auto-load individual frame PNGs from sprites/<charId>/ folders.
+  // Any PNG found replaces the procedural frame for that animation.
+  for(const c of CHARACTERS) loadSpriteFrames(c.id);
+}
 if(typeof window!=='undefined')window.addEventListener('load',()=>setTimeout(initSpriteCache,100));
