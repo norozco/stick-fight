@@ -889,6 +889,11 @@ sl(bx+10,hY+10,bx+14,hY+16,1,sk3+'40');}
 // JADE — Fast Striker. Precise. Relentless. Pixel-art with sf() blocks,
 // lean athletic build, crop top, hakama pants, hand wraps, flowing hair.
 function drawJade(cx,gy,o){
+// Scale up procedural drawing to match real sprite art size (~1.35x)
+_s.save();
+_s.translate(cx, gy);
+_s.scale(1.35, 1.35);
+_s.translate(-cx, -gy);
 const L=o.lean||0, bx=cx+L;
 const tw=o.torsoTwist||0, hr=o.hipRot||0;
 const hY=gy-130+(o.hY||0);
