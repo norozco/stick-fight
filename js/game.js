@@ -982,18 +982,6 @@ function loop(now) {
   drawParticles();
   // X-ray skeleton flash on the ringout CRASH frame
   if(state === 'ringout') drawXraySkeletonFlash();
-  if(state === 'replay') {
-    // Blinking corner badge
-    if(Math.floor(globalTime / 18) % 2 === 0) {
-      ctx.save();
-      ctx.fillStyle = '#ff3030';
-      ctx.beginPath(); ctx.arc(28, 28, 8, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = 'italic 900 18px Inter';
-      ctx.fillText('REPLAY', 44, 34);
-      ctx.restore();
-    }
-  }
 
   ctx.restore();
 
