@@ -1,5 +1,5 @@
-// ============================================================
-// SPRITES — detailed pixel-art with personality
+﻿// ============================================================
+// SPRITES â€” detailed pixel-art with personality
 // ============================================================
 const SPRITE_W=160,SPRITE_H=220,SPRITE_SCALE=1.4;
 const SPRITE_DRAW_W=Math.round(SPRITE_W*SPRITE_SCALE),SPRITE_DRAW_H=Math.round(SPRITE_H*SPRITE_SCALE);
@@ -25,7 +25,7 @@ function sl(x1,y1,x2,y2,w,c){_s.strokeStyle=c;_s.lineWidth=w;_s.lineCap='round';
 function st(x1,y1,w1,x2,y2,w2,c,o){_s.beginPath();_s.moveTo(x1-w1/2,y1);_s.lineTo(x1+w1/2,y1);_s.lineTo(x2+w2/2,y2);_s.lineTo(x2-w2/2,y2);_s.closePath();_s.fillStyle=c;_s.fill();if(o){_s.strokeStyle=o;_s.lineWidth=1.2;_s.stroke();}}
 function shadedLimb(x1,y1,x2,y2,w,l,d,o){const dx=x2-x1,dy=y2-y1,ln=Math.sqrt(dx*dx+dy*dy)||1,nx=-dy/ln,ny=dx/ln;_s.beginPath();_s.moveTo(x1,y1);_s.lineTo(x2,y2);_s.lineTo(x2+nx*w/2,y2+ny*w/2);_s.lineTo(x1+nx*w/2,y1+ny*w/2);_s.closePath();_s.fillStyle=l;_s.fill();_s.beginPath();_s.moveTo(x1,y1);_s.lineTo(x2,y2);_s.lineTo(x2-nx*w/2,y2-ny*w/2);_s.lineTo(x1-nx*w/2,y1-ny*w/2);_s.closePath();_s.fillStyle=d;_s.fill();if(o){_s.strokeStyle=o;_s.lineWidth=1;_s.beginPath();_s.moveTo(x1+nx*w/2,y1+ny*w/2);_s.lineTo(x2+nx*w/2,y2+ny*w/2);_s.lineTo(x2-nx*w/2,y2-ny*w/2);_s.lineTo(x1-nx*w/2,y1-ny*w/2);_s.closePath();_s.stroke();}}
 // === PROFESSIONAL DRAWING PRIMITIVES ===
-// drawLimb — tapered, contoured limb with bezier muscle bulge and 3-tone shading
+// drawLimb â€” tapered, contoured limb with bezier muscle bulge and 3-tone shading
 function drawLimb(x1,y1,x2,y2,w1,w2,light,mid,dark,outline){
   const dx=x2-x1,dy=y2-y1,ln=Math.sqrt(dx*dx+dy*dy)||1;
   const nx=-dy/ln,ny=dx/ln; // perpendicular normal
@@ -66,10 +66,10 @@ function drawLimb(x1,y1,x2,y2,w1,w2,light,mid,dark,outline){
   // 4. Outline for definition
   if(outline){limbPath();_s.strokeStyle=outline;_s.lineWidth=1;_s.stroke();}
 }
-// drawFist — clenched fist shape with knuckle definition
+// drawFist â€” clenched fist shape with knuckle definition
 function drawFist(cx,cy,size,color,darkColor,outline){
   const w=size*1.3,h=size*1.1;
-  // Main fist shape — slightly rectangular, rounded corners
+  // Main fist shape â€” slightly rectangular, rounded corners
   _s.fillStyle=color;
   _s.beginPath();
   _s.moveTo(cx-w/2+2,cy-h/2);
@@ -109,7 +109,7 @@ function drawFist(cx,cy,size,color,darkColor,outline){
     _s.quadraticCurveTo(cx-w/2,cy-h/2,cx-w/2+2,cy-h/2);
     _s.closePath();_s.stroke();}
 }
-// drawBoot — angled boot/shoe with visible sole
+// drawBoot â€” angled boot/shoe with visible sole
 function drawBoot(x,y,w,h,color,darkColor,soleColor,outline,angle){
   _s.save();_s.translate(x,y);_s.rotate(angle||0);
   // Boot upper
@@ -145,7 +145,7 @@ else if(a==="walk"){const s=Math.sin(p*Math.PI*2);o.lLS=-s*18;o.rLS=s*18;o.lFL=M
 else if(a==="attack_light"){
   // 3-phase: anticipation (0-0.2), strike (0.2-0.55), recovery (0.55-1)
   if(p<0.2){
-    // ANTICIPATION — shoulder loads, fist chambers at chin
+    // ANTICIPATION â€” shoulder loads, fist chambers at chin
     const pp=p/0.2;
     o.rAA=-0.4*pp;       // arm pulls back
     o.rAE=-8*pp;         // fist retracts to chin
@@ -155,7 +155,7 @@ else if(a==="attack_light"){
     o.rFist=pp;          // fist clenches during windup
     o.torsoTwist=-3*pp;  // coil torso back
   }else if(p<0.55){
-    // STRIKE — fist drives FORWARD, shoulder rotates in, body pushes
+    // STRIKE â€” fist drives FORWARD, shoulder rotates in, body pushes
     const sp=(p-0.2)/0.35;
     o.rAE=sp*46;         // fist extends toward opponent
     o.rAA=0.15;          // arm straight/slightly down
@@ -166,7 +166,7 @@ else if(a==="attack_light"){
     o.rFist=1;           // fist fully clenched during strike
     o.torsoTwist=-3+sp*10; // torso twists into punch
   }else{
-    // RECOVERY — retract fist, body settles
+    // RECOVERY â€” retract fist, body settles
     const rp=(p-0.55)/0.45;
     o.rAE=46-rp*40;
     o.lean=12-rp*10;
@@ -180,7 +180,7 @@ else if(a==="attack_light"){
 else if(a==="attack_heavy"){
   // 3-phase: big windup (0-0.35), explosive strike (0.35-0.65), follow-through (0.65-1)
   if(p<0.35){
-    // BIG WINDUP — fist behind head, body coils backward, deep squat
+    // BIG WINDUP â€” fist behind head, body coils backward, deep squat
     const pp=p/0.35;
     o.rAA=-1.8*pp;       // arm pulls WAY back
     o.rAE=-12*pp;        // fist goes behind head
@@ -193,7 +193,7 @@ else if(a==="attack_heavy"){
     o.torsoTwist=-8*pp;  // deep torso coil back
     o.hipRot=-4*pp;      // hips load
   }else if(p<0.65){
-    // STRIKE — body UNCOILS, fist explodes forward, full hip rotation
+    // STRIKE â€” body UNCOILS, fist explodes forward, full hip rotation
     const sp=(p-0.35)/0.3;
     o.rAA=-1.8+sp*2.0;   // arm swings from behind to forward
     o.rAE=-12+sp*60;     // massive extension
@@ -207,7 +207,7 @@ else if(a==="attack_heavy"){
     o.torsoTwist=-8+sp*22; // explosive torso rotation through
     o.hipRot=-4+sp*12;   // hips drive into punch
   }else{
-    // FOLLOW-THROUGH — extended pose holds briefly, slow retract
+    // FOLLOW-THROUGH â€” extended pose holds briefly, slow retract
     const rp=(p-0.65)/0.35;
     o.rAE=48-rp*38;
     o.rAA=0.2-rp*0.2;
@@ -228,36 +228,36 @@ else if(a==="dash"){o.lean=16;o.lLS=-20;o.rLS=10;o.lFL=6;o.hY=-3;o.lAA=0.6;o.rAA
 else if(a==="attack_ult"){if(p<0.25){o.rAA=-1.8;o.lean=-8;o.hY=3;o.lLS=-6;o.rFist=1;o.torsoTwist=-6;o.hipRot=-3;}else if(p<0.65){const ext=(p-0.25)/0.4;o.rAE=44;o.lean=12;o.lLS=-ext*8;o.rLS=ext*12;o.hY=-ext*4;o.rFist=1;o.torsoTwist=8;o.hipRot=ext*8;}else{o.rAA=-2.2;o.lean=14;o.hY=-5;o.rLS=8;o.lFL=6;o.rFist=0.5;o.hipRot=6;}}
 else if(a==="attack_throw"){if(p<0.3){o.rAE=32;o.lAE=32;o.lean=6;}else{const tp=(p-0.3)/0.7;o.rAA=-Math.PI*tp;o.rAE=24;o.lean=8-tp*16;o.hY=tp*4;}}
 else if(a==="kick_light"){
-  // Quick chamber and snap — 3 phases
+  // Quick chamber and snap â€” 3 phases
   if(p<0.2){
-    // Chamber — knee rises, body braces
+    // Chamber â€” knee rises, body braces
     const pp=p/0.2;
     o.rFL=pp*28; o.rLS=-pp*6; o.lean=-pp*6;
     o.hY=pp*2; o.lAA=-0.3; o.rAA=0.3;
     o.hipRot=-pp*3;
   }else if(p<0.5){
-    // Snap — leg extends forward, hip drives
+    // Snap â€” leg extends forward, hip drives
     const sp=(p-0.2)/0.3;
     o.rFL=28-sp*14; o.rLS=-6+sp*30; o.lean=-6+sp*14;
     o.hY=2-sp*3; o.lAA=-0.4; o.rAA=0.5;
     o.hipRot=-3+sp*10;
   }else{
-    // Recovery — leg returns
+    // Recovery â€” leg returns
     const rp=(p-0.5)/0.5;
     o.rFL=14-rp*14; o.rLS=24-rp*24; o.lean=8-rp*8;
     o.hY=-1+rp; o.hipRot=7-rp*7;
   }
 }
 else if(a==="kick_heavy"){
-  // Bigger arc, more commitment — roundhouse style
+  // Bigger arc, more commitment â€” roundhouse style
   if(p<0.25){
-    // Deep chamber — big windup
+    // Deep chamber â€” big windup
     const pp=p/0.25;
     o.rFL=pp*34; o.rLS=-pp*10; o.lean=-pp*10;
     o.hY=pp*4; o.lAA=-0.5; o.rAA=0.6;
     o.hipRot=-pp*6; o.torsoTwist=-pp*4;
   }else if(p<0.55){
-    // Full extension — sweeping arc
+    // Full extension â€” sweeping arc
     const sp=(p-0.25)/0.3;
     o.rFL=34-sp*18; o.rLS=-10+sp*42; o.lean=-10+sp*22;
     o.hY=4-sp*6; o.lAA=-0.6; o.rAA=0.7;
@@ -270,13 +270,13 @@ else if(a==="kick_heavy"){
   }
 }
 else if(a==="ko"){
-  // Collapsing backward — body tilts, arms go limp, head drops
+  // Collapsing backward â€” body tilts, arms go limp, head drops
   const col=Math.min(p,1);
   o.lean=-22-col*14;o.hY=8+col*12;o.lAA=0.7+col*0.5;o.rAA=0.6+col*0.4;
   o.lLS=-6-col*10;o.rLS=6+col*8;o.lFL=col*8;o.rFL=col*4;
 }
 else if(a==="knockdown"){
-  // Flat on ground — splayed, motionless defeated
+  // Flat on ground â€” splayed, motionless defeated
   o.lean=-30;o.hY=24;o.lAA=1.2;o.rAA=1.0;
   o.lLS=-16;o.rLS=16;o.lFL=0;o.rFL=0;
 }
@@ -296,398 +296,151 @@ else if(a==="thrown"){
 return o;}
 function pixelFace(bx,hY,opts){const{eyeColor,eyeW,eyeH,browColor,browAngle,mouthW,mouthColor,mouthY,noseColor,skinDark,outline,expression}=opts;const o=outline||'#1a1020';sf(bx-8,hY-4,eyeW+3,eyeH+2,'#ffffff');sf(bx-7,hY-3,eyeW,eyeH,eyeColor);sf(bx-6,hY-2,2,2,o);sf(bx-7,hY-4,1,1,'#ffffff');sf(bx+3,hY-4,eyeW+3,eyeH+2,'#ffffff');sf(bx+4,hY-3,eyeW,eyeH,eyeColor);sf(bx+5,hY-2,2,2,o);sf(bx+4,hY-4,1,1,'#ffffff');sl(bx-9,hY-7+browAngle,bx-3,hY-8,2,browColor||o);sl(bx+2,hY-8,bx+8,hY-7-browAngle,2,browColor||o);sf(bx-1,hY+2,3,2,noseColor||skinDark||'#c0a090');const my=mouthY||7;if(expression==='smile'){sf(bx-2,hY+my,5,2,mouthColor||'#d09090');sf(bx-1,hY+my,3,1,'#e8a0a0');}else if(expression==='grimace'){sf(bx-3,hY+my,mouthW||7,3,mouthColor||o);sf(bx-2,hY+my+1,2,1,'#ffffff');sf(bx+1,hY+my+1,2,1,'#ffffff');}else if(expression==='serious'){sf(bx-2,hY+my,mouthW||5,2,mouthColor||'#a07060');}else if(expression!=='hidden'){sf(bx-2,hY+my,mouthW||5,2,mouthColor||'#c08080');}}
 
-// AURORA — Ice Princess. Professional pixel-art with bezier contours,
+// AURORA â€” Ice Princess. Professional pixel-art with bezier contours,
 // tapered limbs, flowing hair, 3-tone shading throughout.
-function drawAurora(cx,gy,o){const L=o.lean||0,bx=cx+L;
-// Scale up to match Jade's art-style size (same 1.35× factor)
-_s.save();
-_s.translate(cx,gy);
-_s.scale(1.35,1.35);
-_s.translate(-cx,-gy);
-const tw=o.torsoTwist||0,hr=o.hipRot||0;
-const sk='#f2ddd0',skDk='#d4b8a8',skLt='#fff0e8',skMid='#e8d0c0';
-const hair='#80d8ee',hairDk='#50a8cc',hairLt='#b0f0ff';
-const top='#3a78b0',topDk='#224870',topLt='#5898d0',topMid='#4888c0';
-const bot='#2858a0',bootC='#1a3860',bootDk='#0e2440',bootSole='#0a1830';
-const out='#102838',acc='#60ccee',accLt='#90e0ff';
-const twOff=tw*0.3;
-// Raise neck + pelvis to match Jade's taller proportions (nY gy-100, pY gy-52)
-const nY=gy-100,pY=gy-52;
+function drawAurora(cx,gy,o){
+_s.save();_s.translate(cx,gy);_s.scale(1.35,1.35);_s.translate(-cx,-gy);
+const L=o.lean||0,bx=cx+L;
+const tw=o.torsoTwist||0,hr=o.hipRot||0,twOff=tw*0.3;
+// Palette â€” winter warrior: warm olive skin, near-black hair, fur+dark armour
+const skLt='#dca878',skMid='#b87c48',skDk='#8a5828';
+const hairDk='#0c0a18',hairMid='#18162c',hairLt='#282442';
+const furLt='#e8ecf6',furMid='#b8c0d0',furDk='#8898a8';
+const armDk='#1a1c2a',armMid='#2a2c3e',armLt='#3c3e54';
+const pntDk='#10121a',pntMid='#181a28',pntLt='#222436';
+const bltDk='#201408',bltMid='#342010',bltLt='#4a3420';
+const btDk='#101018',btMid='#1a1a26';
+const out='#07070d';
+// Key positions (Jade-style tall figure)
+const nY=gy-100,wY=gy-80,hipY=gy-68,hY=gy-128+(o.hY||0);
+// Leg endpoints
+const lx=(bx-9+(o.lLS||0)+hr*0.3)|0,ly=(gy-(o.lFL||0))|0;
+const rx=(bx+9+(o.rLS||0)+hr*0.3)|0,ry=(gy-(o.rFL||0))|0;
 
-// === FLOWING HAIR — BEHIND BODY (pixel strands) ===
-// Long flowing hair built from staggered pixel rows
-const hShift=(-L*0.8)|0;
-for(let i=0;i<28;i++){
-  const w=Math.max(4,16-i*0.4)|0;
-  const xo=((i%3===0?1:i%3===1?-1:0)+(hShift*i*0.04))|0;
-  const yy=gy-102+i*4;
-  const c=i<5?hairLt:i<18?hair:hairDk;
-  sf(bx-w/2+xo-4,yy,w,3,c);
-  // shadow on left edge of strands
-  if(i>2)sf(bx-w/2+xo-4,yy,2,3,hairDk);
-}
-// Hair ribbon — pixel block
-sf(bx-7,gy-97,4,4,acc);sf(bx-6,gy-96,2,2,accLt);
+// === ICE CAPE â€” large flowing cloak, drawn behind everything ===
+{const cd=-L*1.1,cw=14;
+for(let i=0;i<22;i++){const t=i/22,ease=t*t*(3-2*t),y=nY+85*ease,hw=(cw+i*3.2+Math.sin(i*0.5)*3)|0,xo=(cd*ease)|0,a=Math.max(0,0.58-t*0.34),ah=Math.round(a*255).toString(16).padStart(2,'0');
+sf(bx-hw+xo,y,hw*2,6,'#b4d0ee'+ah);
+if(i<14){sf(bx+hw-3+xo,y,3,6,'#d8eeff'+ah);sf(bx-hw+xo,y,2,6,'#6890b0'+ah);}}}
 
-// === CAPE/TRAIN — pixel sheer behind body ===
-for(let i=0;i<12;i++){
-  const w=(20+i*1.5)|0;
-  const a=Math.max(6,28-i*2);
-  sf(bx-w/2-2,gy-82+i*8,w,7,'rgba(96,204,238,0.'+((a<10?'0':'')+a)+')');
-}
+// === PONYTAIL â€” dark hair cascading behind, high on head ===
+// Upward gather from crown, arcing back and down
+for(let i=0;i<30;i++){const px=(bx+5+(i<6?i*2.2:12+i*2))|0,py=(hY-6+(i<6?-i*3.5:-22+(i-6)*4.8))|0,w=Math.max(3,9-i*0.12)|0;sf(px-w/2,py,w,4,i<6?hairLt:i<16?hairMid:hairDk);if(i%4===0)sf(px-w/2,py,2,4,hairDk);}
+// Loose strand behind left shoulder
+for(let i=0;i<14;i++){const yy=hY+10+i*4,dx=Math.sin(i*0.4)*2-i*0.3-L*0.3,w=(6-i*0.3)|0;if(w>1)sf((bx-9+twOff+dx-w/2)|0,yy,w,3,i<5?hairMid:hairDk);}
 
-// === LEGS — pixel tapered columns ===
-const lx=(bx-8+(o.lLS||0)+hr*0.3)|0, ly=(gy-(o.lFL||0))|0;
-const rx=(bx+8+(o.rLS||0)+hr*0.3)|0, ry=(gy-(o.rFL||0))|0;
-// Helper: draw a pixel leg from (x1,y1) to (x2,y2)
-function pxLeg(x1,y1,x2,y2,wTop,wBot,light,mid,dark,oc){
-  const steps=8;
-  for(let i=0;i<steps;i++){
-    const t=i/steps;
-    const px=(x1+(x2-x1)*t)|0;
-    const py=(y1+(y2-y1)*t)|0;
-    const w=(wTop+(wBot-wTop)*t)|0;
-    const segH=((y2-y1)/steps)|0||2;
-    const c=t<0.3?light:t<0.7?mid:dark;
-    sf(px-w/2,py,w,segH+1,c);
-    // left-edge shadow
-    sf(px-w/2,py,2,segH+1,dark);
-    // outline left & right
-    sf(px-w/2-1,py,1,segH+1,oc);
-    sf(px+w/2,py,1,segH+1,oc);
-  }
-}
-// Left thigh + calf
-const lKneeX=((bx-5+lx)/2)|0, lKneeY=((gy-44+ly)/2)|0;
-const rKneeX=((bx+5+rx)/2)|0, rKneeY=((gy-44+ry)/2)|0;
-pxLeg(bx-5,gy-44,lKneeX,lKneeY,10,8,skLt,sk,skDk,out);
-pxLeg(lKneeX,lKneeY,lx,ly,8,6,skLt,sk,skDk,out);
-// Right thigh + calf
-pxLeg(bx+5,gy-44,rKneeX,rKneeY,10,8,skLt,sk,skDk,out);
-pxLeg(rKneeX,rKneeY,rx,ry,8,6,skLt,sk,skDk,out);
+// === LEGS â€” dark armored pants ===
+{const lKx=(bx-7+lx>>1)|0,lKy=(hipY+ly>>1)|0,rKx=(bx+7+rx>>1)|0,rKy=(hipY+ry>>1)|0;
+// Left thigh
+for(let i=0;i<12;i++){const t=i/12,px=(bx-7+(lKx-(bx-7))*t+hr*0.2)|0,py=(hipY+(lKy-hipY)*t)|0,w=(14-i*0.3)|0;sf(px-w/2,py,w,3,i<4?pntDk:i<8?pntMid:pntLt);sf(px-w/2,py,2,3,pntDk);}
+// Left knee pad
+sf(lKx-6,lKy-5,12,9,armMid);sf(lKx-6,lKy-5,12,2,armLt);sf(lKx-6,lKy+2,12,2,armDk);sf(lKx-7,lKy-6,14,1,out+'60');
+// Left calf
+for(let i=0;i<10;i++){const t=i/10,px=(lKx+(lx-lKx)*t)|0,py=(lKy+(ly-lKy)*t)|0,w=(12-i*0.4)|0;sf(px-w/2,py,w,3,i<4?pntMid:pntLt);sf(px-w/2,py,2,3,pntDk);}
+// Right thigh
+for(let i=0;i<12;i++){const t=i/12,px=(bx+7+(rKx-(bx+7))*t+hr*0.2)|0,py=(hipY+(rKy-hipY)*t)|0,w=(14-i*0.3)|0;sf(px-w/2,py,w,3,i<4?pntDk:i<8?pntMid:pntLt);sf(px+w/2-2,py,2,3,pntLt);}
+// Right knee pad
+sf(rKx-6,rKy-5,12,9,armMid);sf(rKx-6,rKy-5,12,2,armLt);sf(rKx-6,rKy+2,12,2,armDk);sf(rKx-7,rKy-6,14,1,out+'60');
+// Right calf
+for(let i=0;i<10;i++){const t=i/10,px=(rKx+(rx-rKx)*t)|0,py=(rKy+(ry-rKy)*t)|0,w=(12-i*0.4)|0;sf(px-w/2,py,w,3,i<4?pntMid:pntLt);sf(px+w/2-2,py,2,3,pntLt);}
 
-// === BOOTS — angular pixel blocks ===
-function pxBoot(fx,fy){
-  // Boot upper
-  sf(fx-5,fy-14,10,8,bootC);
-  sf(fx-5,fy-6,10,6,bootC);
-  // Boot sole (extends forward)
-  sf(fx-5,fy,12,3,bootSole);
-  // Inner shadow
-  sf(fx-5,fy-14,2,14,bootDk);
-  // Highlight on right
-  sf(fx+3,fy-12,2,6,top);
-  // Outline
-  sf(fx-6,fy-14,1,17,out);  // left
-  sf(fx+5,fy-14,1,14,out);  // right upper
-  sf(fx+7,fy,1,3,out);      // right sole
-  sf(fx-5,fy-15,10,1,out);  // top
-  sf(fx-5,fy+3,12,1,out);   // bottom
-  // Accent trim
-  sf(fx-5,fy-14,10,2,acc);
-}
-pxBoot(lx,ly);pxBoot(rx,ry);
+// === BOOTS â€” dark with fur trim top ===
+// Left boot
+sf(lx-8,ly-14,16,14,btDk);sf(lx-8,ly-14,16,2,btMid);sf(lx-10,ly,20,4,btDk);
+for(let i=0;i<4;i++)sf(lx-7+i,ly-14,14-i*2,3,i<2?furLt:furMid); // fur trim
+sf(lx-9,ly-14,1,18,out+'80');sf(lx+7,ly-14,1,14,out+'80');sf(lx-8,ly-15,16,1,out+'80');sf(lx-10,ly+4,20,1,out+'80');
+// Right boot
+sf(rx-8,ry-14,16,14,btDk);sf(rx-8,ry-14,16,2,btMid);sf(rx-10,ry,20,4,btDk);
+for(let i=0;i<4;i++)sf(rx-7+i,ry-14,14-i*2,3,i<2?furLt:furMid);
+sf(rx-9,ry-14,1,18,out+'80');sf(rx+7,ry-14,1,14,out+'80');sf(rx-8,ry-15,16,1,out+'80');sf(rx-10,ry+4,20,1,out+'80');}
 
-// === TORSO — pixel hourglass built row by row ===
+// === TORSO â€” dark chest armour + exposed midriff ===
 const tx=bx+twOff;
-// Shoulders row by row — wide at shoulders, pinch at waist, flare at hips
-const torsoRows=[
-  // [yOff, halfW, color]  — relative to nY
-  [0, 11, topMid],[2, 12, topMid],[4, 12, topMid],    // shoulders
-  [6, 11, topMid],[8, 10, topMid],[10, 10, topMid],   // upper chest
-  [12, 9, topMid],[14, 9, topMid],                      // bust area
-  [16, 8, topMid],[18, 7, topMid],                      // narrowing
-  [20, 6, topMid],[22, 6, topMid],                      // waist (narrowest)
-  [24, 6, topMid],[26, 6, topMid],                      // waist
-  [28, 7, topMid],[30, 8, topMid],                      // hips widening
-  [32, 9, topMid],[34, 10, topMid],                     // hips
-  [36, 11, topMid],[38, 12, topMid],                    // hip flare
-  [40, 13, topMid],[42, 13, topMid]                     // bottom
-];
-for(let i=0;i<torsoRows.length;i++){
-  const r=torsoRows[i];
-  const hrOff=(r[0]/44*hr*0.3)|0;
-  sf(tx-r[1]+hrOff, nY+r[0], r[1]*2, 2, r[2]);
-}
-// Shadow on left 3px of torso
-for(let i=0;i<torsoRows.length;i++){
-  const r=torsoRows[i];
-  const hrOff=(r[0]/44*hr*0.3)|0;
-  sf(tx-r[1]+hrOff, nY+r[0], 3, 2, topDk);
-}
-// Highlight on right 3px of torso
-for(let i=0;i<torsoRows.length;i++){
-  const r=torsoRows[i];
-  const hrOff=(r[0]/44*hr*0.3)|0;
-  sf(tx+r[1]-3+hrOff, nY+r[0], 3, 2, topLt);
-}
-// Outline left & right edges
-for(let i=0;i<torsoRows.length;i++){
-  const r=torsoRows[i];
-  const hrOff=(r[0]/44*hr*0.3)|0;
-  sf(tx-r[1]-1+hrOff, nY+r[0], 1, 2, out);
-  sf(tx+r[1]+hrOff, nY+r[0], 1, 2, out);
-}
-// Top and bottom outline
-sf(tx-11, nY-1, 22, 1, out);
-sf(tx-13+(hr*0.3)|0, pY, 26, 1, out);
+// Neck
+sf(tx-4,nY-8,8,10,skMid);sf(tx-4,nY-8,3,10,skDk+'60');sf(tx+1,nY-8,3,10,skLt+'30');
+// Chest armour pixel rows
+const cRows=[[0,11,armMid],[2,12,armMid],[4,12,armMid],[6,11,armMid],[8,10,armMid],[10,10,armMid],[12,9,armMid],[14,9,armMid],[16,8,armMid]];
+for(const r of cRows){const xo=(r[0]/20*hr*0.3)|0;sf(tx-r[1]+xo,nY+r[0],r[1]*2,2,r[2]);sf(tx-r[1]+xo,nY+r[0],2,2,armDk);sf(tx+r[1]-2+xo,nY+r[0],2,2,armLt);}
+sf(tx-12,nY-1,24,1,out+'60');sf(tx-9+(hr*0.3)|0,nY+18,18,1,out+'60');
+// Fur collar â€” puffy ring over chest top
+for(let i=0;i<18;i++){const a=(Math.PI/17*i),rx2=18,ry2=7,fx=tx+Math.cos(a)*rx2,fy=nY-Math.sin(a)*ry2,sz=(6-i*0.05)|0;sf((fx-sz/2)|0,(fy-sz)|0,sz,sz+2,i%2===0?furLt:furMid);}
+// Midriff skin
+for(let i=0;i<10;i++){const yy=nY+18+i,hw=(9-i*0.25)|0,xx=(tx-hw+(hr*0.3*i/14)|0)|0;sf(xx,yy,hw*2,1,skMid);if(i>2&&i<8){sf(xx+hw-2,yy,2,1,skLt+'28');sf(xx,yy,2,1,skDk+'20');sf(xx+hw-1,yy,1,1,skDk+'18');}}
+// Belt
+sf((tx-12+(hr*0.3)|0),wY,24,5,bltMid);sf((tx-12+(hr*0.3)|0),wY,24,1,bltLt);sf((tx-3+(hr*0.3)|0),wY-1,6,7,bltLt);sf((tx-2+(hr*0.3)|0),wY+1,4,3,bltDk);
+// Waistband
+sf((tx-14+(hr*0.3)|0),hipY-4,28,4,pntDk);sf((tx-14+(hr*0.3)|0),hipY-4,28,1,pntMid);
 
-// Bust definition — pixel highlight blocks
-sf(tx-7, nY+12, 5, 3, topLt+'55');
-sf(tx+3, nY+12, 5, 3, topLt+'55');
+// === ARMS â€” skin upper, dark wrap forearms ===
+{const sY=nY+4,lAA=o.lAA||0,rAA=o.rAA||0,lAE=o.lAE||0,rAE=o.rAE||0;
+const leX=(bx-18-lAE*0.5+twOff)|0,leY=(sY+18+Math.sin(lAA)*12)|0;
+const reX=(bx+18+rAE*0.5+twOff)|0,reY=(sY+18+Math.sin(rAA)*12)|0;
+const lfX=(leX-5+(o.lFA||0))|0,lfY=(leY+18)|0;
+const rfX=(reX+5+(o.rFA||0))|0,rfY=(reY+18)|0;
+// Left upper arm (skin)
+for(let i=0;i<8;i++){const t=i/8,px=(bx-14+twOff+(leX-(bx-14+twOff))*t)|0,py=(sY+(leY-sY)*t)|0,w=(10-i*0.4)|0;sf(px-w/2,py,w,3,i<3?skLt:i<6?skMid:skDk);}
+// Left fur bracer at elbow
+sf(leX-5,leY-2,10,4,furMid);sf(leX-5,leY-2,10,2,furLt);sf(leX-5,leY+1,10,1,out+'30');
+// Left forearm (dark wrap)
+for(let i=0;i<7;i++){const t=i/7,px=(leX+(lfX-leX)*t)|0,py=(leY+(lfY-leY)*t)|0,w=(8-i*0.5)|0;sf(px-w/2,py,w,3,i<2?armMid:i<5?armLt:armMid);if(i%2===0)sf(px-w/2,py,w,1,armDk);}
+// Right upper arm (skin)
+for(let i=0;i<8;i++){const t=i/8,px=(bx+14+twOff+(reX-(bx+14+twOff))*t)|0,py=(sY+(reY-sY)*t)|0,w=(10-i*0.4)|0;sf(px-w/2,py,w,3,i<3?skLt:i<6?skMid:skDk);}
+// Right fur bracer
+sf(reX-5,reY-2,10,4,furMid);sf(reX-5,reY-2,10,2,furLt);sf(reX-5,reY+1,10,1,out+'30');
+// Right forearm (dark wrap)
+for(let i=0;i<7;i++){const t=i/7,px=(reX+(rfX-reX)*t)|0,py=(reY+(rfY-reY)*t)|0,w=(8-i*0.5)|0;sf(px-w/2,py,w,3,i<2?armMid:i<5?armLt:armMid);if(i%2===0)sf(px-w/2,py,w,1,armDk);}
+// Hands
+if((o.lFist||0)>0.5){sf(lfX-4,lfY,8,7,skMid);sf(lfX-4,lfY,8,2,skLt);sf(lfX-4,lfY+5,8,2,skDk);sf(lfX-3,lfY+2,2,2,skLt);sf(lfX+1,lfY+2,2,2,skLt);}
+else{sf(lfX-3,lfY,6,5,skMid);sf(lfX-3,lfY,6,2,skLt);sf(lfX-3,lfY+3,6,2,skDk+'50');}
+if((o.rFist||0)>0.5){sf(rfX-4,rfY,8,7,skMid);sf(rfX-4,rfY,8,2,skLt);sf(rfX-4,rfY+5,8,2,skDk);sf(rfX-3,rfY+2,2,2,skLt);sf(rfX+1,rfY+2,2,2,skLt);}
+else{sf(rfX-3,rfY,6,5,skMid);sf(rfX-3,rfY,6,2,skLt);sf(rfX-3,rfY+3,6,2,skDk+'50');}}
 
-// V-neckline (skin showing) — pixel triangle
-sf(tx-1, nY+2, 2, 2, sk);
-sf(tx-2, nY+4, 4, 2, sk);
-sf(tx-3, nY+6, 6, 2, sk);
-sf(tx-4, nY+8, 8, 2, sk);
-sf(tx-5, nY+10, 10, 2, sk);
-sf(tx-6, nY+12, 12, 4, sk);
-// Neckline accent edges
-sf(tx-1, nY+2, 1, 14, acc); // left V edge
-sf(tx+1, nY+2, 1, 2, acc);  // right V starts
-sf(tx+2, nY+4, 1, 2, acc);
-sf(tx+3, nY+6, 1, 2, acc);
-sf(tx+4, nY+8, 1, 2, acc);
-sf(tx+5, nY+10, 1, 2, acc);
-sf(tx-2, nY+4, 1, 2, acc);
-sf(tx-3, nY+6, 1, 2, acc);
-sf(tx-4, nY+8, 1, 2, acc);
-sf(tx-5, nY+10, 1, 2, acc);
+// === HEAD â€” pixel rows (rounded rectangle) ===
+sf(bx-8,hY-13,16,2,skMid);sf(bx-10,hY-11,20,2,skMid);sf(bx-12,hY-9,24,4,skMid);
+sf(bx-12,hY-5,24,8,skMid);sf(bx-11,hY+3,22,4,skMid);sf(bx-10,hY+7,20,3,skMid);
+sf(bx-8,hY+10,16,2,skMid);sf(bx-5,hY+12,10,2,skMid);
+// Shading
+sf(bx-12,hY-9,4,19,skDk+'50');sf(bx+7,hY-9,4,12,skLt+'40');sf(bx-5,hY+8,6,4,skDk+'28');
+// Outline
+sf(bx-9,hY-14,18,1,out+'50');sf(bx-13,hY-9,1,21,out+'50');sf(bx+11,hY-9,1,21,out+'50');sf(bx-6,hY+13,12,1,out+'50');
 
-// Waist belt with gem
-sf(tx-7, nY+27, 14, 3, acc);
-sf(tx-1, nY+28, 2, 2, '#ffffff');
-sf(tx-2, nY+27, 4, 1, accLt);
+// === HAIR ON HEAD â€” near-black dome + side bangs ===
+sf(bx-6,hY-18,12,2,hairMid);sf(bx-10,hY-16,20,2,hairMid);sf(bx-12,hY-14,24,2,hairDk);
+sf(bx-13,hY-12,26,4,hairDk);sf(bx-13,hY-8,26,3,hairDk);
+// Highlight on right
+sf(bx+2,hY-16,8,4,hairLt);sf(bx+4,hY-14,6,2,hairMid+'80');
+// Side bangs
+sf(bx-13,hY-7,6,4,hairDk);sf(bx-14,hY-3,5,4,hairDk);sf(bx-13,hY+1,4,3,hairMid);
+sf(bx+8,hY-7,5,4,hairDk);sf(bx+9,hY-3,4,4,hairDk);
+// Front fringe
+sf(bx-9,hY-13,4,3,hairMid);sf(bx-11,hY-10,3,3,hairDk);
+sf(bx+5,hY-14,4,3,hairMid);sf(bx+8,hY-11,3,3,hairDk);
+// Ponytail gathering on crown + hair tie
+sf(bx+4,hY-12,7,5,hairDk);sf(bx+5,hY-10,5,3,hairMid);
+sf(bx+4,hY-14,6,3,armDk);sf(bx+5,hY-13,4,1,armLt);
 
-// Armor accent lines — pixel dithered
-for(let i=0;i<6;i++){
-  sf(tx-8+i, nY+6+i*3, 1, 2, acc+'50');
-  sf(tx+8-i, nY+6+i*3, 1, 2, acc+'50');
-}
-
-// Split skirt flares — pixel blocks below hips
-const skHr=(hr*0.3)|0;
-// Left flare
-sf(bx-16+skHr, pY, 6, 3, bot);sf(bx-18+skHr, pY+3, 6, 3, bot);
-sf(bx-20+skHr, pY+6, 6, 3, bot);sf(bx-21+skHr, pY+9, 5, 3, bot);
-sf(bx-16+skHr, pY, 2, 12, topDk); // shadow edge
-// Right flare
-sf(bx+10+skHr, pY, 6, 3, bot);sf(bx+12+skHr, pY+3, 6, 3, bot);
-sf(bx+14+skHr, pY+6, 6, 3, bot);sf(bx+16+skHr, pY+9, 5, 3, bot);
-sf(bx+18+skHr, pY, 2, 12, topLt); // highlight edge
-// Skirt hem accent
-sf(tx-14+skHr, pY, 28, 2, acc);
-
-// === ARMS — pixel tapered columns ===
-const sY=nY+4;
-const lax=(bx-18-(o.lAE||0)+twOff)|0, lay=(sY+22+Math.sin(o.lAA||0)*16)|0;
-const rax=(bx+18+(o.rAE||0)+twOff)|0, ray=(sY+22+Math.sin(o.rAA||0)*16)|0;
-const lfax=(lax-4+(o.lFA||0))|0, lfay=(lay+14)|0;
-const rfax=(rax+4+(o.rFA||0))|0, rfay=(ray+14)|0;
-
-// Helper: draw pixel arm segment
-function pxArm(x1,y1,x2,y2,wTop,wBot,light,mid,dark,oc){
-  const steps=6;
-  for(let i=0;i<steps;i++){
-    const t=i/steps;
-    const px=(x1+(x2-x1)*t)|0;
-    const py=(y1+(y2-y1)*t)|0;
-    const w=(wTop+(wBot-wTop)*t)|0;
-    const segH=Math.max(2,((y2-y1)/steps)|0);
-    const c=t<0.3?light:t<0.7?mid:dark;
-    sf(px-w/2,py,w,segH+1,c);
-    sf(px-w/2,py,2,segH+1,dark); // inner shadow
-    sf(px-w/2-1,py,1,segH+1,oc);
-    sf(px+w/2,py,1,segH+1,oc);
-  }
-}
-// Left upper arm (sleeve)
-pxArm(bx-11+twOff,sY,lax,lay,8,5,topLt,topMid,topDk,out);
-// Left forearm (skin)
-pxArm(lax,lay,lfax,lfay,5,4,skLt,skMid,skDk,out);
-// Ice bracer — pixel block
-sf(lax-3,lay-2,6,4,accLt);sf(lax-2,lay-1,4,2,'#ffffff');
-// Left hand
-if((o.lFist||0)>0.5){
-  // Pixel fist
-  sf(lfax-3,lfay,6,5,sk);
-  sf(lfax-3,lfay,6,1,skLt);   // knuckle highlight
-  sf(lfax-3,lfay+3,6,2,skDk); // underside shadow
-  sf(lfax-4,lfay,1,5,out);sf(lfax+3,lfay,1,5,out); // outline
-  sf(lfax-3,lfay-1,6,1,out);sf(lfax-3,lfay+5,6,1,out);
-}else{
-  // Pixel open hand
-  sf(lfax-2,lfay,4,4,sk);
-  sf(lfax-2,lfay,4,1,skLt);
-  sf(lfax-3,lfay,1,4,out);sf(lfax+2,lfay,1,4,out);
+// === FACE â€” dark blue eyes, serious expression ===
+{const eY=hY+2;
+// Left eye
+se(bx-7,eY,7,5,'#ffffff');se(bx-7,eY+1,5.5,4.5,'#203090');se(bx-7,eY+2,4,3.5,'#0e1c60');
+sc(bx-6,eY+2,2.5,'#080c28');sc(bx-9,eY-1,2.2,'#ffffff');sc(bx-4,eY+2,1.2,'#ffffff');
+_s.strokeStyle='#0a1228';_s.lineWidth=1.8;_s.beginPath();_s.ellipse(bx-7,eY-1,8,4,0,Math.PI+0.15,2*Math.PI-0.15);_s.stroke();
+sl(bx-13,eY-2,bx-17,eY-7,1.8,'#0a1228');sl(bx-11,eY-3,bx-14,eY-7,1.2,'#0a122860');
+// Right eye
+se(bx+8,eY,7,5,'#ffffff');se(bx+9,eY+1,5.5,4.5,'#203090');se(bx+9,eY+2,4,3.5,'#0e1c60');
+sc(bx+10,eY+2,2.5,'#080c28');sc(bx+7,eY-1,2.2,'#ffffff');sc(bx+12,eY+2,1.2,'#ffffff');
+_s.strokeStyle='#0a1228';_s.lineWidth=1.8;_s.beginPath();_s.ellipse(bx+9,eY-1,8,4,0,Math.PI+0.15,2*Math.PI-0.15);_s.stroke();
+sl(bx+14,eY-2,bx+18,eY-7,1.8,'#0a1228');sl(bx+12,eY-3,bx+15,eY-7,1.2,'#0a122860');
+// Eyebrows â€” dark, slightly angled inward for determination
+sf(bx-14,hY-8,3,1,'#18141e');sf(bx-11,hY-9,3,1,'#18141e');sf(bx-8,hY-10,3,1,'#18141e');sf(bx-5,hY-10,3,1,'#18141e');sf(bx-2,hY-9,2,1,'#18141e');
+sf(bx+3,hY-9,2,1,'#18141e');sf(bx+5,hY-10,3,1,'#18141e');sf(bx+8,hY-10,3,1,'#18141e');sf(bx+11,hY-9,3,1,'#18141e');sf(bx+14,hY-8,2,1,'#18141e');
+// Nose + mouth
+sf(bx,hY+7,2,2,skDk);
+sf(bx-4,hY+11,2,1,skDk);sf(bx-2,hY+12,6,1,skDk);sf(bx+4,hY+11,2,1,skDk);}
+_s.restore();
 }
 
-// Right upper arm (sleeve)
-pxArm(bx+11+twOff,sY,rax,ray,8,5,topLt,topMid,topDk,out);
-// Right forearm (skin)
-pxArm(rax,ray,rfax,rfay,5,4,skLt,skMid,skDk,out);
-// Ice bracer — pixel block
-sf(rax-2,ray-2,6,4,accLt);sf(rax-1,ray-1,4,2,'#ffffff');
-// Right hand
-if((o.rFist||0)>0.5){
-  sf(rfax-3,rfay,6,5,sk);
-  sf(rfax-3,rfay,6,1,skLt);
-  sf(rfax-3,rfay+3,6,2,skDk);
-  sf(rfax-4,rfay,1,5,out);sf(rfax+3,rfay,1,5,out);
-  sf(rfax-3,rfay-1,6,1,out);sf(rfax-3,rfay+5,6,1,out);
-}else{
-  sf(rfax-2,rfay,4,4,sk);
-  sf(rfax-2,rfay,4,1,skLt);
-  sf(rfax-3,rfay,1,4,out);sf(rfax+2,rfay,1,4,out);
-}
-
-// === HEAD — pixel block construction ===
-const hY=nY-26+(o.hY||0);
-
-// Neck — pixel block
-sf(bx-3+twOff,nY-7,6,9,skMid);
-sf(bx-3+twOff,nY-7,3,9,skDk); // shadow half
-
-// Head — built from pixel rows (rounded rectangle, not ellipse)
-// Top rows (narrow — forehead curve)
-sf(bx-14,hY-18,28,2,skMid);
-sf(bx-18,hY-16,36,2,skMid);
-sf(bx-20,hY-14,40,2,skMid);
-// Main face block
-sf(bx-22,hY-12,44,24,skMid);
-// Chin taper
-sf(bx-20,hY+12,40,2,skMid);
-sf(bx-18,hY+14,36,2,skMid);
-sf(bx-14,hY+16,28,2,skMid);
-sf(bx-10,hY+18,20,2,skMid);
-// Forehead highlight (right-top area)
-sf(bx-4,hY-16,18,4,skLt);
-sf(bx+2,hY-12,14,6,skLt+'80');
-// Shadow on left side of face
-sf(bx-22,hY-12,6,24,skDk);
-sf(bx-20,hY+12,4,4,skDk);
-// Jaw shadow
-sf(bx-18,hY+12,36,2,skDk+'80');
-// Head outline — deliberately placed 1px borders
-sf(bx-15,hY-19,30,1,out+'40');  // top
-sf(bx-23,hY-12,1,24,out+'40');  // left
-sf(bx+22,hY-12,1,24,out+'40');  // right
-sf(bx-11,hY+19,22,1,out+'40');  // chin bottom
-// Stairstepped corners
-sf(bx-21,hY-14,1,2,out+'40');sf(bx-19,hY-16,1,2,out+'40');
-sf(bx+20,hY-14,1,2,out+'40');sf(bx+18,hY-16,1,2,out+'40');
-sf(bx-21,hY+12,1,2,out+'40');sf(bx-19,hY+14,1,2,out+'40');
-sf(bx+20,hY+12,1,2,out+'40');sf(bx+18,hY+14,1,2,out+'40');
-
-// Ears — small pixel blocks
-sf(bx-24,hY-2,3,8,skMid);sf(bx-24,hY-2,1,8,skDk);
-sf(bx+21,hY-2,3,8,skMid);sf(bx+23,hY-2,1,8,skLt);
-// Crystal earrings — pixel dots
-sf(bx-25,hY+7,3,3,acc);sf(bx-24,hY+8,1,1,'#fff');
-sf(bx-25,hY+11,3,3,accLt);sf(bx-24,hY+12,1,1,'#fff');
-sf(bx+22,hY+7,3,3,acc);sf(bx+23,hY+8,1,1,'#fff');
-sf(bx+22,hY+11,3,3,accLt);sf(bx+23,hY+12,1,1,'#fff');
-
-// === HAIR ON HEAD — pixel rows with stagger ===
-// Hair dome built row by row over the top of the head
-sf(bx-8,hY-28,16,2,hairLt);
-sf(bx-12,hY-26,24,2,hairLt);
-sf(bx-16,hY-24,32,2,hair);
-sf(bx-20,hY-22,40,2,hair);
-sf(bx-22,hY-20,44,2,hair);
-sf(bx-24,hY-18,48,4,hair);
-sf(bx-24,hY-14,48,3,hair);
-// Shadow on left side of hair
-sf(bx-24,hY-22,8,11,hairDk);
-sf(bx-20,hY-24,6,4,hairDk);
-// Highlight on right side
-sf(bx+12,hY-20,10,6,hairLt);
-sf(bx+8,hY-26,8,4,hairLt);
-// Side bangs — staggered pixel blocks
-sf(bx-24,hY-10,6,4,hairDk);sf(bx-25,hY-6,5,4,hairDk);
-sf(bx-24,hY-2,4,4,hairDk);sf(bx-23,hY+2,3,3,hair);
-sf(bx+20,hY-8,5,4,hair);sf(bx+21,hY-4,4,4,hairLt);
-sf(bx+20,hY,3,3,hair);
-// Front bangs — overlapping pixel wisps
-sf(bx-10,hY-18,6,3,hairLt);sf(bx-12,hY-15,5,3,hair);
-sf(bx-14,hY-12,4,3,hair);sf(bx-15,hY-9,3,2,hairDk);
-sf(bx+6,hY-19,6,3,hairLt);sf(bx+9,hY-16,5,3,hair);
-sf(bx+12,hY-13,4,3,hair);
-// Hair shine — small highlight pixels
-sf(bx+4,hY-24,2,4,hairLt);sf(bx+6,hY-22,2,2,'#d0f8ff');
-sf(bx-3,hY-26,2,3,hairLt);
-
-// === ICE CROWN — pixel spikes ===
-// Crown base band
-sf(bx-16,hY-22,32,3,acc);
-sf(bx-15,hY-21,30,1,accLt);
-// Center spike (tallest)
-sf(bx-2,hY-48,4,26,accLt);sf(bx-1,hY-46,2,22,'#c0f4ff');
-// Left inner spike
-sf(bx-7,hY-38,3,16,accLt);sf(bx-6,hY-36,1,12,'#c0f4ff');
-// Right inner spike
-sf(bx+5,hY-38,3,16,accLt);sf(bx+6,hY-36,1,12,'#c0f4ff');
-// Left outer spike
-sf(bx-13,hY-36,3,14,acc);sf(bx-12,hY-34,1,10,'#c0f4ff');
-// Right outer spike
-sf(bx+11,hY-36,3,14,acc);sf(bx+12,hY-34,1,10,'#c0f4ff');
-// Gem at crown top
-sf(bx-3,hY-50,6,4,'#ffffff');sf(bx-2,hY-49,4,2,'#c0f4ff');
-// Side crown wisps
-sf(bx-20,hY-14,2,6,acc+'80');sf(bx-21,hY-18,2,6,acc+'80');
-sf(bx+19,hY-14,2,6,acc+'80');sf(bx+20,hY-18,2,6,acc+'80');
-
-// === FACE — ANIME EYES (kept intact — these read well at pixel scale) ===
-// --- LEFT EYE ---
-se(bx-8,hY-1,8,6,'#ffffff');
-se(bx-7,hY,6,5.5,'#40d0f0');
-se(bx-7,hY+1,6,4.5,'#20a8d0');
-se(bx-7,hY+2,5,3,'#1880a8');
-sc(bx-6,hY+1,3,'#0c4060');
-sc(bx-9,hY-2,2.5,'#ffffff');
-sc(bx-4,hY+2,1.5,'#ffffff');
-sc(bx-8,hY+3,0.8,'#c0f0ff');
-_s.strokeStyle='#1a3858';_s.lineWidth=2;_s.beginPath();
-_s.ellipse(bx-7,hY-2,8.5,4,0,Math.PI+0.2,2*Math.PI-0.2);_s.stroke();
-_s.strokeStyle='#1a385840';_s.lineWidth=0.8;_s.beginPath();
-_s.ellipse(bx-7,hY+2,7,3,0,0.2,Math.PI-0.2);_s.stroke();
-// --- RIGHT EYE ---
-se(bx+8,hY-1,8,6,'#ffffff');
-se(bx+9,hY,6,5.5,'#40d0f0');
-se(bx+9,hY+1,6,4.5,'#20a8d0');
-se(bx+9,hY+2,5,3,'#1880a8');
-sc(bx+10,hY+1,3,'#0c4060');
-sc(bx+7,hY-2,2.5,'#ffffff');
-sc(bx+12,hY+2,1.5,'#ffffff');
-sc(bx+8,hY+3,0.8,'#c0f0ff');
-_s.strokeStyle='#1a3858';_s.lineWidth=2;_s.beginPath();
-_s.ellipse(bx+9,hY-2,8.5,4,0,Math.PI+0.2,2*Math.PI-0.2);_s.stroke();
-_s.strokeStyle='#1a385840';_s.lineWidth=0.8;_s.beginPath();
-_s.ellipse(bx+9,hY+2,7,3,0,0.2,Math.PI-0.2);_s.stroke();
-// Eyelashes — pixel lines
-sl(bx-14,hY-3,bx-18,hY-8,2,'#1a3858');
-sl(bx-12,hY-4,bx-15,hY-8,1.2,'#1a385890');
-sl(bx+15,hY-3,bx+19,hY-8,2,'#1a3858');
-sl(bx+13,hY-4,bx+16,hY-8,1.2,'#1a385890');
-// Eyebrows — pixel stairstepped arcs
-sf(bx-14,hY-8,3,1,'#8a7060');sf(bx-11,hY-9,3,1,'#8a7060');
-sf(bx-8,hY-10,3,1,'#8a7060');sf(bx-5,hY-10,3,1,'#8a7060');
-sf(bx-2,hY-9,2,1,'#8a7060');
-sf(bx+3,hY-9,2,1,'#8a7060');sf(bx+5,hY-10,3,1,'#8a7060');
-sf(bx+8,hY-10,3,1,'#8a7060');sf(bx+11,hY-9,3,1,'#8a7060');
-sf(bx+14,hY-8,2,1,'#8a7060');
-// Nose — single pixel dot
-sf(bx,hY+5,2,2,'#d8b8a0');
-// Mouth — pixel curved smile
-sf(bx-3,hY+9,2,1,'#cc8888');sf(bx-1,hY+10,4,1,'#cc8888');sf(bx+3,hY+9,2,1,'#cc8888');
-sf(bx,hY+10,2,1,'#e8a0a0');
-// Blush — pixel blocks
-sf(bx-14,hY+4,6,3,'#ffaaaa25');sf(bx+8,hY+4,6,3,'#ffaaaa25');
-_s.restore(); // match scale(1.35) saved at top of drawAurora
-}
-
-// CRIMSON — Flame Fighter. Professional pixel-art with bezier contours,
+// CRIMSON â€” Flame Fighter. Professional pixel-art with bezier contours,
 // tapered limbs, flame hair, 3-tone shading throughout.
 function drawCrimson(cx,gy,o){const L=o.lean||0,bx=cx+L;
 const tw=o.torsoTwist||0,hr=o.hipRot||0;
@@ -720,15 +473,15 @@ for(let i=0;i<3;i++){
 drawBoot(lx,ly,10,16,giDk,'#601020','#2a0810',out,0);
 drawBoot(rx,ry,10,16,giDk,'#601020','#2a0810',out,0);
 
-// === TORSO — BEZIER MASCULINE STRAIGHT with 3-tone shading ===
+// === TORSO â€” BEZIER MASCULINE STRAIGHT with 3-tone shading ===
 const nY=gy-80,pY=gy-46;
 const twOff=tw*0.3;
-// Main torso — straight masculine lines (no waist pinch)
+// Main torso â€” straight masculine lines (no waist pinch)
 _s.fillStyle=giMid;_s.beginPath();
 _s.moveTo(bx-12+twOff,nY);                           // left shoulder
 _s.lineTo(bx+12+twOff,nY);                           // right shoulder
 _s.quadraticCurveTo(bx+13+twOff,nY+10,bx+11+twOff,nY+18); // right side straight
-_s.lineTo(bx+9+twOff*0.5,nY+28);                     // right waist (no pinch — masculine)
+_s.lineTo(bx+9+twOff*0.5,nY+28);                     // right waist (no pinch â€” masculine)
 _s.quadraticCurveTo(bx+10+hr*0.2,nY+36,bx+10+hr*0.3,pY);
 _s.lineTo(bx-10+hr*0.3,pY);
 _s.quadraticCurveTo(bx-10+hr*0.2,nY+36,bx-9+twOff*0.5,nY+28);
@@ -759,7 +512,7 @@ _s.lineTo(bx-10+hr*0.3,pY);
 _s.quadraticCurveTo(bx-10+hr*0.2,nY+36,bx-9+twOff*0.5,nY+28);
 _s.lineTo(bx-11+twOff,nY+18);
 _s.quadraticCurveTo(bx-13+twOff,nY+10,bx-12+twOff,nY);_s.stroke();
-// Exposed chest V (skin showing — muscular)
+// Exposed chest V (skin showing â€” muscular)
 _s.fillStyle=sk;_s.beginPath();_s.moveTo(bx+twOff,nY+3);
 _s.lineTo(bx-8+twOff,nY+22);_s.lineTo(bx+8+twOff,nY+22);_s.closePath();_s.fill();
 sl(bx+twOff,nY+3,bx-8+twOff,nY+24,1.5,out+'50');
@@ -786,7 +539,7 @@ const rax=bx+22+(o.rAE||0)+twOff, ray=sY+24+Math.sin(o.rAA||0)*14;
 // Forearm endpoints
 const lfax=lax-4+(o.lFA||0), lfay=lay+16;
 const rfax=rax+4+(o.rFA||0), rfay=ray+16;
-// Left upper arm (skin — exposed)
+// Left upper arm (skin â€” exposed)
 drawLimb(bx-12+twOff,sY,lax,lay,9,6,skLt,skMid,skDk,out);
 sl(bx-12+(lax-bx+12)*0.35+twOff,sY+(lay-sY)*0.35,bx-12+(lax-bx+12)*0.65+twOff,sY+(lay-sY)*0.65,1.5,skLt+'50');
 // Left forearm wraps
@@ -797,7 +550,7 @@ sl(lfax-1,lfay-8,lfax-3,lfay-2,1.5,wrapDk);sl(lfax+1,lfay-6,lfax-1,lfay-2,1,wrap
 // Left hand
 if((o.lFist||0)>0.5){drawFist(lfax,lfay+2,5,sk,skDk,out);}
 else{sc(lfax,lfay+2,4,sk);sc(lfax,lfay+2,4,out+'18');}
-// Right upper arm (skin — exposed)
+// Right upper arm (skin â€” exposed)
 drawLimb(bx+12+twOff,sY,rax,ray,9,6,skLt,skMid,skDk,out);
 sl(bx+12+(rax-bx-12)*0.35+twOff,sY+(ray-sY)*0.35,bx+12+(rax-bx-12)*0.65+twOff,sY+(ray-sY)*0.65,1.5,skLt+'50');
 // Right forearm wraps
@@ -809,13 +562,13 @@ sl(rfax+1,rfay-8,rfax+3,rfay-2,1.5,wrapDk);sl(rfax-1,rfay-6,rfax+1,rfay-2,1,wrap
 if((o.rFist||0)>0.5){drawFist(rfax,rfay+2,5,sk,skDk,out);}
 else{sc(rfax,rfay+2,4,sk);sc(rfax,rfay+2,4,out+'18');}
 
-// === HEAD — BIG, fierce anime male face ===
+// === HEAD â€” BIG, fierce anime male face ===
 const hY=nY-22+(o.hY||0);
 const sk1='#ffe8d8',sk3='#c8a080',sk4='#a08060';
-// Neck (thicker than Aurora — masculine)
+// Neck (thicker than Aurora â€” masculine)
 sf(bx-3+twOff,nY-5,6,7,sk);
 _s.fillStyle=skDk+'40';_s.fillRect(bx-3+twOff,nY-5,3,7);
-// Head — angular oval (taller than wide — masculine jaw)
+// Head â€” angular oval (taller than wide â€” masculine jaw)
 se(bx,hY,18,20,sk);
 // Jaw definition (darker on sides)
 _s.fillStyle=sk3+'50';_s.beginPath();_s.ellipse(bx-8,hY+6,8,10,0,0,Math.PI*2);_s.fill();
@@ -833,7 +586,7 @@ _s.moveTo(bx-18,hY-3);_s.quadraticCurveTo(bx-24,hY+4,bx-28,hY+12);_s.stroke();
 _s.strokeStyle=band+'80';_s.lineWidth=2.5;_s.beginPath();
 _s.moveTo(bx-28,hY+12);_s.quadraticCurveTo(bx-32,hY+18,bx-35,hY+26);_s.stroke();
 
-// === FLAME HAIR — MASSIVE bezier spikes (biggest silhouette element) ===
+// === FLAME HAIR â€” MASSIVE bezier spikes (biggest silhouette element) ===
 _s.save();
 // Each spike as a bezier stroke for smooth flame shape
 const spikes=[
@@ -857,7 +610,7 @@ sc(bx-14,hY-48,3,'#ff604440');sc(bx-24,hY-40,2.5,'#ff664440');
 _s.shadowBlur=0;_s.shadowColor='transparent';
 _s.restore();
 
-// === FACE — fierce anime male eyes ===
+// === FACE â€” fierce anime male eyes ===
 // --- LEFT EYE (angular, fierce) ---
 _s.fillStyle='#ffffff';_s.beginPath();
 _s.moveTo(bx-12,hY-1);_s.lineTo(bx-4,hY-4);_s.lineTo(bx-2,hY-1);
@@ -894,7 +647,7 @@ se(bx-4,hY+13,10,4,sk3+'30');
 sl(bx-10,hY+10,bx-14,hY+16,1,sk3+'40');
 sl(bx+10,hY+10,bx+14,hY+16,1,sk3+'40');}
 
-// JADE — Fast Striker. Precise. Relentless. Pixel-art with sf() blocks,
+// JADE â€” Fast Striker. Precise. Relentless. Pixel-art with sf() blocks,
 // lean athletic build, crop top, hakama pants, hand wraps, flowing hair.
 function drawJade(cx,gy,o){
 // Scale up procedural drawing to match real sprite art size (~1.35x)
@@ -929,7 +682,7 @@ const wY=gy-82;  // waist
 const hipY=gy-72; // hip line
 
 // === HAIR BEHIND (flowing, drawn first) ===
-// Main cascade behind body — stacked offset rows for organic pixel feel
+// Main cascade behind body â€” stacked offset rows for organic pixel feel
 const hbx=bx+8+twOff-L*0.3; // hair flows opposite to lean
 for(let i=0;i<28;i++){
   const yy=hY+6+i*3;
@@ -952,9 +705,9 @@ for(let i=0;i<18;i++){
 const lx=bx-10+(o.lLS||0)+hr*0.3, ly=gy-(o.lFL||0);
 const rx=bx+10+(o.rLS||0)+hr*0.3, ry=gy-(o.rFL||0);
 
-// Left leg — hakama (wide flowing pants)
+// Left leg â€” hakama (wide flowing pants)
 const lMidX=(bx-6+lx)/2, lMidY=(hipY+ly)/2;
-// Upper left leg — wide hakama fabric
+// Upper left leg â€” wide hakama fabric
 for(let i=0;i<12;i++){
   const t=i/12;
   const px=bx-6+(lMidX-(bx-6))*t+hr*0.2;
@@ -973,7 +726,7 @@ for(let i=0;i<10;i++){
   if(i===0) sf(px-w/2,py,w,1,grn+'60');
 }
 
-// Right leg — hakama
+// Right leg â€” hakama
 const rMidX=(bx+6+rx)/2, rMidY=(hipY+ry)/2;
 for(let i=0;i<12;i++){
   const t=i/12;
@@ -1017,7 +770,7 @@ sf(rx-6,ry-10,12,2,grn);
 sf(rx-10,ry-2,2,4,out);
 sf(rx+8,ry-2,2,4,out);
 
-// === TORSO — Crop top + exposed midriff + waist, all pixel rows ===
+// === TORSO â€” Crop top + exposed midriff + waist, all pixel rows ===
 // Neck
 sf(bx-4+twOff,nY-4,8,6,skMid);
 sf(bx-4+twOff,nY-4,3,6,skDk+'60');
@@ -1033,7 +786,7 @@ sf(bx-18+twOff,nY-2,8,2,grn);
 sf(bx-18+twOff,nY-2,2,6,out);
 sf(bx-18+twOff,nY+2,8,2,topDk);
 
-// Crop top — row by row pixel construction
+// Crop top â€” row by row pixel construction
 for(let i=0;i<14;i++){
   const yy=nY+3+i;
   const taper=i<4?0:i<8?(i-4)*0.3:(i-4)*0.3;
@@ -1045,7 +798,7 @@ for(let i=0;i<14;i++){
   // Left side shadow
   if(i>2&&i<12) sf(xx,yy,3,1,out+'18');
 }
-// Crop top bottom edge — green trim
+// Crop top bottom edge â€” green trim
 sf(bx-14+twOff*0.5,nY+17,28,2,grn);
 sf(bx-14+twOff*0.5,nY+17,28,1,grnLt+'60');
 
@@ -1056,7 +809,7 @@ for(let i=0;i<10;i++){
   const w=24-taper*2;
   const xx=bx-12+taper+twOff*(1-i/14)*0.5;
   sf(xx,yy,w,1,skMid);
-  // Muscle definition — subtle shadow
+  // Muscle definition â€” subtle shadow
   if(i>2&&i<8){
     sf(xx+w/2-1,yy,2,1,skDk+'30'); // center line
     sf(xx+2,yy,2,1,skDk+'20');     // left oblique shadow
@@ -1071,7 +824,7 @@ for(let i=0;i<10;i++){
 sf(bx-14+hr*0.3,wY,28,4,gold);
 sf(bx-14+hr*0.3,wY,28,1,goldBr); // top highlight
 sf(bx-14+hr*0.3,wY+3,28,1,out+'30'); // bottom shadow
-// Belt buckle — center
+// Belt buckle â€” center
 sf(bx-3+hr*0.3,wY-1,6,6,goldLt);
 sf(bx-2+hr*0.3,wY,4,4,goldBr);
 sf(bx-3+hr*0.3,wY-1,6,1,goldBr);
@@ -1102,7 +855,7 @@ const raElbX=bx+20+rAE*0.5+twOff, raElbY=sY+18+Math.sin(rAA)*12;
 const laHandX=laElbX-6-lAE*0.5+(o.lFA||0), laHandY=laElbY+18;
 const raHandX=raElbX+6+rAE*0.5+(o.rFA||0), raHandY=raElbY+18;
 
-// Left arm — upper (skin)
+// Left arm â€” upper (skin)
 for(let i=0;i<8;i++){
   const t=i/8;
   const px=bx-16+twOff+(laElbX-(bx-16+twOff))*t;
@@ -1127,7 +880,7 @@ for(let i=0;i<3;i++){
   sf(px-4,py,8,1,wrapDk);
 }
 
-// Right arm — upper (skin)
+// Right arm â€” upper (skin)
 for(let i=0;i<8;i++){
   const t=i/8;
   const px=bx+16+twOff+(raElbX-(bx+16+twOff))*t;
@@ -1167,7 +920,7 @@ if((o.lFist||0)>0.5){
   // Wrap on fist
   sf(laHandX-5,laHandY+3,10,2,wrapDk+'80');
 }else{
-  // Open hand — flat pixel shape
+  // Open hand â€” flat pixel shape
   sf(laHandX-4,laHandY,8,6,skMid);
   sf(laHandX-4,laHandY,8,2,skLt);
   sf(laHandX-4,laHandY+4,8,2,skDk+'60');
@@ -1199,8 +952,8 @@ if((o.rFist||0)>0.5){
   sf(raHandX+4,raHandY+1,3,4,skMid);
 }
 
-// === HEAD — pixel-art construction from stacked rows ===
-// Head base — stacked pixel rows (wider in middle, narrow at top/chin)
+// === HEAD â€” pixel-art construction from stacked rows ===
+// Head base â€” stacked pixel rows (wider in middle, narrow at top/chin)
 sf(bx-8,hY-14,16,2,skMid);   // top of head (narrow)
 sf(bx-10,hY-12,20,2,skMid);  // forehead upper
 sf(bx-11,hY-10,22,2,skMid);  // forehead
@@ -1211,7 +964,7 @@ sf(bx-10,hY+4,20,3,skMid);   // jaw
 sf(bx-8,hY+7,16,2,skMid);    // lower jaw
 sf(bx-6,hY+9,12,2,skMid);    // chin
 
-// Face shading — left shadow, right highlight
+// Face shading â€” left shadow, right highlight
 sf(bx-12,hY-8,4,16,skDk+'50');
 sf(bx+7,hY-10,4,10,skLt+'40');
 // Cheek shadow
@@ -1225,7 +978,7 @@ sf(bx-14,hY-4,1,6,skDk);
 sf(bx+11,hY-4,3,6,skMid);
 sf(bx+13,hY-4,1,6,skLt+'60');
 
-// === HAIR FRONT — over forehead and flowing over one shoulder ===
+// === HAIR FRONT â€” over forehead and flowing over one shoulder ===
 // Headband / tie element
 sf(bx-12,hY-12,24,3,hairDk);
 sf(bx-12,hY-12,24,1,hairMid);
@@ -1235,13 +988,13 @@ sf(bx+10,hY-10,2,3,grn); // green tie knot right
 sf(bx+11,hY-8,2,8,grn);
 sf(bx+12,hY-4,2,6,grnLt);
 
-// Top hair — pixel rows over the head
+// Top hair â€” pixel rows over the head
 sf(bx-10,hY-18,20,2,hairDk);  // very top
 sf(bx-12,hY-16,24,2,hairDk);
 sf(bx-13,hY-14,26,3,hairDk);  // main hair volume
 sf(bx-12,hY-11,10,2,hairMid); // side fringe left
 sf(bx+4,hY-11,8,2,hairDk);   // side fringe right
-// Bangs — staggered pixel rows across forehead
+// Bangs â€” staggered pixel rows across forehead
 sf(bx-11,hY-12,6,2,hairDk);
 sf(bx-8,hY-11,4,2,hairMid);
 sf(bx-4,hY-12,5,2,hairDk);
@@ -1263,7 +1016,7 @@ for(let i=0;i<12;i++){
 }
 
 // === FACE DETAILS ===
-// Eyes — pixel block construction
+// Eyes â€” pixel block construction
 // Left eye white
 sf(bx-9,hY-4,8,5,'#ffffff');
 sf(bx-9,hY-5,6,1,'#ffffff');
@@ -1304,24 +1057,24 @@ sf(bx+3,hY+1,7,1,out+'60');
 sl(bx+11,hY-5,bx+13,hY-8,1.5,out);
 sl(bx+10,hY-6,bx+11,hY-8,1,out+'80');
 
-// Eyebrows — strong, determined pixel blocks
+// Eyebrows â€” strong, determined pixel blocks
 sf(bx-10,hY-8,8,2,'#1a1410');
 sf(bx-11,hY-7,2,1,'#1a1410');
 sf(bx+3,hY-8,8,2,'#1a1410');
 sf(bx+10,hY-7,2,1,'#1a1410');
 
-// Nose — small pixel detail
+// Nose â€” small pixel detail
 sf(bx,hY+2,2,3,skDk);
 sf(bx-1,hY+4,4,1,skDk+'60');
 sc(bx+2,hY+3,0.8,skLt);
 
-// Mouth — determined line
+// Mouth â€” determined line
 sf(bx-3,hY+6,7,1,'#8a5a40');
 sf(bx-2,hY+7,5,1,'#a07060');
 // Slight highlight on lower lip
 sf(bx-1,hY+7,3,1,skLt+'40');
 
-// === ACCESSORIES — green trim details, gold accents ===
+// === ACCESSORIES â€” green trim details, gold accents ===
 // Crop top neckline green trim
 sf(bx-12+twOff,nY+1,24,1,grnLt);
 
@@ -1329,7 +1082,7 @@ sf(bx-12+twOff,nY+1,24,1,grnLt);
 sf(bx-17+twOff,nY,2,4,goldLt);
 sf(bx-16+twOff,nY-2,6,1,gold);
 
-// Outline pass — key edges for definition
+// Outline pass â€” key edges for definition
 // Head outline
 sf(bx-13,hY-8,1,16,out+'40');
 sf(bx+12,hY-8,1,16,out+'40');
@@ -1340,7 +1093,7 @@ sf(bx+15+twOff,nY,1,17,out+'30');
 _s.restore(); // undo the 1.35x scale
 }
 
-// NOIR — Shadow Assassin. Professional pixel-art with bezier contours,
+// NOIR â€” Shadow Assassin. Professional pixel-art with bezier contours,
 // tapered limbs, flowing cloak, 3-tone shading throughout.
 function drawNoir(cx,gy,o){const L=o.lean||0,bx=cx+L;
 const tw=o.torsoTwist||0,hr=o.hipRot||0;
@@ -1348,7 +1101,7 @@ const sk='#d8c8a8',skDk='#b8a888',skLt='#e8dcc8',skMid='#d0c0a0';
 const cloak='#2a1840',dk='#180c28',cloakMid='#221438',acc='#6030a0',accLt='#8050cc';
 const glow='#ffcc00',glowLt='#fff8cc',blade='#c0c8d8',bladeDk='#8090a0',out='#0c0618';
 
-// === FLOWING CLOAK (behind everything — bezier curves) ===
+// === FLOWING CLOAK (behind everything â€” bezier curves) ===
 _s.fillStyle=cloak+'d0';_s.beginPath();
 _s.moveTo(bx-16,gy-74);
 _s.quadraticCurveTo(bx-26-L*3,gy-22,bx-18-L*4,gy+8);
@@ -1371,7 +1124,7 @@ for(let i=0;i<4;i++){
   _s.quadraticCurveTo(bx+18-L*0.5+i*2.5,gy+5+i*3,bx+20-L+i*3,gy+8+i*4);_s.stroke();
 }
 
-// === LEGS (tapered, contoured with drawLimb — sleek assassin) ===
+// === LEGS (tapered, contoured with drawLimb â€” sleek assassin) ===
 const lx=bx-6+(o.lLS||0)+hr*0.3, ly=gy-(o.lFL||0);
 const rx=bx+6+(o.rLS||0)+hr*0.3, ry=gy-(o.rFL||0);
 // Upper legs
@@ -1388,10 +1141,10 @@ sl(rx-2,ry-6,rx+2,ry-6,1.5,acc+'60');
 drawBoot(lx,ly,8,14,dk,'#0a0414','#060210',out,0);
 drawBoot(rx,ry,8,14,dk,'#0a0414','#060210',out,0);
 
-// === TORSO — BEZIER MASCULINE SLEEK with 3-tone shading ===
+// === TORSO â€” BEZIER MASCULINE SLEEK with 3-tone shading ===
 const nY=gy-74,pY=gy-38;
 const twOff=tw*0.3;
-// Main torso — slim, straight (assassin build)
+// Main torso â€” slim, straight (assassin build)
 _s.fillStyle=cloakMid;_s.beginPath();
 _s.moveTo(bx-9+twOff,nY);
 _s.lineTo(bx+9+twOff,nY);
@@ -1441,7 +1194,7 @@ _s.beginPath();_s.moveTo(bx+6+twOff,nY+6);_s.quadraticCurveTo(bx+twOff*0.5,nY+18
 // Torso rune glow
 sl(bx+twOff,nY+2,bx+twOff,nY+12,1,glow+'60');sc(bx+twOff,nY+13,2,glow+'80');
 
-// === ARMS (tapered, contoured with drawLimb — sleek assassin) ===
+// === ARMS (tapered, contoured with drawLimb â€” sleek assassin) ===
 const sY=nY+5;
 const lax=bx-16-(o.lAE||0)+twOff, lay=sY+20+Math.sin(o.lAA||0)*14;
 const rax=bx+16+(o.rAE||0)+twOff, ray=sY+20+Math.sin(o.rAA||0)*14;
@@ -1480,14 +1233,14 @@ sl(rfax,rfay+2,rfax+4,rfay+18,2.5,blade);sl(rfax+4,rfay+18,rfax+5,rfay+21,2,blad
 sl(rfax-2,rfay+2,rfax+2,rfay+2,3,glow+'80');
 _s.shadowColor=glow;_s.shadowBlur=3;sl(rfax+1,rfay+4,rfax+5,rfay+18,1,glow+'40');_s.shadowBlur=0;_s.shadowColor='transparent';
 
-// === HEAD — BIG, dramatic hood, face wraps, piercing glowing eyes ===
+// === HEAD â€” BIG, dramatic hood, face wraps, piercing glowing eyes ===
 const hY=nY-22+(o.hY||0);
 // Neck (thin, partly wrapped)
 sf(bx-2+twOff,nY-6,5,8,sk);sf(bx-3+twOff,nY-4,7,4,dk+'90');
 // Head base
 sc(bx,hY,17,sk);
 
-// === FACE WRAPS — ninja-style, layered cloth ===
+// === FACE WRAPS â€” ninja-style, layered cloth ===
 sf(bx-14,hY+2,28,12,dk+'e0');
 sf(bx-13,hY+2,26,2,dk+'c0');sf(bx-14,hY+5,28,2,dk+'d0');
 sf(bx-13,hY+8,26,2,dk+'b0');sf(bx-14,hY+11,28,2,dk+'c0');
@@ -1500,7 +1253,7 @@ _s.moveTo(bx-14,hY+7);_s.quadraticCurveTo(bx-22,hY+14,bx-26,hY+22);_s.stroke();
 _s.lineWidth=2;_s.strokeStyle=dk+'50';_s.beginPath();
 _s.moveTo(bx-26,hY+22);_s.quadraticCurveTo(bx-28,hY+28,bx-24,hY+32);_s.stroke();
 
-// === MASSIVE HOOD (defining silhouette — bezier) ===
+// === MASSIVE HOOD (defining silhouette â€” bezier) ===
 _s.fillStyle=cloak;_s.beginPath();_s.ellipse(bx,hY-4,26,20,0,Math.PI,0);_s.fill();
 _s.fillStyle=dk+'80';_s.beginPath();_s.ellipse(bx,hY-8,20,10,0,Math.PI,0);_s.fill();
 _s.strokeStyle=acc;_s.lineWidth=3.5;_s.beginPath();_s.ellipse(bx,hY-4,26,20,0,Math.PI,0);_s.stroke();
@@ -1524,7 +1277,7 @@ sl(bx-2,hY-18,bx+2,hY-18,0.8,acc+'40');sl(bx,hY-20,bx,hY-16,0.8,acc+'40');
 // Shadow covering face between hood and wraps
 se(bx,hY+1,16,6,cloak+'c0');
 
-// === GLOWING EYES — ICONIC, piercing from darkness ===
+// === GLOWING EYES â€” ICONIC, piercing from darkness ===
 _s.shadowColor=glow;_s.shadowBlur=14;
 // --- LEFT EYE ---
 se(bx-7,hY-2,8,4,dk+'a0');
@@ -1551,7 +1304,7 @@ sl(bx+4,hY-8,bx+12,hY-5,2.5,dk);
 // SPRITE SHEET SUPPORT (Phase 3 prep)
 // ============================================================
 // When real PNG sprite sheets exist, load them with loadSpriteSheet().
-// The engine checks spriteSheets[id] first — if frames exist for an
+// The engine checks spriteSheets[id] first â€” if frames exist for an
 // animation, they're used directly. Otherwise falls back to procedural.
 const spriteSheets = {};
 
