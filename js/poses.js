@@ -1456,8 +1456,9 @@ function drawFighter(f) {
     const dir = f.lastHitDir || -f.facing;
 
     // KO: tumble rotation while airborne, then tilt flat when landed
+    // Skip if character has real sprite frames for KO
     let koRotation = 0;
-    if(f.state === 'ko') {
+    if(f.state === 'ko' && !(hasRealFrames && hasRealFrames['ko'])) {
       if(!f.koLanded) {
         // Airborne: progressive backward tumble (up to ~100 degrees)
         const tumbleP = Math.min(f.stateTime / 18, 1);
