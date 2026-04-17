@@ -142,7 +142,7 @@ function handleKO(loser, winner, winnerIdx) {
   const wasMatchEnd = roundsWon[winnerIdx - 1] + 1 >= 2;
 
   if(!(wasUlt || wasCombo || wasHeavy || wasMatchEnd)) {
-    startReplay(winnerIdx);
+    endRound(winnerIdx);
     return;
   }
   runFatalBlow(winner, loser, winnerIdx,
