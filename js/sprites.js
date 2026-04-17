@@ -24,6 +24,121 @@ function se(cx,cy,rx,ry,c){_s.fillStyle=c;_s.beginPath();_s.ellipse(cx,cy,rx,ry,
 function sl(x1,y1,x2,y2,w,c){_s.strokeStyle=c;_s.lineWidth=w;_s.lineCap='round';_s.beginPath();_s.moveTo(x1,y1);_s.lineTo(x2,y2);_s.stroke();}
 function st(x1,y1,w1,x2,y2,w2,c,o){_s.beginPath();_s.moveTo(x1-w1/2,y1);_s.lineTo(x1+w1/2,y1);_s.lineTo(x2+w2/2,y2);_s.lineTo(x2-w2/2,y2);_s.closePath();_s.fillStyle=c;_s.fill();if(o){_s.strokeStyle=o;_s.lineWidth=1.2;_s.stroke();}}
 function shadedLimb(x1,y1,x2,y2,w,l,d,o){const dx=x2-x1,dy=y2-y1,ln=Math.sqrt(dx*dx+dy*dy)||1,nx=-dy/ln,ny=dx/ln;_s.beginPath();_s.moveTo(x1,y1);_s.lineTo(x2,y2);_s.lineTo(x2+nx*w/2,y2+ny*w/2);_s.lineTo(x1+nx*w/2,y1+ny*w/2);_s.closePath();_s.fillStyle=l;_s.fill();_s.beginPath();_s.moveTo(x1,y1);_s.lineTo(x2,y2);_s.lineTo(x2-nx*w/2,y2-ny*w/2);_s.lineTo(x1-nx*w/2,y1-ny*w/2);_s.closePath();_s.fillStyle=d;_s.fill();if(o){_s.strokeStyle=o;_s.lineWidth=1;_s.beginPath();_s.moveTo(x1+nx*w/2,y1+ny*w/2);_s.lineTo(x2+nx*w/2,y2+ny*w/2);_s.lineTo(x2-nx*w/2,y2-ny*w/2);_s.lineTo(x1-nx*w/2,y1-ny*w/2);_s.closePath();_s.stroke();}}
+// === PROFESSIONAL DRAWING PRIMITIVES ===
+// drawLimb — tapered, contoured limb with bezier muscle bulge and 3-tone shading
+function drawLimb(x1,y1,x2,y2,w1,w2,light,mid,dark,outline){
+  const dx=x2-x1,dy=y2-y1,ln=Math.sqrt(dx*dx+dy*dy)||1;
+  const nx=-dy/ln,ny=dx/ln; // perpendicular normal
+  const mx=(x1+x2)*0.5,my=(y1+y2)*0.5; // midpoint
+  const bulge=Math.max(w1,w2)*0.18; // subtle muscle bulge at midpoint
+  // Control points for the bezier contour (right side = highlight, left side = shadow)
+  const r1x=x1+nx*w1/2, r1y=y1+ny*w1/2;
+  const r2x=x2+nx*w2/2, r2y=y2+ny*w2/2;
+  const l1x=x1-nx*w1/2, l1y=y1-ny*w1/2;
+  const l2x=x2-nx*w2/2, l2y=y2-ny*w2/2;
+  const rmx=mx+nx*(Math.max(w1,w2)/2+bulge), rmy=my+ny*(Math.max(w1,w2)/2+bulge);
+  const lmx=mx-nx*(Math.max(w1,w2)/2+bulge), lmy=my-ny*(Math.max(w1,w2)/2+bulge);
+  // Full shape path (used for outline and midtone fill)
+  function limbPath(){
+    _s.beginPath();
+    _s.moveTo(r1x,r1y);
+    _s.quadraticCurveTo(rmx,rmy,r2x,r2y);
+    _s.lineTo(l2x,l2y);
+    _s.quadraticCurveTo(lmx,lmy,l1x,l1y);
+    _s.closePath();
+  }
+  // 1. Midtone base fill
+  limbPath();_s.fillStyle=mid;_s.fill();
+  // 2. Highlight on right side (light catches the outer edge)
+  _s.beginPath();
+  _s.moveTo(r1x,r1y);
+  _s.quadraticCurveTo(rmx,rmy,r2x,r2y);
+  _s.lineTo((r2x+x2)/2,(r2y+y2)/2);
+  _s.quadraticCurveTo((rmx+mx)/2,(rmy+my)/2,(r1x+x1)/2,(r1y+y1)/2);
+  _s.closePath();_s.fillStyle=light;_s.fill();
+  // 3. Shadow on left side (inner/underside)
+  _s.beginPath();
+  _s.moveTo(l1x,l1y);
+  _s.quadraticCurveTo(lmx,lmy,l2x,l2y);
+  _s.lineTo((l2x+x2)/2,(l2y+y2)/2);
+  _s.quadraticCurveTo((lmx+mx)/2,(lmy+my)/2,(l1x+x1)/2,(l1y+y1)/2);
+  _s.closePath();_s.fillStyle=dark;_s.fill();
+  // 4. Outline for definition
+  if(outline){limbPath();_s.strokeStyle=outline;_s.lineWidth=1;_s.stroke();}
+}
+// drawFist — clenched fist shape with knuckle definition
+function drawFist(cx,cy,size,color,darkColor,outline){
+  const w=size*1.3,h=size*1.1;
+  // Main fist shape — slightly rectangular, rounded corners
+  _s.fillStyle=color;
+  _s.beginPath();
+  _s.moveTo(cx-w/2+2,cy-h/2);
+  _s.lineTo(cx+w/2-2,cy-h/2);
+  _s.quadraticCurveTo(cx+w/2,cy-h/2,cx+w/2,cy-h/2+2);
+  _s.lineTo(cx+w/2,cy+h/2-2);
+  _s.quadraticCurveTo(cx+w/2,cy+h/2,cx+w/2-2,cy+h/2);
+  _s.lineTo(cx-w/2+2,cy+h/2);
+  _s.quadraticCurveTo(cx-w/2,cy+h/2,cx-w/2,cy+h/2-2);
+  _s.lineTo(cx-w/2,cy-h/2+2);
+  _s.quadraticCurveTo(cx-w/2,cy-h/2,cx-w/2+2,cy-h/2);
+  _s.closePath();_s.fill();
+  // Dark underside
+  _s.fillStyle=darkColor;
+  _s.fillRect(cx-w/2+1,cy,w-2,h/2-1);
+  // Knuckle line (lighter ridge across the top)
+  _s.strokeStyle=color.replace(/[0-9a-f]{2}$/i,'ff');
+  _s.lineWidth=1.2;_s.beginPath();
+  _s.moveTo(cx-w/2+2,cy-h/4);_s.lineTo(cx+w/2-2,cy-h/4);_s.stroke();
+  // Knuckle bumps
+  for(let i=-1;i<=1;i++){
+    sc(cx+i*(w/4),cy-h/4,1.5,darkColor+'60');
+  }
+  // Thumb tuck
+  _s.fillStyle=darkColor;
+  _s.fillRect(cx-w/2-1,cy-2,3,h/2);
+  // Outline
+  if(outline){_s.strokeStyle=outline;_s.lineWidth=1.5;
+    _s.beginPath();
+    _s.moveTo(cx-w/2+2,cy-h/2);_s.lineTo(cx+w/2-2,cy-h/2);
+    _s.quadraticCurveTo(cx+w/2,cy-h/2,cx+w/2,cy-h/2+2);
+    _s.lineTo(cx+w/2,cy+h/2-2);
+    _s.quadraticCurveTo(cx+w/2,cy+h/2,cx+w/2-2,cy+h/2);
+    _s.lineTo(cx-w/2+2,cy+h/2);
+    _s.quadraticCurveTo(cx-w/2,cy+h/2,cx-w/2,cy+h/2-2);
+    _s.lineTo(cx-w/2,cy-h/2+2);
+    _s.quadraticCurveTo(cx-w/2,cy-h/2,cx-w/2+2,cy-h/2);
+    _s.closePath();_s.stroke();}
+}
+// drawBoot — angled boot/shoe with visible sole
+function drawBoot(x,y,w,h,color,darkColor,soleColor,outline,angle){
+  _s.save();_s.translate(x,y);_s.rotate(angle||0);
+  // Boot upper
+  _s.fillStyle=color;_s.beginPath();
+  _s.moveTo(-w/2,0);_s.lineTo(w/2+2,0);
+  _s.lineTo(w/2+4,-h*0.3); // toe extends forward
+  _s.lineTo(w/2+2,-h*0.7);
+  _s.lineTo(-w/2,-h);
+  _s.lineTo(-w/2-1,-h*0.5);
+  _s.closePath();_s.fill();
+  // Dark shading on back half
+  _s.fillStyle=darkColor;_s.beginPath();
+  _s.moveTo(-w/2,0);_s.lineTo(0,0);_s.lineTo(0,-h);
+  _s.lineTo(-w/2,-h);_s.lineTo(-w/2-1,-h*0.5);_s.closePath();_s.fill();
+  // Sole (thicker, different color)
+  _s.fillStyle=soleColor;
+  _s.fillRect(-w/2-1,0,w+5,h*0.25);
+  // Sole edge highlight
+  _s.fillStyle=soleColor+'80';
+  _s.fillRect(-w/2,h*0.25-1,w+4,1);
+  // Outline
+  if(outline){_s.strokeStyle=outline;_s.lineWidth=1.5;
+    _s.beginPath();_s.moveTo(-w/2,-1);_s.lineTo(w/2+4,-h*0.3);
+    _s.lineTo(w/2+2,-h*0.7);_s.lineTo(-w/2,-h);
+    _s.lineTo(-w/2-1,-h*0.5);_s.lineTo(-w/2,-1);
+    _s.lineTo(w/2+3,-1);_s.stroke();
+  }
+  _s.restore();
+}
 function gp(a,f,t){const p=t>1?f/(t-1):0;const o={hY:0,lean:0,lAA:0,rAA:0,lLS:0,rLS:0,lFL:0,rFL:0,rAE:0,lAE:0};
 if(a==="idle"){o.hY=Math.sin(p*Math.PI*2)*3;o.lLS=Math.sin(p*Math.PI*2)*2;o.rLS=-Math.sin(p*Math.PI*2)*2;o.lAA=Math.sin(p*Math.PI*2)*0.15;o.rAA=-Math.sin(p*Math.PI*2)*0.15;}
 else if(a==="walk"){const s=Math.sin(p*Math.PI*2);o.lLS=-s*18;o.rLS=s*18;o.lFL=Math.max(0,s)*12;o.rFL=Math.max(0,-s)*12;o.lAA=s*0.8;o.rAA=-s*0.8;o.lean=4+Math.abs(s)*2;o.hY=Math.abs(s)*3;}
