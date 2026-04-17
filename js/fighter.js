@@ -136,6 +136,14 @@ class Fighter {
       // Slower startup (commitment) but bigger reward
       return { start: 8, active: 12, total: 34, dmg: 14, kb: 16, up: -6, reach: 82, boxH: 40, boxY: -70, ult: 12, canCombo: false };
     }
+    if(this.attackType === 'kick_light') {
+      // Quick snap kick — faster than heavy, hits mid/low
+      return { start: 3, active: 8, total: 18, dmg: 7, kb: 7, up: 0, reach: 72, boxH: 36, boxY: -50, ult: 7, canCombo: true, type: 'kick_light' };
+    }
+    if(this.attackType === 'kick_heavy') {
+      // Big roundhouse — slower but powerful, wide arc
+      return { start: 7, active: 10, total: 30, dmg: 12, kb: 14, up: -4, reach: 88, boxH: 44, boxY: -55, ult: 10, canCombo: false, type: 'kick_heavy' };
+    }
     if(this.attackType === 'throw') {
       // Ken-style shoulder throw — tight 35-frame sequence.
       // 0-3 startup/grab, 4-24 arc (victim flips overhead), 24-35 recovery.
