@@ -379,6 +379,24 @@ class Fighter {
         hitstop = ulHit.launch ? 10 : 5;
       }
       if(this.hp < 0) this.hp = 0;
+
+      // --- KO from ult: enter 'ko' state so the game loop can detect it ---
+      if(this.hp <= 0 && ulHit.finisher) {
+        this.state = 'ko';
+        this.stateTime = 0;
+        this.koLanded = false;
+        this.koLandFrame = 0;
+        this.lastHitDir = fromFacing;
+        // Strong launch from ult finisher
+        this.koVx = fromFacing * (box.kb || 20) * 0.8;
+        this.koVy = -8;
+        this.onGround = false;
+        this.vx = 0; this.vy = 0;
+        this.attackType = null;
+        this.blocking = false;
+        this.beingUlted = 0;
+      }
+
       return 'hit';
     }
 
