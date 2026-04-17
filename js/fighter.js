@@ -569,10 +569,10 @@ class Fighter {
     // --- THROWN STATE: airborne after throw release ---
     if(this.state === 'thrown') {
       this.stateTime++;
-      this.vy += 0.85;
+      this.vy += 0.65;          // lighter gravity — longer hang time for throw arc
       this.x += this.vx;
       this.y += this.vy;
-      this.vx *= 0.98;
+      this.vx *= 0.97;          // slight air drag
       if(this.y >= GROUND) {
         this.y = GROUND;
         this.state = 'knockdown';
