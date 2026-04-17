@@ -490,35 +490,134 @@ sc(bx,hY+10,0.8,'#e8a0a0');
 // Blush
 se(bx-11,hY+5,5,3,'#ffaaaa25');se(bx+11,hY+5,5,3,'#ffaaaa25');}
 
-// CRIMSON
-function drawCrimson(cx,gy,o){const L=o.lean||0,bx=cx+L;const sk='#f0d0b8',skDk='#d0a890',skLt='#ffe0d0';const gi='#cc2244',giDk='#881430',giLt='#ee4466',giVLt='#ff6688';const wrap='#ff8866',wrapDk='#cc5533',band='#ff5566',bandDk='#cc3344',out='#3a0a14';
-_s.strokeStyle='rgba(255,56,96,0.25)';_s.lineWidth=5;_s.lineCap='round';_s.beginPath();_s.moveTo(bx-5,gy-44);_s.quadraticCurveTo(bx-18-L*3,gy-18,bx-22-L*4,gy);_s.stroke();_s.lineWidth=3;_s.strokeStyle='rgba(255,56,96,0.12)';_s.beginPath();_s.moveTo(bx-22-L*4,gy);_s.quadraticCurveTo(bx-24-L*4,gy+10,bx-20-L*3,gy+16);_s.stroke();
-const lx=bx-9+(o.lLS||0),ly=gy-(o.lFL||0),rx=bx+9+(o.rLS||0),ry=gy-(o.rFL||0);
-shadedLimb(bx-4,gy-46,lx,ly,11,gi,giDk,out);shadedLimb(bx+4,gy-46,rx,ry,11,gi,giDk,out);sf(lx-3,ly-8,2,3,giLt);sf(rx+2,ry-6,2,4,giLt);
-for(let i=0;i<3;i++){sl((bx-4+lx)/2-1,(gy-46+ly)/2-4+i*3,(bx-4+lx)/2+3,(gy-46+ly)/2-3+i*3,2,wrap);sl((bx+4+rx)/2-1,(gy-46+ry)/2-4+i*3,(bx+4+rx)/2+3,(gy-46+ry)/2-3+i*3,2,wrap);}
-sf(lx-5,ly-3,12,6,giDk);sf(lx-5,ly-3,12,1.5,out);sf(rx-5,ry-3,12,6,giDk);sf(rx-5,ry-3,12,1.5,out);
-const nY=gy-80,pY=gy-46;st(bx,pY,16,bx,nY,24,gi,out);sf(bx-12,nY,12,pY-nY,giDk+'50');sl(bx+9,nY+4,bx+8,pY-4,1.5,giVLt+'40');
-_s.fillStyle=sk;_s.beginPath();_s.moveTo(bx,nY+3);_s.lineTo(bx-8,nY+22);_s.lineTo(bx+8,nY+22);_s.closePath();_s.fill();
-sl(bx,nY+3,bx-8,nY+24,1.5,out+'50');sl(bx,nY+3,bx+8,nY+24,1.5,out+'50');
-se(bx-4,nY+12,5,3,skLt);se(bx+4,nY+12,5,3,skLt);
-for(let i=0;i<3;i++){sl(bx-3,nY+20+i*5,bx-3,nY+23+i*5,0.8,skDk+'50');sl(bx+3,nY+20+i*5,bx+3,nY+23+i*5,0.8,skDk+'50');}
-sl(bx,nY+18,bx,pY-4,1,skDk+'40');sl(bx-6,nY+8,bx+4,nY+18,1.2,'#cc9080');
-sl(bx-6,nY+14,bx-9,nY+10,1,'#ff886640');sl(bx-9,nY+10,bx-7,nY+6,1,'#ff886640');sl(bx-7,nY+6,bx-4,nY+8,1,'#ff886640');
-sf(bx-9,pY-2,18,4,'#1a1a1a');sf(bx-9,pY-2,18,1,out);sf(bx-2,pY-1,5,3,band);sc(bx,pY,1.5,'#ffaa44');
-const sY=nY+4;const lax=bx-22-(o.lAE||0),lay=sY+24+Math.sin(o.lAA||0)*14;const rax=bx+22+(o.rAE||0),ray=sY+24+Math.sin(o.rAA||0)*14;
-shadedLimb(bx-12,sY,lax,lay,10,sk,skDk,out);sl(bx-12+(lax-bx+12)*0.35,sY+(lay-sY)*0.35,bx-12+(lax-bx+12)*0.65,sY+(lay-sY)*0.65,1.5,skLt+'50');
-sf(lax-2,lay-2,8,5,wrapDk);sf(lax-2,lay-2,8,1.5,'#444');sl(lax,lay-4,lax,lay-7,1.5,'#666');sl(lax+3,lay-4,lax+3,lay-7,1.5,'#666');
-shadedLimb(lax,lay+3,lax-4,lay+16,8,wrap,wrapDk,out);sl(lax-1,lay+4,lax-3,lay+14,1.5,wrapDk);sl(lax+1,lay+6,lax-1,lay+12,1,wrap);
-sc(lax-4,lay+19,5,sk);sc(lax-4,lay+19,5,out+'20');
-shadedLimb(bx+12,sY,rax,ray,10,sk,skDk,out);sl(bx+12+(rax-bx-12)*0.35,sY+(ray-sY)*0.35,bx+12+(rax-bx-12)*0.65,sY+(ray-sY)*0.65,1.5,skLt+'50');
-sf(rax-4,ray-2,8,5,wrapDk);sf(rax-4,ray-2,8,1.5,'#444');sl(rax,ray-4,rax,ray-7,1.5,'#666');sl(rax-3,ray-4,rax-3,ray-7,1.5,'#666');
-shadedLimb(rax,ray+3,rax+4,ray+16,8,wrap,wrapDk,out);sl(rax+1,ray+4,rax+3,ray+14,1.5,wrapDk);sl(rax-1,ray+6,rax+1,ray+12,1,wrap);
-sc(rax+4,ray+19,5,sk);sc(rax+4,ray+19,5,out+'20');
+// CRIMSON — Flame Fighter. Professional pixel-art with bezier contours,
+// tapered limbs, flame hair, 3-tone shading throughout.
+function drawCrimson(cx,gy,o){const L=o.lean||0,bx=cx+L;
+const tw=o.torsoTwist||0,hr=o.hipRot||0;
+const sk='#f0d0b8',skDk='#d0a890',skLt='#ffe0d0',skMid='#e8c8b0';
+const gi='#cc2244',giDk='#881430',giLt='#ee4466',giMid='#bb2040';
+const wrap='#ff8866',wrapDk='#cc5533',band='#ff5566',bandDk='#cc3344',out='#3a0a14';
+
+// === WAIST SASH TRAIL (behind everything) ===
+_s.strokeStyle='rgba(255,56,96,0.25)';_s.lineWidth=5;_s.lineCap='round';_s.beginPath();
+_s.moveTo(bx-5,gy-44);_s.quadraticCurveTo(bx-18-L*3,gy-18,bx-22-L*4,gy);_s.stroke();
+_s.lineWidth=3;_s.strokeStyle='rgba(255,56,96,0.12)';_s.beginPath();
+_s.moveTo(bx-22-L*4,gy);_s.quadraticCurveTo(bx-24-L*4,gy+10,bx-20-L*3,gy+16);_s.stroke();
+
+// === LEGS (tapered, contoured with drawLimb) ===
+const lx=bx-9+(o.lLS||0)+hr*0.3, ly=gy-(o.lFL||0);
+const rx=bx+9+(o.rLS||0)+hr*0.3, ry=gy-(o.rFL||0);
+// Upper legs (thighs)
+const lKneeX=(bx-5+lx)/2, lKneeY=(gy-46+ly)/2;
+const rKneeX=(bx+5+rx)/2, rKneeY=(gy-46+ry)/2;
+drawLimb(bx-5,gy-46,lKneeX,lKneeY,11,9,giLt,giMid,giDk,out);
+drawLimb(lKneeX,lKneeY,lx,ly,9,7,giLt,giMid,giDk,out);
+drawLimb(bx+5,gy-46,rKneeX,rKneeY,11,9,giLt,giMid,giDk,out);
+drawLimb(rKneeX,rKneeY,rx,ry,9,7,giLt,giMid,giDk,out);
+// Knee wraps (cloth strips)
+for(let i=0;i<3;i++){
+  sl((bx-5+lx)/2-2,(gy-46+ly)/2-4+i*3,(bx-5+lx)/2+3,(gy-46+ly)/2-3+i*3,2,wrap);
+  sl((bx+5+rx)/2-2,(gy-46+ry)/2-4+i*3,(bx+5+rx)/2+3,(gy-46+ry)/2-3+i*3,2,wrap);
+}
+// Boots using drawBoot
+drawBoot(lx,ly,10,16,giDk,'#601020','#2a0810',out,0);
+drawBoot(rx,ry,10,16,giDk,'#601020','#2a0810',out,0);
+
+// === TORSO — BEZIER MASCULINE STRAIGHT with 3-tone shading ===
+const nY=gy-80,pY=gy-46;
+const twOff=tw*0.3;
+// Main torso — straight masculine lines (no waist pinch)
+_s.fillStyle=giMid;_s.beginPath();
+_s.moveTo(bx-12+twOff,nY);                           // left shoulder
+_s.lineTo(bx+12+twOff,nY);                           // right shoulder
+_s.quadraticCurveTo(bx+13+twOff,nY+10,bx+11+twOff,nY+18); // right side straight
+_s.lineTo(bx+9+twOff*0.5,nY+28);                     // right waist (no pinch — masculine)
+_s.quadraticCurveTo(bx+10+hr*0.2,nY+36,bx+10+hr*0.3,pY);
+_s.lineTo(bx-10+hr*0.3,pY);
+_s.quadraticCurveTo(bx-10+hr*0.2,nY+36,bx-9+twOff*0.5,nY+28);
+_s.lineTo(bx-11+twOff,nY+18);
+_s.quadraticCurveTo(bx-13+twOff,nY+10,bx-12+twOff,nY);
+_s.closePath();_s.fill();
+// Highlight right side
+_s.fillStyle=giLt+'50';_s.beginPath();
+_s.moveTo(bx+twOff,nY);_s.lineTo(bx+12+twOff,nY);
+_s.quadraticCurveTo(bx+13+twOff,nY+10,bx+11+twOff,nY+18);
+_s.lineTo(bx+9+twOff*0.5,nY+28);
+_s.quadraticCurveTo(bx+10+hr*0.2,nY+36,bx+10+hr*0.3,pY);
+_s.lineTo(bx+hr*0.3,pY);_s.closePath();_s.fill();
+// Shadow left side
+_s.fillStyle=giDk+'50';_s.beginPath();
+_s.moveTo(bx-12+twOff,nY);_s.lineTo(bx+twOff,nY);
+_s.lineTo(bx+hr*0.3,pY);_s.lineTo(bx-10+hr*0.3,pY);
+_s.quadraticCurveTo(bx-10+hr*0.2,nY+36,bx-9+twOff*0.5,nY+28);
+_s.lineTo(bx-11+twOff,nY+18);
+_s.quadraticCurveTo(bx-13+twOff,nY+10,bx-12+twOff,nY);_s.closePath();_s.fill();
+// Torso outline
+_s.strokeStyle=out;_s.lineWidth=1.5;_s.beginPath();
+_s.moveTo(bx-12+twOff,nY);_s.lineTo(bx+12+twOff,nY);
+_s.quadraticCurveTo(bx+13+twOff,nY+10,bx+11+twOff,nY+18);
+_s.lineTo(bx+9+twOff*0.5,nY+28);
+_s.quadraticCurveTo(bx+10+hr*0.2,nY+36,bx+10+hr*0.3,pY);
+_s.lineTo(bx-10+hr*0.3,pY);
+_s.quadraticCurveTo(bx-10+hr*0.2,nY+36,bx-9+twOff*0.5,nY+28);
+_s.lineTo(bx-11+twOff,nY+18);
+_s.quadraticCurveTo(bx-13+twOff,nY+10,bx-12+twOff,nY);_s.stroke();
+// Exposed chest V (skin showing — muscular)
+_s.fillStyle=sk;_s.beginPath();_s.moveTo(bx+twOff,nY+3);
+_s.lineTo(bx-8+twOff,nY+22);_s.lineTo(bx+8+twOff,nY+22);_s.closePath();_s.fill();
+sl(bx+twOff,nY+3,bx-8+twOff,nY+24,1.5,out+'50');
+sl(bx+twOff,nY+3,bx+8+twOff,nY+24,1.5,out+'50');
+// Pec definition
+se(bx-4+twOff,nY+12,5,3,skLt);se(bx+4+twOff,nY+12,5,3,skLt);
+// Cross scars on chest
+sl(bx-6+twOff,nY+8,bx+4+twOff,nY+18,1.2,'#cc9080');
+sl(bx-6+twOff,nY+14,bx-9+twOff,nY+10,1,'#ff886640');
+sl(bx-9+twOff,nY+10,bx-7+twOff,nY+6,1,'#ff886640');
+sl(bx-7+twOff,nY+6,bx-4+twOff,nY+8,1,'#ff886640');
+// Ab line
+for(let i=0;i<3;i++){sl(bx-3+twOff,nY+20+i*5,bx-3+twOff,nY+23+i*5,0.8,skDk+'50');
+  sl(bx+3+twOff,nY+20+i*5,bx+3+twOff,nY+23+i*5,0.8,skDk+'50');}
+sl(bx+twOff,nY+18,bx+twOff,pY-4,1,skDk+'40');
+// Waist sash/belt
+sf(bx-9+hr*0.3,pY-2,18,4,'#1a1a1a');sf(bx-9+hr*0.3,pY-2,18,1,out);
+sf(bx-2+hr*0.3,pY-1,5,3,band);sc(bx+hr*0.3,pY,1.5,'#ffaa44');
+
+// === ARMS (tapered, contoured with drawLimb) ===
+const sY=nY+4;
+const lax=bx-22-(o.lAE||0)+twOff, lay=sY+24+Math.sin(o.lAA||0)*14;
+const rax=bx+22+(o.rAE||0)+twOff, ray=sY+24+Math.sin(o.rAA||0)*14;
+// Forearm endpoints
+const lfax=lax-4+(o.lFA||0), lfay=lay+16;
+const rfax=rax+4+(o.rFA||0), rfay=ray+16;
+// Left upper arm (skin — exposed)
+drawLimb(bx-12+twOff,sY,lax,lay,9,6,skLt,skMid,skDk,out);
+sl(bx-12+(lax-bx+12)*0.35+twOff,sY+(lay-sY)*0.35,bx-12+(lax-bx+12)*0.65+twOff,sY+(lay-sY)*0.65,1.5,skLt+'50');
+// Left forearm wraps
+sf(lax-2,lay-2,8,5,wrapDk);sf(lax-2,lay-2,8,1.5,'#444');
+sl(lax,lay-4,lax,lay-7,1.5,'#666');sl(lax+3,lay-4,lax+3,lay-7,1.5,'#666');
+drawLimb(lax,lay+3,lfax,lfay,7,5,wrap,wrapDk,'#993320',out);
+sl(lfax-1,lfay-8,lfax-3,lfay-2,1.5,wrapDk);sl(lfax+1,lfay-6,lfax-1,lfay-2,1,wrap);
+// Left hand
+if((o.lFist||0)>0.5){drawFist(lfax,lfay+2,5,sk,skDk,out);}
+else{sc(lfax,lfay+2,4,sk);sc(lfax,lfay+2,4,out+'18');}
+// Right upper arm (skin — exposed)
+drawLimb(bx+12+twOff,sY,rax,ray,9,6,skLt,skMid,skDk,out);
+sl(bx+12+(rax-bx-12)*0.35+twOff,sY+(ray-sY)*0.35,bx+12+(rax-bx-12)*0.65+twOff,sY+(ray-sY)*0.65,1.5,skLt+'50');
+// Right forearm wraps
+sf(rax-4,ray-2,8,5,wrapDk);sf(rax-4,ray-2,8,1.5,'#444');
+sl(rax,ray-4,rax,ray-7,1.5,'#666');sl(rax-3,ray-4,rax-3,ray-7,1.5,'#666');
+drawLimb(rax,ray+3,rfax,rfay,7,5,wrap,wrapDk,'#993320',out);
+sl(rfax+1,rfay-8,rfax+3,rfay-2,1.5,wrapDk);sl(rfax-1,rfay-6,rfax+1,rfay-2,1,wrap);
+// Right hand
+if((o.rFist||0)>0.5){drawFist(rfax,rfay+2,5,sk,skDk,out);}
+else{sc(rfax,rfay+2,4,sk);sc(rfax,rfay+2,4,out+'18');}
+
 // === HEAD — BIG, fierce anime male face ===
 const hY=nY-22+(o.hY||0);
 const sk1='#ffe8d8',sk3='#c8a080',sk4='#a08060';
 // Neck (thicker than Aurora — masculine)
-sf(bx-3,nY-5,6,7,sk);
+sf(bx-3+twOff,nY-5,6,7,sk);
+_s.fillStyle=skDk+'40';_s.fillRect(bx-3+twOff,nY-5,3,7);
 // Head — angular oval (taller than wide — masculine jaw)
 se(bx,hY,18,20,sk);
 // Jaw definition (darker on sides)
@@ -530,43 +629,48 @@ se(bx-16,hY+2,3,5,sk);
 
 // === HEADBAND (prominent, with flame emblem) ===
 sf(bx-18,hY-5,36,6,band);sf(bx-18,hY-5,36,1.5,bandDk);
-// Flame emblem on headband
 sc(bx+2,hY-2,3.5,bandDk);sc(bx+2,hY-2,2,'#ffaa44');sc(bx+2,hY-3,1,'#ffee88');
-// Trailing tails
-sl(bx-18,hY-3,bx-26,hY+10,3.5,band);sl(bx-26,hY+10,bx-32,hY+20,3,band+'80');sl(bx-32,hY+20,bx-35,hY+26,2,band+'40');
+// Trailing tails (bezier)
+_s.strokeStyle=band;_s.lineWidth=3.5;_s.lineCap='round';_s.beginPath();
+_s.moveTo(bx-18,hY-3);_s.quadraticCurveTo(bx-24,hY+4,bx-28,hY+12);_s.stroke();
+_s.strokeStyle=band+'80';_s.lineWidth=2.5;_s.beginPath();
+_s.moveTo(bx-28,hY+12);_s.quadraticCurveTo(bx-32,hY+18,bx-35,hY+26);_s.stroke();
 
-// === FLAME HAIR — MASSIVE (biggest silhouette element) ===
-sl(bx-7,hY-12,bx-24,hY-42,6,'#ff6644');
-sl(bx-4,hY-14,bx-14,hY-50,7,'#ff3040');          // tallest spike
-sl(bx+1,hY-12,bx-6,hY-42,5.5,'#ff5533');
-sl(bx+5,hY-11,bx+2,hY-36,5,'#ff4444');
-sl(bx+8,hY-9,bx+7,hY-28,4,'#ff7744');
-sl(bx+11,hY-6,bx+11,hY-20,3.5,'#ffaa44');
-sl(bx+14,hY-3,bx+15,hY-14,2.5,'#ffcc66');
+// === FLAME HAIR — MASSIVE bezier spikes (biggest silhouette element) ===
+_s.save();
+// Each spike as a bezier stroke for smooth flame shape
+const spikes=[
+  {x:-7, y:-12, tx:-24, ty:-42, w:6, c:'#ff6644'},
+  {x:-4, y:-14, tx:-14, ty:-50, w:7, c:'#ff3040'},   // tallest
+  {x:1,  y:-12, tx:-6,  ty:-42, w:5.5, c:'#ff5533'},
+  {x:5,  y:-11, tx:2,   ty:-36, w:5, c:'#ff4444'},
+  {x:8,  y:-9,  tx:7,   ty:-28, w:4, c:'#ff7744'},
+  {x:11, y:-6,  tx:11,  ty:-20, w:3.5, c:'#ffaa44'},
+  {x:14, y:-3,  tx:15,  ty:-14, w:2.5, c:'#ffcc66'}
+];
+for(const sp of spikes){
+  _s.strokeStyle=sp.c;_s.lineWidth=sp.w;_s.lineCap='round';_s.beginPath();
+  _s.moveTo(bx+sp.x,hY+sp.y);
+  _s.quadraticCurveTo(bx+sp.x+(sp.tx-sp.x)*0.4,hY+sp.y+(sp.ty-sp.y)*0.5,bx+sp.tx,hY+sp.ty);
+  _s.stroke();
+}
 // Fire glow at tips
 _s.shadowColor='#ff440060';_s.shadowBlur=4;
 sc(bx-14,hY-48,3,'#ff604440');sc(bx-24,hY-40,2.5,'#ff664440');
 _s.shadowBlur=0;_s.shadowColor='transparent';
+_s.restore();
 
 // === FACE — fierce anime male eyes ===
-// Male anime eyes: narrower, more angular, intense stare
-
-// --- LEFT EYE (angular, fierce — 8x5 area) ---
-// White sclera (slightly angular shape using polygon)
+// --- LEFT EYE (angular, fierce) ---
 _s.fillStyle='#ffffff';_s.beginPath();
 _s.moveTo(bx-12,hY-1);_s.lineTo(bx-4,hY-4);_s.lineTo(bx-2,hY-1);
 _s.lineTo(bx-4,hY+2);_s.lineTo(bx-12,hY+1);_s.closePath();_s.fill();
-// Iris (fiery red-orange, smaller than Aurora's — intense)
 se(bx-7,hY-1,4,4,'#e83048');
 se(bx-7,hY,4,3,'#c82030');
-// Pupil
 sc(bx-6,hY,2.5,'#401018');
-// Single sharp highlight (males get 1, not 2)
 sc(bx-8,hY-2,2,'#ffffff');
-// Thick upper lid (sharp, angular)
 _s.strokeStyle='#2a0810';_s.lineWidth=2.5;_s.beginPath();
 _s.moveTo(bx-13,hY);_s.lineTo(bx-8,hY-4);_s.lineTo(bx-2,hY-1);_s.stroke();
-
 // --- RIGHT EYE (mirror) ---
 _s.fillStyle='#ffffff';_s.beginPath();
 _s.moveTo(bx+12,hY-1);_s.lineTo(bx+4,hY-4);_s.lineTo(bx+2,hY-1);
@@ -577,24 +681,18 @@ sc(bx+6,hY,2.5,'#401018');
 sc(bx+8,hY-2,2,'#ffffff');
 _s.strokeStyle='#2a0810';_s.lineWidth=2.5;_s.beginPath();
 _s.moveTo(bx+13,hY);_s.lineTo(bx+8,hY-4);_s.lineTo(bx+2,hY-1);_s.stroke();
-
 // Eyebrows (THICK, angled DOWN = angry)
 _s.strokeStyle='#3a1810';_s.lineWidth=2.5;_s.lineCap='round';
 _s.beginPath();_s.moveTo(bx-13,hY-5);_s.lineTo(bx-4,hY-8);_s.stroke();
 _s.beginPath();_s.moveTo(bx+4,hY-8);_s.lineTo(bx+13,hY-5);_s.stroke();
-
-// Nose (angular, more defined than Aurora — masculine)
-sl(bx,hY+3,bx+1,hY+6,1.2,sk3);
-sc(bx+1,hY+6,0.8,sk4);
-
-// Mouth (grimace with teeth showing)
-sf(bx-4,hY+9,9,4,out);                           // dark mouth opening
-sf(bx-3,hY+10,3,1.5,'#ffffff');sf(bx+1,hY+10,3,1.5,'#ffffff');  // teeth
-sl(bx-4,hY+9,bx+5,hY+9,1,out);                  // upper lip line
-
-// Stubble (shadow on jaw)
+// Nose
+sl(bx,hY+3,bx+1,hY+6,1.2,sk3);sc(bx+1,hY+6,0.8,sk4);
+// Mouth (grimace with teeth)
+sf(bx-4,hY+9,9,4,out);
+sf(bx-3,hY+10,3,1.5,'#ffffff');sf(bx+1,hY+10,3,1.5,'#ffffff');
+sl(bx-4,hY+9,bx+5,hY+9,1,out);
+// Stubble
 se(bx-4,hY+13,10,4,sk3+'30');
-
 // Chin/jaw definition
 sl(bx-10,hY+10,bx-14,hY+16,1,sk3+'40');
 sl(bx+10,hY+10,bx+14,hY+16,1,sk3+'40');}
