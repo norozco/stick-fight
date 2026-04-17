@@ -1,6 +1,6 @@
 # Stick-Fight Session Checkpoint
 
-**Last updated:** 2026-04-17 (active session)
+**Last updated:** 2026-04-17 09:05 (active session, auto-refreshed every 10 min)
 **Repo:** https://github.com/norozco/stick-fight (user is collaborator `AzuXo`)
 **Working branch:** `main` (auto-deploys to GitHub Pages ~30s after push)
 **Local path:** `Z:\Claude\stick-fight`
@@ -68,19 +68,27 @@ if(targetVx === 0 && this.onGround) this.vx *= 0.80;
 
 ## Active / next step
 
-**Goal:** Give Aurora her own unique high-quality PNG frames.
-**Reference:** User provided a Frost Vanguard character sheet (dark ponytail, fur collar, ice cape, winter warrior) with clear animation rows:
-- Walk (5 frames), Dash/Frost Glide (6), Back Dash (6), Jump (5), Fall (6), Air Dash (6), Landing (5), Step Forward/Backward/Diagonal (4 each)
-- Turnaround poses + facial expressions + FX examples also present
+**Goal:** Give Aurora her own unique high-quality PNG frames extracted from Frost Vanguard reference.
 
-**Plan:**
-1. User saves reference image to `Z:\Claude\stick-fight\frost_vanguard_ref.png`
-2. Python/Pillow script crops animation rows into individual frames
-3. Save as `sprites/aurora/<anim>_<n>.png` matching the naming convention
-4. Commit + push to main, GitHub Pages redeploys
+**Status as of this checkpoint:**
+- User saved `frost_vanguard_ref.png` (1536x1024) — but it's the IDLE-ONLY sheet (7 idle variation frames), not the multi-animation sheet
+- Extraction script `extract_aurora_idle.py` written and iterating
+- First auto-detection run: threshold was too tight, only captured character torsos (height 175 band) — need wider y-range
+- Currently switching from auto-detection to manual y-bounds (y0=320, y1=910) for the full character height
+- Multi-animation sheet (walk/dash/jump/fall/etc.) still pending — user will save as a separate file later
+
+**Remaining steps:**
+1. Tune manual y-bounds → re-run extractor → verify preview shows full-body characters
+2. If frame detection still wrong, tune column threshold
+3. Once 6 clean idle frames in `sprites/aurora/idle_*.png`, commit + push
+4. Ask user for the walk/dash/etc sheet to get other animations
 
 **Tools confirmed available:** Python 3 with Pillow (`py -3`)
 **Tools NOT available locally:** ImageMagick, node-canvas
+
+**Scripts on disk:**
+- `extract_aurora_frames.py` — original multi-row extractor (for future use with the action sheet)
+- `extract_aurora_idle.py` — current single-row idle extractor (being tuned)
 
 ---
 
@@ -112,9 +120,13 @@ if(targetVx === 0 && this.onGround) this.vx *= 0.80;
 
 ## Agents / tools used this session
 
-- **Bash** — git operations, file ops, tool availability checks, copying sprite files
-- **Read / Edit / Write / Grep / Glob** — direct file edits on js sources
-- **Claude in Chrome MCP** — attempted to open game for visual verification (extension was disconnected)
+- **Bash** — git ops, file ops, Python/Pillow scripts, sprite extraction
+- **Read / Edit / Write / Grep / Glob** — direct file edits on js sources + Python scripts
+- **Claude in Chrome MCP** — attempted to open game for visual verification (extension was disconnected, didn't retry)
+- **Python 3 + Pillow** — image analysis and frame extraction for Aurora sprites
+- **CronCreate** — scheduled recurring job `fc3a7631` every 10 min to auto-update this checkpoint
+- **ToolSearch** — deferred tool loader (for CronCreate, Chrome MCP)
+- **Skill: loop** — set up the 10-min checkpoint refresh
 - **No sub-agents (`general-purpose`, `Explore`, `Plan`) spawned** — all work done directly in main thread
 
 ---
@@ -122,6 +134,7 @@ if(targetVx === 0 && this.onGround) this.vx *= 0.80;
 ## Recent commits (origin/main)
 
 ```
+f03414c Add session checkpoint doc for crash recovery
 d274bda Aurora: copy Jade PNG frames so sprite renderer uses high-quality art style
 3881a80 Aurora: full winter-warrior redesign based on reference image
 0964b59 Aurora sprite: match Jade's 1.35x scale + taller proportions
