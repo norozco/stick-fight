@@ -139,7 +139,7 @@ function drawBoot(x,y,w,h,color,darkColor,soleColor,outline,angle){
   }
   _s.restore();
 }
-function gp(a,f,t){const p=t>1?f/(t-1):0;const o={hY:0,lean:0,lAA:0,rAA:0,lLS:0,rLS:0,lFL:0,rFL:0,rAE:0,lAE:0};
+function gp(a,f,t){const p=t>1?f/(t-1):0;const o={hY:0,lean:0,lAA:0,rAA:0,lLS:0,rLS:0,lFL:0,rFL:0,rAE:0,lAE:0,rFA:0,lFA:0,rFist:0,lFist:0,hipRot:0,torsoTwist:0};
 if(a==="idle"){o.hY=Math.sin(p*Math.PI*2)*3;o.lLS=Math.sin(p*Math.PI*2)*2;o.rLS=-Math.sin(p*Math.PI*2)*2;o.lAA=Math.sin(p*Math.PI*2)*0.15;o.rAA=-Math.sin(p*Math.PI*2)*0.15;}
 else if(a==="walk"){const s=Math.sin(p*Math.PI*2);o.lLS=-s*18;o.rLS=s*18;o.lFL=Math.max(0,s)*12;o.rFL=Math.max(0,-s)*12;o.lAA=s*0.8;o.rAA=-s*0.8;o.lean=4+Math.abs(s)*2;o.hY=Math.abs(s)*3;}
 else if(a==="attack_light"){
@@ -152,6 +152,8 @@ else if(a==="attack_light"){
     o.lean=-4*pp;        // body coils slightly
     o.hY=pp*2;           // slight squat
     o.rLS=-3*pp;         // rear foot loads
+    o.rFist=pp;          // fist clenches during windup
+    o.torsoTwist=-3*pp;  // coil torso back
   }else if(p<0.55){
     // STRIKE — fist drives FORWARD, shoulder rotates in, body pushes
     const sp=(p-0.2)/0.35;
@@ -161,6 +163,8 @@ else if(a==="attack_light"){
     o.hY=2-sp*3;         // rises from squat
     o.rLS=-3+sp*10;      // rear foot pivots
     o.lAA=-0.3;          // guard arm stays up
+    o.rFist=1;           // fist fully clenched during strike
+    o.torsoTwist=-3+sp*10; // torso twists into punch
   }else{
     // RECOVERY — retract fist, body settles
     const rp=(p-0.55)/0.45;
@@ -169,6 +173,8 @@ else if(a==="attack_light"){
     o.hY=-1+rp;
     o.lAA=-0.3+rp*0.3;
     o.rLS=7-rp*7;
+    o.rFist=1-rp;        // fist unclenches
+    o.torsoTwist=7-rp*7; // torso returns
   }
 }
 else if(a==="attack_heavy"){
@@ -183,6 +189,9 @@ else if(a==="attack_heavy"){
     o.rLS=-8*pp;         // rear foot loads weight
     o.lAA=-0.4*pp;       // lead arm guards
     o.lAE=6*pp;          // lead hand forward for guard
+    o.rFist=pp;          // fist clenches
+    o.torsoTwist=-8*pp;  // deep torso coil back
+    o.hipRot=-4*pp;      // hips load
   }else if(p<0.65){
     // STRIKE — body UNCOILS, fist explodes forward, full hip rotation
     const sp=(p-0.35)/0.3;
@@ -194,6 +203,9 @@ else if(a==="attack_heavy"){
     o.lLS=-sp*8;         // lead foot braces
     o.lAA=-0.4+sp*0.2;
     o.lAE=6-sp*4;
+    o.rFist=1;           // full fist
+    o.torsoTwist=-8+sp*22; // explosive torso rotation through
+    o.hipRot=-4+sp*12;   // hips drive into punch
   }else{
     // FOLLOW-THROUGH — extended pose holds briefly, slow retract
     const rp=(p-0.65)/0.35;
@@ -204,6 +216,9 @@ else if(a==="attack_heavy"){
     o.rLS=10-rp*10;
     o.lLS=-8+rp*8;
     o.lAA=-0.2+rp*0.2;
+    o.rFist=1-rp*0.8;    // slowly unclench
+    o.torsoTwist=14-rp*14; // settle back
+    o.hipRot=8-rp*8;     // hips return
   }
 }
 else if(a==="hurt"){o.lean=-12;o.hY=6;o.lAA=0.5;o.rAA=0.5;o.lLS=-4;o.rLS=4;}
