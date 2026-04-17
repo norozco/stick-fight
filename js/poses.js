@@ -1511,7 +1511,7 @@ function drawFighter(f) {
 
     // Thrown state: tumble through the air after release
     let thrownRotation = 0;
-    if(f.state === 'thrown') {
+    if(f.state === 'thrown' && !(hasRealFrames && hasRealFrames['thrown'])) {
       // Continue rotation from where grabbed left off (~3.6 rad) and keep spinning
       const throwDir = (f.vx > 0) ? 1 : -1;
       thrownRotation = throwDir * (Math.PI + Math.min(f.stateTime / 6, 1) * 1.2);
