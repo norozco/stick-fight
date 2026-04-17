@@ -10,7 +10,7 @@ function getSpriteAnim(f){
   if(f.state==='knockdown')return'knockdown';
   if(f.state==='grabbed')return'grabbed';
   if(f.state==='thrown')return'thrown';
-  if(f.state==='attack'){if(f.attackType==='ult')return'attack_ult';if(f.attackType==='throw')return'attack_throw';if(f.attackType==='heavy')return'attack_heavy';return'attack_light';}
+  if(f.state==='attack'){if(f.attackType==='ult')return'attack_ult';if(f.attackType==='throw')return'attack_throw';if(f.attackType==='heavy')return'attack_heavy';if(f.attackType==='kick_light')return'kick_light';if(f.attackType==='kick_heavy')return'kick_heavy';return'attack_light';}
   if(f.state==='hurt'||f.state==='stagger'||f.state==='wallsplat')return'hurt';
   if(f.state==='dash')return'dash';if(f.state==='ringout')return'hurt';
   if(f.blocking)return'block';if(!f.onGround)return'jump';
