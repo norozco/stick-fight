@@ -566,6 +566,87 @@ function computeTargetPose(f) {
         pose.rKnee.x = x + fc * lerp(14, 8, rt);
       }
     }
+    else if(f.attackType === 'kick_light') {
+      const data = f.attackData();
+      const phase = t < data.start ? 'startup'
+                  : t < data.start + data.active ? 'active'
+                  : 'recovery';
+      if(phase === 'startup') {
+        const pp = easeOutCubic(t / data.start);
+        // Chamber — knee rises, body braces
+        pose.rFoot.x = x + fc * lerp(12, -2, pp);
+        pose.rFoot.y = y - lerp(0, 28, pp);
+        pose.rKnee.x = x + fc * lerp(8, 6, pp);
+        pose.rKnee.y = y - lerp(22, 40, pp);
+        pose.lFoot.x = x - fc * 10; pose.lFoot.y = y;
+        pose.bodyLean = -fc * lerp(0, 8, pp);
+        pose.pelvis.y = y - lerp(42, 38, pp);
+        pose.rHand.x = x + fc * 6;  pose.rHand.y = y - 68;
+        pose.lHand.x = x - fc * 14; pose.lHand.y = y - 72;
+      } else if(phase === 'active') {
+        const at = easeOutCubic(clamp((t - data.start) / data.active * 1.2, 0, 1));
+        const kickExt = lerp(-2, 58, at);
+        pose.rFoot.x = x + fc * kickExt;
+        pose.rFoot.y = y - lerp(28, 40, at);
+        pose.rKnee.x = x + fc * lerp(6, kickExt * 0.4, at);
+        pose.rKnee.y = y - lerp(40, 38, at);
+        pose.lFoot.x = x - fc * 10; pose.lFoot.y = y;
+        pose.bodyLean = fc * lerp(-8, 6, at);
+        pose.pelvis.y = y - 38;
+        pose.pelvis.x = x + fc * lerp(0, 4, at);
+        pose.lHand.x = x - fc * 20; pose.lHand.y = y - 68;
+        pose.rHand.x = x + fc * 4;  pose.rHand.y = y - 62;
+      } else {
+        const rt = easeOutQuad(clamp((t - data.start - data.active) / (data.total - data.start - data.active), 0, 1));
+        pose.rFoot.x = x + fc * lerp(58, 12, rt);
+        pose.rFoot.y = y - lerp(40, 0, rt);
+        pose.rKnee.x = x + fc * lerp(24, 8, rt);
+        pose.rKnee.y = y - lerp(38, 22, rt);
+        pose.bodyLean = fc * lerp(6, 0, rt);
+        pose.pelvis.y = y - lerp(38, 42, rt);
+      }
+    }
+    else if(f.attackType === 'kick_heavy') {
+      const data = f.attackData();
+      const phase = t < data.start ? 'startup'
+                  : t < data.start + data.active ? 'active'
+                  : 'recovery';
+      if(phase === 'startup') {
+        const pp = easeOutCubic(t / data.start);
+        pose.rFoot.x = x + fc * lerp(12, -6, pp);
+        pose.rFoot.y = y - lerp(0, 34, pp);
+        pose.rKnee.x = x + fc * lerp(8, 4, pp);
+        pose.rKnee.y = y - lerp(22, 44, pp);
+        pose.lFoot.x = x - fc * 10; pose.lFoot.y = y;
+        pose.bodyLean = -fc * lerp(0, 12, pp);
+        pose.pelvis.y = y - lerp(42, 36, pp);
+        pose.rHand.x = x + fc * 8;  pose.rHand.y = y - 72;
+        pose.lHand.x = x - fc * 18; pose.lHand.y = y - 76;
+      } else if(phase === 'active') {
+        const at = easeOutCubic(clamp((t - data.start) / data.active * 1.2, 0, 1));
+        const kickExt = lerp(-6, 66, at);
+        pose.rFoot.x = x + fc * kickExt;
+        pose.rFoot.y = y - lerp(34, 52, at);
+        pose.rKnee.x = x + fc * lerp(4, kickExt * 0.4, at);
+        pose.rKnee.y = y - lerp(44, 46, at);
+        pose.lFoot.x = x - fc * 10; pose.lFoot.y = y;
+        pose.bodyLean = fc * lerp(-12, 10, at);
+        pose.pelvis.y = y - 36;
+        pose.pelvis.x = x + fc * lerp(0, 6, at);
+        pose.lHand.x = x - fc * lerp(18, 28, at); pose.lHand.y = y - 70;
+        pose.rHand.x = x + fc * lerp(8, -6, at);  pose.rHand.y = y - 64;
+      } else {
+        const rt = easeOutQuad(clamp((t - data.start - data.active) / (data.total - data.start - data.active), 0, 1));
+        pose.rFoot.x = x + fc * lerp(66, 12, rt);
+        pose.rFoot.y = y - lerp(52, 0, rt);
+        pose.rKnee.x = x + fc * lerp(28, 8, rt);
+        pose.rKnee.y = y - lerp(46, 22, rt);
+        pose.bodyLean = fc * lerp(10, 0, rt);
+        pose.pelvis.y = y - lerp(36, 42, rt);
+        pose.lHand.x = x - fc * lerp(28, 14, rt); pose.lHand.y = y - lerp(70, 62, rt);
+        pose.rHand.x = x + fc * lerp(-6, 14, rt);  pose.rHand.y = y - lerp(64, 62, rt);
+      }
+    }
     else if(f.attackType === 'throw') {
       // Phase-synced throw pose — matches the 4-phase system in fighter.js
       // Uses f.throwPhase + f.throwTimer so the visual is LOCKED to the mechanic
