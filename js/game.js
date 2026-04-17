@@ -292,7 +292,8 @@ let p1, p2;
 function makeInput() {
   return { left: false, right: false, jumpPressed: false, block: false,
     lightPressed: false, heavyPressed: false, throwPressed: false,
-    dashPressed: false, ultPressed: false };
+    dashPressed: false, ultPressed: false,
+    kickLightPressed: false, kickHeavyPressed: false };
 }
 
 function getP1Input() {
