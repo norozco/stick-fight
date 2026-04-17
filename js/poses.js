@@ -1495,7 +1495,7 @@ function drawFighter(f) {
 
     // Grabbed state: progressive tilt as attacker secures the hold
     let grabbedRotation = 0;
-    if(f.state === 'grabbed') {
+    if(f.state === 'grabbed' && !(hasRealFrames && hasRealFrames['grabbed'])) {
       // Gradual tilt toward attacker over the grab duration
       const grabP = Math.min(f.stateTime / 12, 1);
       const grabDir = f.facing;  // facing = toward attacker
