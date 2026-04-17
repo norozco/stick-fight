@@ -644,8 +644,8 @@ class Fighter {
         def.stateTime = 0;
         def.throwBy = null;
         def.hitStun = 0;
-        def.vx = fc * -14;       // launched in throw direction
-        def.vy = -8;
+        def.vx = fc * -18;       // strong horizontal launch — real throw distance
+        def.vy = -12;            // high arc so it reads as a proper throw
         def.onGround = false;
         def.hurtFlash = 16;
         // Effects
