@@ -1215,7 +1215,7 @@ function drawFighter(f) {
       if(!f.koLanded) {
         // Airborne: progressive backward tumble (up to ~100 degrees)
         const tumbleP = Math.min(f.stateTime / 18, 1);
-        koRotation = dir * easeOutCubic(tumbleP) * 1.7;  // ~100° in hit direction
+        koRotation = dir * easeOutCubic(tumbleP) * 1.7;
       } else {
         // Landed: settle to ~90° (lying flat)
         const settleP = Math.min((f.stateTime - (f.koLandFrame || 0)) / 8, 1);
@@ -1223,19 +1223,44 @@ function drawFighter(f) {
       }
     }
 
-    // Knockdown: flat on the ground (~90°)
+    // Knockdown: flat on the ground, with gradual recovery tilt if getting up
     let knockdownRotation = 0;
     if(f.state === 'knockdown') {
-      knockdownRotation = dir * Math.PI / 2;
+      // Start flat, then if hitStun is low, start tilting back upright (recovery)
+      if(f.hitStun > 8) {
+        knockdownRotation = dir * Math.PI / 2;
+      } else {
+        // Last 8 frames: tilt from flat back to upright
+        const recoverP = 1 - (f.hitStun / 8);
+        knockdownRotation = dir * lerp(Math.PI / 2, 0, easeOutCubic(recoverP));
+      }
     }
 
-    // Thrown state: tumble through arc
+    // Grabbed state: progressive tilt as attacker secures the hold
+    let grabbedRotation = 0;
+    if(f.state === 'grabbed') {
+      // Gradual tilt toward attacker over the grab duration
+      const grabP = Math.min(f.stateTime / 12, 1);
+      const grabDir = f.facing;  // facing = toward attacker
+      grabbedRotation = grabDir * easeOutCubic(grabP) * 0.5;  // ~30° lean into attacker
+
+      // If attacker is in throw arc phase (phase 3), rotate with the arc
+      if(f.throwBy && f.throwBy.throwPhase === 3) {
+        const arcP = Math.min((f.throwBy.throwTimer || 0) / 14, 1);
+        const arcAngle = easeInOutCubic(arcP) * Math.PI;  // full semicircle
+        grabbedRotation = grabDir * (0.5 + arcAngle);  // starts from lean, adds arc rotation
+      }
+    }
+
+    // Thrown state: tumble through the air after release
     let thrownRotation = 0;
     if(f.state === 'thrown') {
-      thrownRotation = dir * Math.min(f.stateTime / 6, 1) * 1.4;
+      // Continue rotation from where grabbed left off (~3.6 rad) and keep spinning
+      const throwDir = (f.vx > 0) ? 1 : -1;
+      thrownRotation = throwDir * (Math.PI + Math.min(f.stateTime / 6, 1) * 1.2);
     }
 
-    const needsRotation = hasThrowSpin || hasRingoutSpin || koRotation || knockdownRotation || thrownRotation;
+    const needsRotation = hasThrowSpin || hasRingoutSpin || koRotation || knockdownRotation || grabbedRotation || thrownRotation;
 
     if(needsRotation) {
       const spin = hasThrowSpin ? f.throwSpin
