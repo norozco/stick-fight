@@ -816,12 +816,12 @@ function loop(now) {
 
     if(mode !== 'training') {
       // KO detection — fighter enters 'ko' state in takeHit when HP<=0.
-      // Ring-out check happens IMMEDIATELY on KO (stateTime === 1) so the
+      // Ring-out check happens in the first few frames of KO so the
       // fighter's position at the killing blow is used, not after they've
-      // slid away. Non-ringout KOs wait for the fall animation to complete.
-      if(p1.state === 'ko' && p1.stateTime === 1 && canRingOut(p1, 2)) {
+      // slid far away. Non-ringout KOs wait for the fall animation.
+      if(p1.state === 'ko' && p1.stateTime <= 3 && canRingOut(p1, 2)) {
         triggerRingOut(p1, 2);
-      } else if(p2.state === 'ko' && p2.stateTime === 1 && canRingOut(p2, 1)) {
+      } else if(p2.state === 'ko' && p2.stateTime <= 3 && canRingOut(p2, 1)) {
         triggerRingOut(p2, 1);
       } else if(p1.state === 'ko' && p1.koLanded && p1.stateTime > 30) {
         handleKO(p1, p2, 2);
