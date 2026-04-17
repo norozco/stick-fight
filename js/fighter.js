@@ -1121,8 +1121,10 @@ function cpuInput(cpu, player) {
   if(ad < 80) {
     if(Math.random() < 0.09) {
       const r = Math.random();
-      if(r < 0.55) input.lightPressed = true;
-      else if(r < 0.85) input.heavyPressed = true;
+      if(r < 0.35) input.lightPressed = true;
+      else if(r < 0.55) input.kickLightPressed = true;
+      else if(r < 0.72) input.heavyPressed = true;
+      else if(r < 0.88) input.kickHeavyPressed = true;
       else input.dashPressed = true;
     }
     if(Math.random() < 0.02) {
