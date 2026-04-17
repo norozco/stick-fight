@@ -332,6 +332,8 @@ function getP2Input() {
   i.throwPressed = !!keyPressed["'"];
   i.dashPressed = !!keyPressed[';'];
   i.ultPressed = !!keyPressed['enter'];
+  i.kickLightPressed = !!keyPressed['o'];
+  i.kickHeavyPressed = !!keyPressed['p'];
   return i;
 }
 
