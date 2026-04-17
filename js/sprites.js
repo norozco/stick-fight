@@ -1329,6 +1329,7 @@ sf(bx-7,hY+10,14,1,out+'30');
 // Torso outline edges
 sf(bx-16+twOff,nY,1,17,out+'30');
 sf(bx+15+twOff,nY,1,17,out+'30');
+_s.restore(); // undo the 1.35x scale
 }
 
 // NOIR — Shadow Assassin. Professional pixel-art with bezier contours,
