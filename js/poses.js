@@ -1265,7 +1265,7 @@ function drawFighter(f) {
     if(needsRotation) {
       const spin = hasThrowSpin ? f.throwSpin
                  : hasRingoutSpin ? f.ringoutSpin
-                 : koRotation || knockdownRotation || thrownRotation;
+                 : koRotation || knockdownRotation || grabbedRotation || thrownRotation;
       ctx.save();
       // Pivot at the fighter's center-mass
       const pivotX = f.x;
