@@ -1135,8 +1135,60 @@ sl(bx-12,hY-5,bx-4,hY-8,2.5,dk);
 sl(bx+4,hY-8,bx+12,hY-5,2.5,dk);
 }
 
+// ============================================================
+// SPRITE SHEET SUPPORT (Phase 3 prep)
+// ============================================================
+// When real PNG sprite sheets exist, load them with loadSpriteSheet().
+// The engine checks spriteSheets[id] first — if frames exist for an
+// animation, they're used directly. Otherwise falls back to procedural.
+const spriteSheets = {};
+
+// Load a sprite sheet PNG and slice it into animation frames.
+// Returns a promise. Once loaded, regenerate the character's cache.
+function loadSpriteSheet(sheetUrl, charId, layout) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      spriteSheets[charId] = {};
+      for(const [anim, info] of Object.entries(layout)) {
+        spriteSheets[charId][anim] = [];
+        for(let col = 0; col < info.cols; col++) {
+          const cv = document.createElement('canvas');
+          cv.width = SPRITE_W; cv.height = SPRITE_H;
+          const cx = cv.getContext('2d');
+          cx.imageSmoothingEnabled = false;
+          cx.drawImage(img,
+            col * info.frameW, info.row * info.frameH, info.frameW, info.frameH,
+            0, 0, SPRITE_W, SPRITE_H);
+          spriteSheets[charId][anim].push(cv);
+        }
+      }
+      resolve();
+    };
+    img.onerror = reject;
+    img.src = sheetUrl;
+  });
+}
+
 // GEN + DRAW + INIT
-function generateSpritesForCharacter(c){const id=c.id;spriteCache[id]={};const fn=id==='aurora'?drawAurora:id==='crimson'?drawCrimson:id==='jade'?drawJade:id==='noir'?drawNoir:drawAurora;for(const[a,d]of Object.entries(SPRITE_ANIMS)){spriteCache[id][a]=[];for(let f=0;f<d.frames;f++){const cv=document.createElement('canvas');cv.width=SPRITE_W;cv.height=SPRITE_H;_s=cv.getContext('2d');_s.imageSmoothingEnabled=false;fn(SPRITE_W/2,SPRITE_H-14,gp(a,f,d.frames));spriteCache[id][a].push(cv);}}_s=null;}
+function generateSpritesForCharacter(c){
+  const id=c.id;spriteCache[id]={};
+  const fn=id==='aurora'?drawAurora:id==='crimson'?drawCrimson:id==='jade'?drawJade:id==='noir'?drawNoir:drawAurora;
+  for(const[a,d]of Object.entries(SPRITE_ANIMS)){
+    // Use real sprite sheet frames if available
+    if(spriteSheets[id]&&spriteSheets[id][a]&&spriteSheets[id][a].length>0){
+      spriteCache[id][a]=spriteSheets[id][a]; continue;
+    }
+    spriteCache[id][a]=[];
+    for(let f=0;f<d.frames;f++){
+      const cv=document.createElement('canvas');
+      cv.width=SPRITE_W;cv.height=SPRITE_H;
+      _s=cv.getContext('2d');_s.imageSmoothingEnabled=false;
+      fn(SPRITE_W/2,SPRITE_H-14,gp(a,f,d.frames));
+      spriteCache[id][a].push(cv);
+    }
+  }_s=null;
+}
 function drawFighterSprite(f){const id=f.character&&f.character.id;if(!id||!spriteCache[id])return false;const an=getSpriteAnim(f),am=spriteCache[id][an];if(!am||!am.length)return false;const fr=am[Math.min(getSpriteFrame(f,an),am.length-1)];if(!fr)return false;ctx.save();ctx.imageSmoothingEnabled=false;const dx=f.x-SPRITE_DRAW_W/2,dy=f.y-SPRITE_DRAW_H+22;if(f.facing<0){ctx.translate(f.x,0);ctx.scale(-1,1);ctx.translate(-f.x,0);}if(f.hurtFlash>0&&Math.floor(f.hurtFlash/2)%2===0){const t=document.createElement('canvas');t.width=fr.width;t.height=fr.height;const tc=t.getContext('2d');tc.drawImage(fr,0,0);tc.globalCompositeOperation='source-atop';tc.fillStyle='rgba(255,200,200,0.55)';tc.fillRect(0,0,t.width,t.height);ctx.drawImage(t,dx,dy,SPRITE_DRAW_W,SPRITE_DRAW_H);}else{ctx.drawImage(fr,dx,dy,SPRITE_DRAW_W,SPRITE_DRAW_H);}ctx.imageSmoothingEnabled=true;ctx.restore();return true;}
 function drawCharacterAura(f){if(!f||!f.character)return;const g=f.character.glow||'#fff';const p=0.3+Math.abs(Math.sin(globalTime*0.06))*0.2;const gr=ctx.createRadialGradient(f.x,GROUND+4,0,f.x,GROUND+4,45);gr.addColorStop(0,g.slice(0,7)+(Math.round(p*60).toString(16).padStart(2,'0')));gr.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=gr;ctx.fillRect(f.x-45,GROUND-2,90,20);}
 function initSpriteCache(){for(const c of CHARACTERS)generateSpritesForCharacter(c);}
