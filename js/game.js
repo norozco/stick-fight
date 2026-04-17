@@ -811,8 +811,7 @@ function loop(now) {
     const lowHp = (p1.hp / p1.maxHp < 0.3) || (p2.hp / p2.maxHp < 0.3);
     Audio.musicSetIntense(lowHp);
 
-    // Capture replay frame after both fighters update
-    if(mode !== 'training') replaySnapshot();
+    // (Replay system removed)
 
     if(mode !== 'training') {
       // KO detection — fighter enters 'ko' state in takeHit when HP<=0.
