@@ -928,113 +928,211 @@ sc(bx+9,hY+6,1.2,sk4+'60');
 // Blush
 se(bx-11,hY+5,4,2.5,'#ddaa9920');se(bx+12,hY+5,4,2.5,'#ddaa9920');}
 
-// NOIR
-function drawNoir(cx,gy,o){const L=o.lean||0,bx=cx+L;const sk='#d8c8a8',skDk='#b8a888';const cloak='#2a1840',dk='#180c28',acc='#6030a0',accLt='#8050cc';const glow='#ffcc00',glowLt='#fff8cc',blade='#c0c8d8',bladeDk='#8090a0',out='#0c0618';
-_s.fillStyle=cloak+'d0';_s.beginPath();_s.moveTo(bx-16,gy-74);_s.quadraticCurveTo(bx-26-L*3,gy-22,bx-18-L*4,gy+8);_s.lineTo(bx+18-L,gy+8);_s.quadraticCurveTo(bx+20,gy-22,bx+16,gy-74);_s.closePath();_s.fill();_s.strokeStyle=acc+'50';_s.lineWidth=1.5;_s.stroke();
-sl(bx-10,gy-55,bx-16-L*2,gy-12,1,acc+'20');sl(bx+8,gy-55,bx+6-L,gy-12,1,acc+'20');
-_s.strokeStyle=acc+'15';_s.lineWidth=0.8;_s.beginPath();_s.arc(bx-8,gy-35,4,0,Math.PI*2);_s.stroke();_s.beginPath();_s.arc(bx+4,gy-25,3,0,Math.PI*2);_s.stroke();
-for(let i=0;i<4;i++){sl(bx-16-L*3-i*2,gy+2+i*2,bx-20-L*4-i*3,gy+8+i*4,1.5,dk+'80');sl(bx+16-L+i*2,gy+2+i*2,bx+20-L+i*3,gy+8+i*4,1.5,dk+'80');}
-const lx=bx-6+(o.lLS||0),ly=gy-(o.lFL||0),rx=bx+6+(o.rLS||0),ry=gy-(o.rFL||0);
-shadedLimb(bx-3,gy-38,lx,ly,8,cloak,dk,out);shadedLimb(bx+3,gy-38,rx,ry,8,cloak,dk,out);
-sf(lx-4,ly-3,8,5,dk);sf(rx-4,ry-3,8,5,dk);sl(lx-2,ly-6,lx+2,ly-6,1.5,acc+'60');sl(rx-2,ry-6,rx+2,ry-6,1.5,acc+'60');
-const nY=gy-74,pY=gy-38;st(bx,pY,13,bx,nY,17,cloak,out);sf(bx-8,nY,8,pY-nY,dk+'60');
-sf(bx-6,nY,12,5,cloak);sf(bx-6,nY,12,1.5,acc);sf(bx-6,nY+4,12,1,acc+'40');
-sf(bx-8,pY-3,16,4,acc);_s.shadowColor=glow;_s.shadowBlur=5;sf(bx-2,pY-2,4,3,glow);_s.shadowBlur=0;_s.shadowColor='transparent';
-sf(bx-7,pY-5,3,4,accLt+'80');sf(bx+5,pY-5,3,4,'#44cc88'+'80');
-sl(bx-6,nY+6,bx+6,pY-6,1.5,acc+'40');sl(bx+6,nY+6,bx-6,pY-6,1.5,acc+'40');
-sl(bx,nY+2,bx,nY+12,1,glow+'60');sc(bx,nY+13,2,glow+'80');
-const sY=nY+5;const lax=bx-16-(o.lAE||0),lay=sY+20+Math.sin(o.lAA||0)*14;const rax=bx+16+(o.rAE||0),ray=sY+20+Math.sin(o.rAA||0)*14;
-sf(bx-10,sY-2,6,6,accLt+'60');shadedLimb(bx-8,sY,lax,lay,7,cloak,dk,out);
-_s.shadowColor='#9060cc';_s.shadowBlur=3;shadedLimb(lax,lay,lax-3,lay+12,6,'#9060cc','#6040a0',out);_s.shadowBlur=0;_s.shadowColor='transparent';
-sc(lax-3,lay+14,4,sk);sl(lax-3,lay+14,lax-7,lay+30,2.5,blade);sl(lax-7,lay+30,lax-9,lay+32,2,bladeDk);sl(lax-6,lay+32,lax-8,lay+34,1.5,blade);
-sl(lax-5,lay+14,lax-1,lay+14,3,glow+'80');_s.shadowColor=glow;_s.shadowBlur=3;sl(lax-4,lay+16,lax-8,lay+30,1,glow+'40');_s.shadowBlur=0;_s.shadowColor='transparent';
-shadedLimb(bx+8,sY,rax,ray,7,cloak,dk,out);_s.shadowColor='#9060cc';_s.shadowBlur=3;shadedLimb(rax,ray,rax+3,ray+12,6,'#9060cc','#6040a0',out);_s.shadowBlur=0;_s.shadowColor='transparent';
-sc(rax+3,ray+14,4,sk);sl(rax+3,ray+14,rax+7,ray+30,2.5,blade);sl(rax+7,ray+30,rax+8,ray+33,2,bladeDk);
-sl(rax+1,ray+14,rax+5,ray+14,3,glow+'80');_s.shadowColor=glow;_s.shadowBlur=3;sl(rax+4,ray+16,rax+8,ray+30,1,glow+'40');_s.shadowBlur=0;_s.shadowColor='transparent';
+// NOIR — Shadow Assassin. Professional pixel-art with bezier contours,
+// tapered limbs, flowing cloak, 3-tone shading throughout.
+function drawNoir(cx,gy,o){const L=o.lean||0,bx=cx+L;
+const tw=o.torsoTwist||0,hr=o.hipRot||0;
+const sk='#d8c8a8',skDk='#b8a888',skLt='#e8dcc8',skMid='#d0c0a0';
+const cloak='#2a1840',dk='#180c28',cloakMid='#221438',acc='#6030a0',accLt='#8050cc';
+const glow='#ffcc00',glowLt='#fff8cc',blade='#c0c8d8',bladeDk='#8090a0',out='#0c0618';
+
+// === FLOWING CLOAK (behind everything — bezier curves) ===
+_s.fillStyle=cloak+'d0';_s.beginPath();
+_s.moveTo(bx-16,gy-74);
+_s.quadraticCurveTo(bx-26-L*3,gy-22,bx-18-L*4,gy+8);
+_s.lineTo(bx+18-L,gy+8);
+_s.quadraticCurveTo(bx+20,gy-22,bx+16,gy-74);
+_s.closePath();_s.fill();_s.strokeStyle=acc+'50';_s.lineWidth=1.5;_s.stroke();
+// Cloak fold lines (bezier)
+_s.strokeStyle=acc+'20';_s.lineWidth=1;_s.lineCap='round';
+_s.beginPath();_s.moveTo(bx-10,gy-55);_s.quadraticCurveTo(bx-14-L*1.5,gy-35,bx-16-L*2,gy-12);_s.stroke();
+_s.beginPath();_s.moveTo(bx+8,gy-55);_s.quadraticCurveTo(bx+7-L*0.5,gy-35,bx+6-L,gy-12);_s.stroke();
+// Mystical rune circles on cloak
+_s.strokeStyle=acc+'15';_s.lineWidth=0.8;_s.beginPath();_s.arc(bx-8,gy-35,4,0,Math.PI*2);_s.stroke();
+_s.beginPath();_s.arc(bx+4,gy-25,3,0,Math.PI*2);_s.stroke();
+// Cloak tattered edges (bezier wisps)
+for(let i=0;i<4;i++){
+  _s.strokeStyle=dk+'80';_s.lineWidth=1.5;_s.lineCap='round';
+  _s.beginPath();_s.moveTo(bx-16-L*3-i*2,gy+2+i*2);
+  _s.quadraticCurveTo(bx-18-L*3.5-i*2.5,gy+5+i*3,bx-20-L*4-i*3,gy+8+i*4);_s.stroke();
+  _s.beginPath();_s.moveTo(bx+16-L+i*2,gy+2+i*2);
+  _s.quadraticCurveTo(bx+18-L*0.5+i*2.5,gy+5+i*3,bx+20-L+i*3,gy+8+i*4);_s.stroke();
+}
+
+// === LEGS (tapered, contoured with drawLimb — sleek assassin) ===
+const lx=bx-6+(o.lLS||0)+hr*0.3, ly=gy-(o.lFL||0);
+const rx=bx+6+(o.rLS||0)+hr*0.3, ry=gy-(o.rFL||0);
+// Upper legs
+const lKneeX=(bx-3+lx)/2, lKneeY=(gy-38+ly)/2;
+const rKneeX=(bx+3+rx)/2, rKneeY=(gy-38+ry)/2;
+drawLimb(bx-3,gy-38,lKneeX,lKneeY,8,7,cloakMid,cloak,dk,out);
+drawLimb(lKneeX,lKneeY,lx,ly,7,5,cloakMid,cloak,dk,out);
+drawLimb(bx+3,gy-38,rKneeX,rKneeY,8,7,cloakMid,cloak,dk,out);
+drawLimb(rKneeX,rKneeY,rx,ry,7,5,cloakMid,cloak,dk,out);
+// Shin accent straps
+sl(lx-2,ly-6,lx+2,ly-6,1.5,acc+'60');
+sl(rx-2,ry-6,rx+2,ry-6,1.5,acc+'60');
+// Boots using drawBoot (dark, stealthy)
+drawBoot(lx,ly,8,14,dk,'#0a0414','#060210',out,0);
+drawBoot(rx,ry,8,14,dk,'#0a0414','#060210',out,0);
+
+// === TORSO — BEZIER MASCULINE SLEEK with 3-tone shading ===
+const nY=gy-74,pY=gy-38;
+const twOff=tw*0.3;
+// Main torso — slim, straight (assassin build)
+_s.fillStyle=cloakMid;_s.beginPath();
+_s.moveTo(bx-9+twOff,nY);
+_s.lineTo(bx+9+twOff,nY);
+_s.quadraticCurveTo(bx+10+twOff,nY+8,bx+8+twOff,nY+16);
+_s.lineTo(bx+7+twOff*0.5,nY+26);
+_s.quadraticCurveTo(bx+8+hr*0.2,nY+32,bx+7+hr*0.3,pY);
+_s.lineTo(bx-7+hr*0.3,pY);
+_s.quadraticCurveTo(bx-8+hr*0.2,nY+32,bx-7+twOff*0.5,nY+26);
+_s.lineTo(bx-8+twOff,nY+16);
+_s.quadraticCurveTo(bx-10+twOff,nY+8,bx-9+twOff,nY);
+_s.closePath();_s.fill();
+// Highlight right
+_s.fillStyle=accLt+'18';_s.beginPath();
+_s.moveTo(bx+twOff,nY);_s.lineTo(bx+9+twOff,nY);
+_s.quadraticCurveTo(bx+10+twOff,nY+8,bx+8+twOff,nY+16);
+_s.lineTo(bx+7+twOff*0.5,nY+26);
+_s.quadraticCurveTo(bx+8+hr*0.2,nY+32,bx+7+hr*0.3,pY);
+_s.lineTo(bx+hr*0.3,pY);_s.closePath();_s.fill();
+// Shadow left
+_s.fillStyle=dk+'60';_s.beginPath();
+_s.moveTo(bx-9+twOff,nY);_s.lineTo(bx+twOff,nY);
+_s.lineTo(bx+hr*0.3,pY);_s.lineTo(bx-7+hr*0.3,pY);
+_s.quadraticCurveTo(bx-8+hr*0.2,nY+32,bx-7+twOff*0.5,nY+26);
+_s.lineTo(bx-8+twOff,nY+16);
+_s.quadraticCurveTo(bx-10+twOff,nY+8,bx-9+twOff,nY);_s.closePath();_s.fill();
+// Torso outline
+_s.strokeStyle=out;_s.lineWidth=1.5;_s.beginPath();
+_s.moveTo(bx-9+twOff,nY);_s.lineTo(bx+9+twOff,nY);
+_s.quadraticCurveTo(bx+10+twOff,nY+8,bx+8+twOff,nY+16);
+_s.lineTo(bx+7+twOff*0.5,nY+26);
+_s.quadraticCurveTo(bx+8+hr*0.2,nY+32,bx+7+hr*0.3,pY);
+_s.lineTo(bx-7+hr*0.3,pY);
+_s.quadraticCurveTo(bx-8+hr*0.2,nY+32,bx-7+twOff*0.5,nY+26);
+_s.lineTo(bx-8+twOff,nY+16);
+_s.quadraticCurveTo(bx-10+twOff,nY+8,bx-9+twOff,nY);_s.stroke();
+// Collar piece
+sf(bx-6+twOff,nY,12,5,cloak);sf(bx-6+twOff,nY,12,1.5,acc);sf(bx-6+twOff,nY+4,12,1,acc+'40');
+// Belt with glowing gem
+sf(bx-8+hr*0.3,pY-3,16,4,acc);
+_s.shadowColor=glow;_s.shadowBlur=5;sf(bx-2+hr*0.3,pY-2,4,3,glow);_s.shadowBlur=0;_s.shadowColor='transparent';
+// Pouch accents
+sf(bx-7+hr*0.3,pY-5,3,4,accLt+'80');sf(bx+5+hr*0.3,pY-5,3,4,'#44cc88'+'80');
+// Cross straps on torso (bezier)
+_s.strokeStyle=acc+'40';_s.lineWidth=1.5;_s.lineCap='round';
+_s.beginPath();_s.moveTo(bx-6+twOff,nY+6);_s.quadraticCurveTo(bx+twOff*0.5,nY+18,bx+6+hr*0.3,pY-6);_s.stroke();
+_s.beginPath();_s.moveTo(bx+6+twOff,nY+6);_s.quadraticCurveTo(bx+twOff*0.5,nY+18,bx-6+hr*0.3,pY-6);_s.stroke();
+// Torso rune glow
+sl(bx+twOff,nY+2,bx+twOff,nY+12,1,glow+'60');sc(bx+twOff,nY+13,2,glow+'80');
+
+// === ARMS (tapered, contoured with drawLimb — sleek assassin) ===
+const sY=nY+5;
+const lax=bx-16-(o.lAE||0)+twOff, lay=sY+20+Math.sin(o.lAA||0)*14;
+const rax=bx+16+(o.rAE||0)+twOff, ray=sY+20+Math.sin(o.rAA||0)*14;
+// Forearm endpoints
+const lfax=lax-3+(o.lFA||0), lfay=lay+12;
+const rfax=rax+3+(o.rFA||0), rfay=ray+12;
+// Left shoulder pad
+se(bx-10+twOff,sY-2,5,5,accLt+'60');
+// Left upper arm (cloak sleeve)
+drawLimb(bx-8+twOff,sY,lax,lay,7,5,cloakMid,cloak,dk,out);
+// Left forearm (purple wrappings with glow)
+_s.shadowColor='#9060cc';_s.shadowBlur=3;
+drawLimb(lax,lay,lfax,lfay,6,4,'#9060cc','#7848b0','#6040a0',out);
+_s.shadowBlur=0;_s.shadowColor='transparent';
+// Left hand
+if((o.lFist||0)>0.5){drawFist(lfax,lfay+2,4,sk,skDk,out);}
+else{sc(lfax,lfay+2,4,sk);sc(lfax,lfay+2,4,out+'18');}
+// Left blade
+sl(lfax,lfay+2,lfax-4,lfay+18,2.5,blade);sl(lfax-4,lfay+18,lfax-6,lfay+20,2,bladeDk);
+sl(lfax-3,lfay+20,lfax-5,lfay+22,1.5,blade);
+// Left wrist glow
+sl(lfax-2,lfay+2,lfax+2,lfay+2,3,glow+'80');
+_s.shadowColor=glow;_s.shadowBlur=3;sl(lfax-1,lfay+4,lfax-5,lfay+18,1,glow+'40');_s.shadowBlur=0;_s.shadowColor='transparent';
+// Right upper arm (cloak sleeve)
+drawLimb(bx+8+twOff,sY,rax,ray,7,5,cloakMid,cloak,dk,out);
+// Right forearm (purple wrappings with glow)
+_s.shadowColor='#9060cc';_s.shadowBlur=3;
+drawLimb(rax,ray,rfax,rfay,6,4,'#9060cc','#7848b0','#6040a0',out);
+_s.shadowBlur=0;_s.shadowColor='transparent';
+// Right hand
+if((o.rFist||0)>0.5){drawFist(rfax,rfay+2,4,sk,skDk,out);}
+else{sc(rfax,rfay+2,4,sk);sc(rfax,rfay+2,4,out+'18');}
+// Right blade
+sl(rfax,rfay+2,rfax+4,rfay+18,2.5,blade);sl(rfax+4,rfay+18,rfax+5,rfay+21,2,bladeDk);
+// Right wrist glow
+sl(rfax-2,rfay+2,rfax+2,rfay+2,3,glow+'80');
+_s.shadowColor=glow;_s.shadowBlur=3;sl(rfax+1,rfay+4,rfax+5,rfay+18,1,glow+'40');_s.shadowBlur=0;_s.shadowColor='transparent';
+
 // === HEAD — BIG, dramatic hood, face wraps, piercing glowing eyes ===
 const hY=nY-22+(o.hY||0);
 // Neck (thin, partly wrapped)
-sf(bx-2,nY-6,5,8,sk);sf(bx-3,nY-4,7,4,dk+'90'); // neck wrapping
-
-// Head base (hidden under hood+wraps, but defines the shape)
+sf(bx-2+twOff,nY-6,5,8,sk);sf(bx-3+twOff,nY-4,7,4,dk+'90');
+// Head base
 sc(bx,hY,17,sk);
 
-// === FACE WRAPS — ninja-style, layered cloth covering lower face ===
-// Multiple strips for texture (not just one rectangle)
-sf(bx-14,hY+2,28,12,dk+'e0');                     // main wrap area
-// Wrap cloth texture — horizontal strips with slight color variation
+// === FACE WRAPS — ninja-style, layered cloth ===
+sf(bx-14,hY+2,28,12,dk+'e0');
 sf(bx-13,hY+2,26,2,dk+'c0');sf(bx-14,hY+5,28,2,dk+'d0');
 sf(bx-13,hY+8,26,2,dk+'b0');sf(bx-14,hY+11,28,2,dk+'c0');
-// Wrap edges
-sl(bx-14,hY+2,bx+14,hY+2,1.2,acc+'30');          // top edge
-sl(bx-14,hY+14,bx+14,hY+14,1,acc+'20');           // bottom edge
-// Wrap crossing point (where cloth folds)
+sl(bx-14,hY+2,bx+14,hY+2,1.2,acc+'30');
+sl(bx-14,hY+14,bx+14,hY+14,1,acc+'20');
 sl(bx+4,hY+3,bx-2,hY+13,1,acc+'25');
-// Trailing wrap tail (flowing behind)
+// Trailing wrap tail (bezier)
 _s.strokeStyle=dk+'90';_s.lineWidth=3;_s.lineCap='round';_s.beginPath();
 _s.moveTo(bx-14,hY+7);_s.quadraticCurveTo(bx-22,hY+14,bx-26,hY+22);_s.stroke();
 _s.lineWidth=2;_s.strokeStyle=dk+'50';_s.beginPath();
 _s.moveTo(bx-26,hY+22);_s.quadraticCurveTo(bx-28,hY+28,bx-24,hY+32);_s.stroke();
 
-// === MASSIVE HOOD (the defining silhouette element) ===
-// Hood is HUGE — extends well beyond the head on both sides
+// === MASSIVE HOOD (defining silhouette — bezier) ===
 _s.fillStyle=cloak;_s.beginPath();_s.ellipse(bx,hY-4,26,20,0,Math.PI,0);_s.fill();
-// Hood inner shadow (darker gradient at the top)
 _s.fillStyle=dk+'80';_s.beginPath();_s.ellipse(bx,hY-8,20,10,0,Math.PI,0);_s.fill();
-// Hood outline — thick, ornate purple accent
 _s.strokeStyle=acc;_s.lineWidth=3.5;_s.beginPath();_s.ellipse(bx,hY-4,26,20,0,Math.PI,0);_s.stroke();
-// Inner trim line
 _s.strokeStyle=accLt+'40';_s.lineWidth=1;_s.beginPath();_s.ellipse(bx,hY-4,23,17,0,Math.PI+0.1,2*Math.PI-0.1);_s.stroke();
 
-// Pointed ear/horn tips (dramatic, extend upward)
-sl(bx-25,hY-4,bx-32,hY-18,4,acc);sl(bx-30,hY-14,bx-34,hY-22,2,accLt+'60');
-sl(bx+25,hY-4,bx+32,hY-18,4,acc);sl(bx+30,hY-14,bx+34,hY-22,2,accLt+'60');
+// Pointed ear/horn tips (bezier curves)
+_s.strokeStyle=acc;_s.lineWidth=4;_s.lineCap='round';
+_s.beginPath();_s.moveTo(bx-25,hY-4);_s.quadraticCurveTo(bx-30,hY-12,bx-32,hY-18);_s.stroke();
+_s.strokeStyle=accLt+'60';_s.lineWidth=2;
+_s.beginPath();_s.moveTo(bx-30,hY-14);_s.quadraticCurveTo(bx-33,hY-19,bx-34,hY-22);_s.stroke();
+_s.strokeStyle=acc;_s.lineWidth=4;
+_s.beginPath();_s.moveTo(bx+25,hY-4);_s.quadraticCurveTo(bx+30,hY-12,bx+32,hY-18);_s.stroke();
+_s.strokeStyle=accLt+'60';_s.lineWidth=2;
+_s.beginPath();_s.moveTo(bx+30,hY-14);_s.quadraticCurveTo(bx+33,hY-19,bx+34,hY-22);_s.stroke();
 
-// Hood rune (glowing symbol at the peak)
+// Hood rune
 sc(bx,hY-18,4,acc+'40');
 _s.strokeStyle=acc+'50';_s.lineWidth=1;_s.beginPath();_s.arc(bx,hY-18,4,0,Math.PI*2);_s.stroke();
-// Inner rune cross
 sl(bx-2,hY-18,bx+2,hY-18,0.8,acc+'40');sl(bx,hY-20,bx,hY-16,0.8,acc+'40');
 
-// Shadow covering the face between hood and wraps (only eyes visible)
+// Shadow covering face between hood and wraps
 se(bx,hY+1,16,6,cloak+'c0');
 
-// === GLOWING EYES — the MAIN feature, piercing from the darkness ===
-// These eyes should be ICONIC — narrow, intense, glowing yellow from pure shadow
-
-// Outer glow (ambient light spilling from the eyes into the hood shadow)
+// === GLOWING EYES — ICONIC, piercing from darkness ===
 _s.shadowColor=glow;_s.shadowBlur=14;
-
-// --- LEFT EYE (narrow, intense, glowing) ---
-// Dark eye socket first (shadow recess)
+// --- LEFT EYE ---
 se(bx-7,hY-2,8,4,dk+'a0');
-// Bright glowing iris (narrow anime-style — wider than tall)
 se(bx-7,hY-2,7,3.5,glow);
-// Inner bright core
 se(bx-7,hY-2,5,2.5,'#ffe060');
-// Hot white center
 se(bx-6,hY-2,3,1.5,'#ffffff');
-// Pupil slit (vertical, cat-like — assassin)
 sf(bx-7,hY-3,1.5,3,'#806020');
-
-// --- RIGHT EYE (mirror) ---
+// --- RIGHT EYE ---
 se(bx+7,hY-2,8,4,dk+'a0');
 se(bx+7,hY-2,7,3.5,glow);
 se(bx+7,hY-2,5,2.5,'#ffe060');
 se(bx+8,hY-2,3,1.5,'#ffffff');
 sf(bx+7,hY-3,1.5,3,'#806020');
-
-// Extra glow flare (light streaking from outer corners — dramatic)
+// Extra glow flare
 sl(bx-13,hY-2,bx-17,hY-3,1.5,glow+'60');
 sl(bx+13,hY-2,bx+17,hY-3,1.5,glow+'60');
-
 _s.shadowBlur=0;_s.shadowColor='transparent';
-
-// Eyebrows (sharp V-shape, visible above the glow — menacing)
+// Eyebrows (sharp V-shape, menacing)
 sl(bx-12,hY-5,bx-4,hY-8,2.5,dk);
 sl(bx+4,hY-8,bx+12,hY-5,2.5,dk);
-
-// No nose, no mouth — all hidden behind wraps. The eyes ARE the face.
 }
 
 // GEN + DRAW + INIT
