@@ -254,148 +254,211 @@ else if(a==="thrown"){
 return o;}
 function pixelFace(bx,hY,opts){const{eyeColor,eyeW,eyeH,browColor,browAngle,mouthW,mouthColor,mouthY,noseColor,skinDark,outline,expression}=opts;const o=outline||'#1a1020';sf(bx-8,hY-4,eyeW+3,eyeH+2,'#ffffff');sf(bx-7,hY-3,eyeW,eyeH,eyeColor);sf(bx-6,hY-2,2,2,o);sf(bx-7,hY-4,1,1,'#ffffff');sf(bx+3,hY-4,eyeW+3,eyeH+2,'#ffffff');sf(bx+4,hY-3,eyeW,eyeH,eyeColor);sf(bx+5,hY-2,2,2,o);sf(bx+4,hY-4,1,1,'#ffffff');sl(bx-9,hY-7+browAngle,bx-3,hY-8,2,browColor||o);sl(bx+2,hY-8,bx+8,hY-7-browAngle,2,browColor||o);sf(bx-1,hY+2,3,2,noseColor||skinDark||'#c0a090');const my=mouthY||7;if(expression==='smile'){sf(bx-2,hY+my,5,2,mouthColor||'#d09090');sf(bx-1,hY+my,3,1,'#e8a0a0');}else if(expression==='grimace'){sf(bx-3,hY+my,mouthW||7,3,mouthColor||o);sf(bx-2,hY+my+1,2,1,'#ffffff');sf(bx+1,hY+my+1,2,1,'#ffffff');}else if(expression==='serious'){sf(bx-2,hY+my,mouthW||5,2,mouthColor||'#a07060');}else if(expression!=='hidden'){sf(bx-2,hY+my,mouthW||5,2,mouthColor||'#c08080');}}
 
-// AURORA — Ice Princess. CLEARLY FEMININE: hourglass body with visible curves,
-// massive flowing hair, dress with split skirt, graceful proportions.
+// AURORA — Ice Princess. Professional pixel-art with bezier contours,
+// tapered limbs, flowing hair, 3-tone shading throughout.
 function drawAurora(cx,gy,o){const L=o.lean||0,bx=cx+L;
-const sk='#f2ddd0',skDk='#d4b8a8',skLt='#fff0e8';
+const tw=o.torsoTwist||0,hr=o.hipRot||0;
+const sk='#f2ddd0',skDk='#d4b8a8',skLt='#fff0e8',skMid='#e8d0c0';
 const hair='#80d8ee',hairDk='#50a8cc',hairLt='#b0f0ff';
-const top='#3a78b0',topDk='#224870',topLt='#5898d0';
-const bot='#2858a0',boot='#1a3860',out='#102838',acc='#60ccee',accLt='#90e0ff';
+const top='#3a78b0',topDk='#224870',topLt='#5898d0',topMid='#4888c0';
+const bot='#2858a0',bootC='#1a3860',bootDk='#0e2440',bootSole='#0a1830';
+const out='#102838',acc='#60ccee',accLt='#90e0ff';
 
-// === MASSIVE FLOWING HAIR (behind everything — this IS her silhouette) ===
-// Hair is huge — extends far down her back, waves and flows
-for(let i=0;i<35;i++){const sw=Math.sin(i*0.18+L*0.04)*6+Math.cos(i*0.3)*2;
-const w=Math.max(2,10-i/4);
-sf(bx-5+sw-L*0.4,gy-92+i*3,w,3,i%6===0?hairLt:i%3===0?hair:hairDk);}
+// === MASSIVE FLOWING HAIR (behind everything — bezier curves) ===
+_s.save();
+for(let strand=0;strand<3;strand++){
+  const ox=strand*4-4, baseW=12-strand*2;
+  _s.strokeStyle=strand===0?hairDk:strand===1?hair:hairLt;
+  _s.lineWidth=baseW;_s.lineCap='round';_s.beginPath();
+  _s.moveTo(bx+ox,gy-100);
+  _s.quadraticCurveTo(bx+ox-8-L*0.6,gy-60,bx+ox-6+Math.sin(L*0.08)*8-L*0.8,gy-20);
+  _s.quadraticCurveTo(bx+ox-4+Math.sin(L*0.05)*6-L*1.0,gy+5,bx+ox-2-L*1.2,gy+10);
+  _s.stroke();
+}
+_s.restore();
 // Hair ribbon
-sc(bx-4,gy-88,3.5,acc);sc(bx-4,gy-88,2,accLt);
+sc(bx-5,gy-96,4,acc);sc(bx-5,gy-96,2.5,accLt);
 
 // === CAPE/TRAIN (behind body, flows with movement) ===
-_s.fillStyle='rgba(96,204,238,0.12)';_s.beginPath();_s.moveTo(bx-10,gy-76);
-_s.quadraticCurveTo(bx-22-L*3,gy-30,bx-14-L*4,gy+8);
-_s.lineTo(bx+10,gy+8);_s.quadraticCurveTo(bx+12,gy-30,bx+10,gy-76);_s.closePath();_s.fill();
+_s.fillStyle='rgba(96,204,238,0.10)';_s.beginPath();_s.moveTo(bx-12,gy-84);
+_s.quadraticCurveTo(bx-26-L*3,gy-34,bx-16-L*4,gy+10);
+_s.lineTo(bx+12,gy+10);_s.quadraticCurveTo(bx+14,gy-34,bx+12,gy-84);_s.closePath();_s.fill();
 
-// === LEGS (slender, long — shows through split skirt) ===
-const lx=bx-7+(o.lLS||0),ly=gy-(o.lFL||0),rx=bx+7+(o.rLS||0),ry=gy-(o.rFL||0);
-shadedLimb(bx-4,gy-38,lx,ly,8,sk,skDk,out);  // visible skin (thigh-highs)
-shadedLimb(bx+4,gy-38,rx,ry,8,sk,skDk,out);
-// Thigh-high boots (tall, with heel)
-sf(lx-4,ly-12,9,14,boot);sf(lx-4,ly-12,9,2,acc);sl(lx-3,ly,lx+5,ly,1.5,acc+'50');sf(lx+2,ly-4,3,6,boot);
-sf(rx-4,ry-12,9,14,boot);sf(rx-4,ry-12,9,2,acc);sl(rx-3,ry,rx+5,ry,1.5,acc+'50');sf(rx+2,ry-4,3,6,boot);
+// === LEGS (tapered, contoured with drawLimb) ===
+const lx=bx-8+(o.lLS||0)+hr*0.3, ly=gy-(o.lFL||0);
+const rx=bx+8+(o.rLS||0)+hr*0.3, ry=gy-(o.rFL||0);
+// Upper legs (thighs) — tapered from hip to knee
+const lKneeX=(bx-5+lx)/2, lKneeY=(gy-44+ly)/2;
+const rKneeX=(bx+5+rx)/2, rKneeY=(gy-44+ry)/2;
+drawLimb(bx-5,gy-44,lKneeX,lKneeY,10,8,skLt,sk,skDk,out);
+drawLimb(lKneeX,lKneeY,lx,ly,8,6,skLt,sk,skDk,out);
+drawLimb(bx+5,gy-44,rKneeX,rKneeY,10,8,skLt,sk,skDk,out);
+drawLimb(rKneeX,rKneeY,rx,ry,8,6,skLt,sk,skDk,out);
+// Boots using drawBoot
+drawBoot(lx,ly,10,16,bootC,bootDk,bootSole,out,0);
+drawBoot(rx,ry,10,16,bootC,bootDk,bootSole,out,0);
+// Boot accent trim
+sl(lx-5,ly-14,lx+7,ly-14,1.5,acc);
+sl(rx-5,ry-14,rx+7,ry-14,1.5,acc);
 
-// === TORSO — TRUE HOURGLASS with visible feminine curves ===
-const nY=gy-80,pY=gy-38;
-// Draw the body as a custom bezier shape — NOT a trapezoid
-_s.fillStyle=top;_s.beginPath();
-_s.moveTo(bx-9,nY);                    // left shoulder
-_s.lineTo(bx+9,nY);                    // right shoulder
-_s.quadraticCurveTo(bx+11,nY+10,bx+6,nY+18);  // right bust curve
-_s.quadraticCurveTo(bx+4,nY+22,bx+5,nY+26);   // right waist pinch
-_s.quadraticCurveTo(bx+8,nY+32,bx+12,pY);      // right hip flare
-_s.lineTo(bx-12,pY);                   // bottom
-_s.quadraticCurveTo(bx-8,nY+32,bx-5,nY+26);   // left hip flare
-_s.quadraticCurveTo(bx-4,nY+22,bx-6,nY+18);   // left waist pinch
-_s.quadraticCurveTo(bx-11,nY+10,bx-9,nY);      // left bust curve
+// === TORSO — BEZIER HOURGLASS with 3-tone shading ===
+const nY=gy-88,pY=gy-44;
+const twOff=tw*0.3; // torso twist visual offset
+// Main torso shape — true hourglass with quadraticCurveTo
+_s.fillStyle=topMid;_s.beginPath();
+_s.moveTo(bx-11+twOff,nY);                          // left shoulder
+_s.lineTo(bx+11+twOff,nY);                          // right shoulder
+_s.quadraticCurveTo(bx+14+twOff,nY+12,bx+8+twOff,nY+20);  // right bust curve
+_s.quadraticCurveTo(bx+5+twOff*0.5,nY+26,bx+6+twOff*0.5,nY+30);   // right waist pinch
+_s.quadraticCurveTo(bx+10+hr*0.2,nY+38,bx+14+hr*0.3,pY);   // right hip flare
+_s.lineTo(bx-14+hr*0.3,pY);                         // bottom
+_s.quadraticCurveTo(bx-10+hr*0.2,nY+38,bx-6+twOff*0.5,nY+30);   // left hip flare
+_s.quadraticCurveTo(bx-5+twOff*0.5,nY+26,bx-8+twOff,nY+20);     // left waist pinch
+_s.quadraticCurveTo(bx-14+twOff,nY+12,bx-11+twOff,nY);           // left bust curve
 _s.closePath();_s.fill();
-_s.strokeStyle=out;_s.lineWidth=1.2;_s.stroke();
-// Dark shading on left side
+// Highlight on right side
+_s.fillStyle=topLt+'50';_s.beginPath();
+_s.moveTo(bx+twOff,nY);_s.lineTo(bx+11+twOff,nY);
+_s.quadraticCurveTo(bx+14+twOff,nY+12,bx+8+twOff,nY+20);
+_s.quadraticCurveTo(bx+5+twOff*0.5,nY+26,bx+6+twOff*0.5,nY+30);
+_s.quadraticCurveTo(bx+10+hr*0.2,nY+38,bx+14+hr*0.3,pY);
+_s.lineTo(bx+hr*0.3,pY);_s.closePath();_s.fill();
+// Shadow on left side
 _s.fillStyle=topDk+'50';_s.beginPath();
-_s.moveTo(bx-9,nY);_s.lineTo(bx,nY);_s.lineTo(bx,pY);_s.lineTo(bx-12,pY);
-_s.quadraticCurveTo(bx-8,nY+32,bx-5,nY+26);
-_s.quadraticCurveTo(bx-4,nY+22,bx-6,nY+18);
-_s.quadraticCurveTo(bx-11,nY+10,bx-9,nY);_s.closePath();_s.fill();
+_s.moveTo(bx-11+twOff,nY);_s.lineTo(bx+twOff,nY);
+_s.lineTo(bx+hr*0.3,pY);_s.lineTo(bx-14+hr*0.3,pY);
+_s.quadraticCurveTo(bx-10+hr*0.2,nY+38,bx-6+twOff*0.5,nY+30);
+_s.quadraticCurveTo(bx-5+twOff*0.5,nY+26,bx-8+twOff,nY+20);
+_s.quadraticCurveTo(bx-14+twOff,nY+12,bx-11+twOff,nY);_s.closePath();_s.fill();
+// Specular highlight line along right shoulder edge
+_s.strokeStyle=topLt+'60';_s.lineWidth=1;_s.beginPath();
+_s.moveTo(bx+4+twOff,nY+1);_s.quadraticCurveTo(bx+12+twOff,nY+8,bx+9+twOff,nY+16);_s.stroke();
+// 1.5px outline on torso
+_s.strokeStyle=out;_s.lineWidth=1.5;_s.beginPath();
+_s.moveTo(bx-11+twOff,nY);_s.lineTo(bx+11+twOff,nY);
+_s.quadraticCurveTo(bx+14+twOff,nY+12,bx+8+twOff,nY+20);
+_s.quadraticCurveTo(bx+5+twOff*0.5,nY+26,bx+6+twOff*0.5,nY+30);
+_s.quadraticCurveTo(bx+10+hr*0.2,nY+38,bx+14+hr*0.3,pY);
+_s.lineTo(bx-14+hr*0.3,pY);
+_s.quadraticCurveTo(bx-10+hr*0.2,nY+38,bx-6+twOff*0.5,nY+30);
+_s.quadraticCurveTo(bx-5+twOff*0.5,nY+26,bx-8+twOff,nY+20);
+_s.quadraticCurveTo(bx-14+twOff,nY+12,bx-11+twOff,nY);_s.stroke();
 // Bust definition
-se(bx-4,nY+12,5,4,topLt+'40');se(bx+4,nY+12,5,4,topLt+'40');
-// V-neckline
-_s.fillStyle=sk;_s.beginPath();_s.moveTo(bx,nY+1);_s.lineTo(bx-5,nY+14);_s.lineTo(bx+5,nY+14);_s.closePath();_s.fill();
-sl(bx,nY+1,bx-5,nY+14,1.3,acc);sl(bx,nY+1,bx+5,nY+14,1.3,acc);
-// Waist belt (at the narrowest point)
-sf(bx-5,nY+24,10,3,acc);se(bx,nY+25,2.5,2.5,'#fff');
+se(bx-4+twOff,nY+14,6,4.5,topLt+'35');se(bx+5+twOff,nY+14,6,4.5,topLt+'35');
+// V-neckline (skin showing)
+_s.fillStyle=sk;_s.beginPath();_s.moveTo(bx+twOff,nY+2);
+_s.lineTo(bx-6+twOff,nY+16);_s.lineTo(bx+6+twOff,nY+16);_s.closePath();_s.fill();
+sl(bx+twOff,nY+2,bx-6+twOff,nY+16,1.5,acc);
+sl(bx+twOff,nY+2,bx+6+twOff,nY+16,1.5,acc);
+// Waist belt with gem (at the narrowest point)
+sf(bx-6+twOff*0.5,nY+28,12,4,acc);
+se(bx+twOff*0.5,nY+30,3,3,'#fff');sc(bx+twOff*0.5,nY+30,1.5,accLt);
+// Armor accent lines on torso
+sl(bx-8+twOff,nY+6,bx-6+twOff*0.5,nY+28,1,acc+'30');
+sl(bx+8+twOff,nY+6,bx+6+twOff*0.5,nY+28,1,acc+'30');
 // Split skirt flare below hips
-_s.fillStyle=bot;_s.beginPath();_s.moveTo(bx-12,pY);_s.lineTo(bx-16,pY+10);
-_s.lineTo(bx-4,pY+8);_s.lineTo(bx,pY+2);_s.closePath();_s.fill();
-_s.beginPath();_s.moveTo(bx+12,pY);_s.lineTo(bx+16,pY+10);
-_s.lineTo(bx+4,pY+8);_s.lineTo(bx,pY+2);_s.closePath();_s.fill();
-sf(bx-12,pY,24,1.5,acc);
+_s.fillStyle=bot;_s.beginPath();_s.moveTo(bx-14+hr*0.3,pY);
+_s.quadraticCurveTo(bx-18+hr*0.3,pY+6,bx-20+hr*0.2,pY+14);
+_s.lineTo(bx-4,pY+10);_s.lineTo(bx,pY+3);_s.closePath();_s.fill();
+_s.beginPath();_s.moveTo(bx+14+hr*0.3,pY);
+_s.quadraticCurveTo(bx+18+hr*0.3,pY+6,bx+20+hr*0.2,pY+14);
+_s.lineTo(bx+4,pY+10);_s.lineTo(bx,pY+3);_s.closePath();_s.fill();
+sf(bx-14+hr*0.3,pY,28,2,acc);
 
-// === ARMS (slender, graceful) ===
-const sY=nY+3;const lax=bx-16-(o.lAE||0),lay=sY+20+Math.sin(o.lAA||0)*14;
-const rax=bx+16+(o.rAE||0),ray=sY+20+Math.sin(o.rAA||0)*14;
-shadedLimb(bx-9,sY,lax,lay,6,top,topDk,out);
-shadedLimb(lax,lay,lax-3,lay+12,5,sk,skDk,out);
-// Ice crystal bracer
-sf(lax-2,lay-1,5,3,accLt);sc(lax,lay,2,'#fff');
-sc(lax-3,lay+14,3.5,sk);sc(lax-3,lay+14,3.5,out+'20');
-shadedLimb(bx+9,sY,rax,ray,6,top,topDk,out);
-shadedLimb(rax,ray,rax+3,ray+12,5,sk,skDk,out);
-sf(rax-1,ray-1,5,3,accLt);sc(rax+1,ray,2,'#fff');
-sc(rax+3,ray+14,3.5,sk);sc(rax+3,ray+14,3.5,out+'20');
+// === ARMS (tapered, contoured with drawLimb) ===
+const sY=nY+4;
+const lax=bx-18-(o.lAE||0)+twOff, lay=sY+22+Math.sin(o.lAA||0)*16;
+const rax=bx+18+(o.rAE||0)+twOff, ray=sY+22+Math.sin(o.rAA||0)*16;
+// Forearm endpoints
+const lfax=lax-4+(o.lFA||0), lfay=lay+14;
+const rfax=rax+4+(o.rFA||0), rfay=ray+14;
+// Left arm — upper arm (sleeve)
+drawLimb(bx-11+twOff,sY,lax,lay,8,5,topLt,topMid,topDk,out);
+// Left forearm (skin)
+drawLimb(lax,lay,lfax,lfay,5,4,skLt,skMid,skDk,out);
+// Ice crystal bracer on left
+sf(lax-3,lay-2,6,4,accLt);sc(lax,lay,2.5,'#fff');
+// Left hand — fist or open
+if((o.lFist||0)>0.5){drawFist(lfax,lfay+2,5,sk,skDk,out);}
+else{sc(lfax,lfay+2,4,sk);sc(lfax,lfay+2,4,out+'18');}
+// Right arm — upper arm (sleeve)
+drawLimb(bx+11+twOff,sY,rax,ray,8,5,topLt,topMid,topDk,out);
+// Right forearm (skin)
+drawLimb(rax,ray,rfax,rfay,5,4,skLt,skMid,skDk,out);
+// Ice crystal bracer on right
+sf(rax-2,ray-2,6,4,accLt);sc(rax+1,ray,2.5,'#fff');
+// Right hand — fist or open
+if((o.rFist||0)>0.5){drawFist(rfax,rfay+2,5,sk,skDk,out);}
+else{sc(rfax,rfay+2,4,sk);sc(rfax,rfay+2,4,out+'18');}
 
 // === HEAD — BIG (3-head chibi ratio), anime-style face ===
-// Research: head should be ~1/3 of total height, eyes should DOMINATE the face
-const hY=nY-24+(o.hY||0);
-const sk1='#fff0e8',sk2='#f0d8c8',sk3='#d8b8a0',sk4='#c09880'; // 4-tone skin ramp
+const hY=nY-26+(o.hY||0);
+const sk1='#fff0e8',sk2='#f0d8c8',sk3='#d8b8a0',sk4='#c09880';
 
 // Neck (very thin — feminine)
-sf(bx-2,nY-6,4,8,sk2);
+sf(bx-3+twOff,nY-7,6,9,sk2);
+_s.fillStyle=skDk+'40';_s.fillRect(bx-3+twOff,nY-7,3,9); // neck shadow
 
 // Head — BIG oval (wider than tall, soft feminine shape)
-se(bx,hY,22,20,sk2);                             // base skin
-// Skin shading — left side shadow, right highlight
-_s.fillStyle=sk3+'60';_s.beginPath();_s.ellipse(bx-6,hY+2,12,16,0,0,Math.PI*2);_s.fill(); // cheek shadow
-_s.fillStyle=sk1+'40';_s.beginPath();_s.ellipse(bx+6,hY-4,10,12,0,0,Math.PI*2);_s.fill(); // highlight
-// Subtle head outline
-_s.strokeStyle=sk4+'30';_s.lineWidth=1;_s.beginPath();_s.ellipse(bx,hY,22,20,0,0,Math.PI*2);_s.stroke();
+se(bx,hY,24,22,sk2);
+// 3-tone skin shading
+_s.fillStyle=sk3+'55';_s.beginPath();_s.ellipse(bx-7,hY+3,13,17,0,0,Math.PI*2);_s.fill();
+_s.fillStyle=sk1+'40';_s.beginPath();_s.ellipse(bx+7,hY-5,11,13,0,0,Math.PI*2);_s.fill();
+// Head outline
+_s.strokeStyle=out+'25';_s.lineWidth=1.5;_s.beginPath();_s.ellipse(bx,hY,24,22,0,0,Math.PI*2);_s.stroke();
 
 // Ears
-se(bx-20,hY+2,3,5,sk2);se(bx+20,hY+2,3,5,sk2);
+se(bx-22,hY+2,3.5,5.5,sk2);se(bx+22,hY+2,3.5,5.5,sk2);
 // Dangling crystal earrings
-sc(bx-20,hY+7,2.5,acc);sc(bx-20,hY+7,1,'#fff');sc(bx-20,hY+10,2,accLt);sc(bx-20,hY+10,0.8,'#fff');
-sc(bx+20,hY+7,2.5,acc);sc(bx+20,hY+7,1,'#fff');sc(bx+20,hY+10,2,accLt);sc(bx+20,hY+10,0.8,'#fff');
+sc(bx-22,hY+8,3,acc);sc(bx-22,hY+8,1.2,'#fff');sc(bx-22,hY+12,2.5,accLt);sc(bx-22,hY+12,1,'#fff');
+sc(bx+22,hY+8,3,acc);sc(bx+22,hY+8,1.2,'#fff');sc(bx+22,hY+12,2.5,accLt);sc(bx+22,hY+12,1,'#fff');
 
-// === HUGE VOLUMINOUS HAIR (the big silhouette element) ===
-se(bx,hY-16,24,12,hair);                         // main dome
-se(bx-8,hY-17,12,8,hairDk);                      // left shadow
-se(bx+12,hY-14,9,7,hairLt);                      // right highlight
-sf(bx-18,hY-8,10,10,hairDk);                     // left side bang (BIG)
-sf(bx+14,hY-6,9,8,hair);                         // right side bang
-// Hair shine streak
-sl(bx+4,hY-20,bx+8,hY-8,1.5,hairLt+'80');
+// === FLOWING BEZIER HAIR (the big silhouette element) ===
+// Main hair dome
+se(bx,hY-18,26,14,hair);
+se(bx-9,hY-19,13,9,hairDk); // left shadow
+se(bx+13,hY-16,10,8,hairLt); // right highlight
+// Side bangs as bezier curves
+_s.fillStyle=hairDk;_s.beginPath();
+_s.moveTo(bx-20,hY-10);_s.quadraticCurveTo(bx-24,hY-2,bx-20,hY+6);
+_s.quadraticCurveTo(bx-16,hY+2,bx-14,hY-6);_s.closePath();_s.fill();
+_s.fillStyle=hair;_s.beginPath();
+_s.moveTo(bx+16,hY-8);_s.quadraticCurveTo(bx+22,hY-1,bx+18,hY+4);
+_s.quadraticCurveTo(bx+14,hY+1,bx+12,hY-4);_s.closePath();_s.fill();
+// Flowing front bangs (bezier wisps)
+_s.strokeStyle=hairLt;_s.lineWidth=2.5;_s.lineCap='round';_s.beginPath();
+_s.moveTo(bx-6,hY-20);_s.quadraticCurveTo(bx-12,hY-12,bx-16,hY-4);_s.stroke();
+_s.strokeStyle=hair;_s.lineWidth=2;_s.beginPath();
+_s.moveTo(bx+2,hY-21);_s.quadraticCurveTo(bx+10,hY-14,bx+14,hY-6);_s.stroke();
+// Hair shine streaks
+sl(bx+5,hY-22,bx+9,hY-10,1.5,hairLt+'80');
+sl(bx-2,hY-20,bx+1,hY-12,1,hairLt+'50');
 
 // === ICE CROWN (taller, more ornate) ===
-sl(bx-10,hY-18,bx-14,hY-40,4,acc);
-sl(bx-5,hY-20,bx-7,hY-34,3,accLt);
-sl(bx,hY-21,bx,hY-44,5,'#c0f4ff');
-sl(bx+5,hY-20,bx+7,hY-34,3,accLt);
-sl(bx+10,hY-18,bx+14,hY-40,4,acc);
-sc(bx,hY-44,4.5,'#ffffff');sc(bx,hY-44,3,'#c0f4ff');sc(bx,hY-44,1.5,'#fff');
-sf(bx-14,hY-19,28,3,acc);                        // tiara band
-sl(bx-18,hY-10,bx-20,hY-20,2.5,acc+'70');
-sl(bx+18,hY-10,bx+20,hY-20,2.5,acc+'70');
+sl(bx-12,hY-20,bx-16,hY-44,4.5,acc);
+sl(bx-6,hY-22,bx-8,hY-38,3.5,accLt);
+sl(bx,hY-23,bx,hY-48,5.5,'#c0f4ff');
+sl(bx+6,hY-22,bx+8,hY-38,3.5,accLt);
+sl(bx+12,hY-20,bx+16,hY-44,4.5,acc);
+sc(bx,hY-48,5,'#ffffff');sc(bx,hY-48,3.5,'#c0f4ff');sc(bx,hY-48,1.8,'#fff');
+sf(bx-16,hY-21,32,3.5,acc);
+sl(bx-20,hY-12,bx-22,hY-22,2.5,acc+'70');
+sl(bx+20,hY-12,bx+22,hY-22,2.5,acc+'70');
 
-// === FACE — ANIME EYES (the #1 feature, everything revolves around these) ===
-// Eyes placed at vertical CENTER of head (halfway between top and chin)
-
+// === FACE — ANIME EYES (existing quality — kept intact) ===
 // --- LEFT EYE (BIG — 9x7 pixel area) ---
-// White sclera
 se(bx-8,hY-1,8,6,'#ffffff');
-// Iris — gradient effect: lighter at top, deeper at bottom
-se(bx-7,hY,6,5.5,'#40d0f0');                     // light cyan upper
-se(bx-7,hY+1,6,4.5,'#20a8d0');                   // medium mid
-se(bx-7,hY+2,5,3,'#1880a8');                     // deep lower
-// Pupil (large, centered)
+se(bx-7,hY,6,5.5,'#40d0f0');
+se(bx-7,hY+1,6,4.5,'#20a8d0');
+se(bx-7,hY+2,5,3,'#1880a8');
 sc(bx-6,hY+1,3,'#0c4060');
-// Catch light (BIG — this is what makes anime eyes sparkle)
-sc(bx-9,hY-2,2.5,'#ffffff');                      // main highlight (upper-left, BRIGHT)
-sc(bx-4,hY+2,1.5,'#ffffff');                      // secondary highlight (lower-right)
-sc(bx-8,hY+3,0.8,'#c0f0ff');                     // colored reflection
-// Upper eyelid (thick, defines the eye shape)
+sc(bx-9,hY-2,2.5,'#ffffff');
+sc(bx-4,hY+2,1.5,'#ffffff');
+sc(bx-8,hY+3,0.8,'#c0f0ff');
 _s.strokeStyle='#1a3858';_s.lineWidth=2;_s.beginPath();
 _s.ellipse(bx-7,hY-2,8.5,4,0,Math.PI+0.2,2*Math.PI-0.2);_s.stroke();
-// Lower lash (thin, subtle)
 _s.strokeStyle='#1a385840';_s.lineWidth=0.8;_s.beginPath();
 _s.ellipse(bx-7,hY+2,7,3,0,0.2,Math.PI-0.2);_s.stroke();
-
 // --- RIGHT EYE (mirror) ---
 se(bx+8,hY-1,8,6,'#ffffff');
 se(bx+9,hY,6,5.5,'#40d0f0');
@@ -409,27 +472,22 @@ _s.strokeStyle='#1a3858';_s.lineWidth=2;_s.beginPath();
 _s.ellipse(bx+9,hY-2,8.5,4,0,Math.PI+0.2,2*Math.PI-0.2);_s.stroke();
 _s.strokeStyle='#1a385840';_s.lineWidth=0.8;_s.beginPath();
 _s.ellipse(bx+9,hY+2,7,3,0,0.2,Math.PI-0.2);_s.stroke();
-
-// Eyelashes (long, elegant, extending outward+upward)
+// Eyelashes
 sl(bx-14,hY-3,bx-18,hY-8,2,'#1a3858');
 sl(bx-12,hY-4,bx-15,hY-8,1.2,'#1a385890');
 sl(bx+15,hY-3,bx+19,hY-8,2,'#1a3858');
 sl(bx+13,hY-4,bx+16,hY-8,1.2,'#1a385890');
-
 // Eyebrows (thin arched — feminine)
 _s.strokeStyle='#8a7060';_s.lineWidth=1.5;_s.lineCap='round';
 _s.beginPath();_s.moveTo(bx-14,hY-8);_s.quadraticCurveTo(bx-8,hY-12,bx-2,hY-9);_s.stroke();
 _s.beginPath();_s.moveTo(bx+3,hY-9);_s.quadraticCurveTo(bx+9,hY-12,bx+15,hY-8);_s.stroke();
-
-// Nose (minimalist — just a tiny shadow, less is more at this scale)
+// Nose
 sc(bx+1,hY+5,1,sk3);
-
-// Mouth (small, soft — curved smile)
+// Mouth (curved smile)
 _s.strokeStyle='#cc8888';_s.lineWidth=1.5;_s.lineCap='round';
 _s.beginPath();_s.moveTo(bx-3,hY+9);_s.quadraticCurveTo(bx,hY+11,bx+3,hY+9);_s.stroke();
-sc(bx,hY+10,0.8,'#e8a0a0');                      // lower lip hint
-
-// Blush (visible, warm)
+sc(bx,hY+10,0.8,'#e8a0a0');
+// Blush
 se(bx-11,hY+5,5,3,'#ffaaaa25');se(bx+11,hY+5,5,3,'#ffaaaa25');}
 
 // CRIMSON
