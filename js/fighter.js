@@ -533,12 +533,21 @@ class Fighter {
       return; // KO overrides everything
     }
 
-    // --- KNOCKDOWN STATE: on the ground, stays down ---
+    // --- KNOCKDOWN STATE: on the ground, recovers after delay ---
     if(this.state === 'knockdown') {
       this.stateTime++;
       this.y = GROUND;
       this.onGround = true;
-      return; // stays down until round ends
+      // Recovery: after hitStun expires, stand back up
+      // hitStun is set to 30 on knockdown entry — counts down via the
+      // decrement at the top of update(). Once it hits 0, fighter gets up.
+      if(this.hitStun <= 0 && this.hp > 0) {
+        this.state = 'idle';
+        this.stateTime = 0;
+        this.stateTimeF = 0;
+        this.invuln = 20;   // brief invulnerability on getup
+      }
+      return;
     }
 
     // --- GRABBED STATE: locked by attacker's throw, no input ---
