@@ -1317,6 +1317,57 @@ function loadSpriteSheet(sheetUrl, charId, layout) {
   });
 }
 
+// ============================================================
+// INDIVIDUAL FRAME LOADER
+// ============================================================
+// Drop individual PNGs into sprites/<charId>/ with naming:
+//   <anim>_<frame>.png   e.g. idle_0.png, attack_light_2.png
+//
+// Call: loadSpriteFrames('jade')
+// Auto-discovers which files exist. Missing frames fall back to procedural.
+// Any anim with at least 1 loaded frame replaces the procedural version.
+
+function loadSpriteFrames(charId) {
+  if(!spriteSheets[charId]) spriteSheets[charId] = {};
+  const basePath = `sprites/${charId}/`;
+  const promises = [];
+
+  for(const [anim, info] of Object.entries(SPRITE_ANIMS)) {
+    const framePromises = [];
+    for(let i = 0; i < info.frames; i++) {
+      framePromises.push(new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          const cv = document.createElement('canvas');
+          cv.width = SPRITE_W; cv.height = SPRITE_H;
+          const cx = cv.getContext('2d');
+          cx.imageSmoothingEnabled = false;
+          cx.drawImage(img, 0, 0, SPRITE_W, SPRITE_H);
+          resolve({ index: i, canvas: cv });
+        };
+        img.onerror = () => resolve(null);
+        img.src = `${basePath}${anim}_${i}.png`;
+      }));
+    }
+    promises.push(
+      Promise.all(framePromises).then(results => {
+        const loaded = results.filter(r => r !== null);
+        if(loaded.length > 0) {
+          loaded.sort((a, b) => a.index - b.index);
+          spriteSheets[charId][anim] = loaded.map(r => r.canvas);
+          console.log(`[sprites] ${charId}/${anim}: ${loaded.length} frames loaded`);
+        }
+      })
+    );
+  }
+
+  return Promise.all(promises).then(() => {
+    const char = CHARACTERS.find(c => c.id === charId);
+    if(char) generateSpritesForCharacter(char);
+    console.log(`[sprites] ${charId} frames applied`);
+  });
+}
+
 // GEN + DRAW + INIT
 function generateSpritesForCharacter(c){
   const id=c.id;spriteCache[id]={};
