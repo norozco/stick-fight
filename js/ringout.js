@@ -113,13 +113,16 @@ function lockVictimToUlt(victim, attacker) {
 // ============================================================
 // RING-OUT — Killer-Instinct-style stage fall finisher
 // ============================================================
-const EDGE_THRESHOLD = 150;   // px from screen edge that counts as "near edge"
+const EDGE_THRESHOLD = 200;   // px from screen edge that counts as "near edge"
 
 function canRingOut(loser, winningPlayer) {
   // Only fires when THIS KO ends the match (winner already has 1 round win)
   if(roundsWon[winningPlayer - 1] < 1) return false;
-  // Must be near an edge of the stage
-  return loser.x < EDGE_THRESHOLD || loser.x > W - EDGE_THRESHOLD;
+  // Near edge → ring-out. Wider threshold for ult kills (epic finish).
+  const winner = loser === p1 ? p2 : p1;
+  const wasUlt = winner && winner.state === 'attack' && winner.attackType === 'ult';
+  const threshold = wasUlt ? 350 : EDGE_THRESHOLD;
+  return loser.x < threshold || loser.x > W - threshold;
 }
 
 // ============================================================
