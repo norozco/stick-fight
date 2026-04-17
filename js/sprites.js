@@ -27,8 +27,70 @@ function shadedLimb(x1,y1,x2,y2,w,l,d,o){const dx=x2-x1,dy=y2-y1,ln=Math.sqrt(dx
 function gp(a,f,t){const p=t>1?f/(t-1):0;const o={hY:0,lean:0,lAA:0,rAA:0,lLS:0,rLS:0,lFL:0,rFL:0,rAE:0,lAE:0};
 if(a==="idle"){o.hY=Math.sin(p*Math.PI*2)*3;o.lLS=Math.sin(p*Math.PI*2)*2;o.rLS=-Math.sin(p*Math.PI*2)*2;o.lAA=Math.sin(p*Math.PI*2)*0.15;o.rAA=-Math.sin(p*Math.PI*2)*0.15;}
 else if(a==="walk"){const s=Math.sin(p*Math.PI*2);o.lLS=-s*18;o.rLS=s*18;o.lFL=Math.max(0,s)*12;o.rFL=Math.max(0,-s)*12;o.lAA=s*0.8;o.rAA=-s*0.8;o.lean=4+Math.abs(s)*2;o.hY=Math.abs(s)*3;}
-else if(a==="attack_light"){o.rAE=(p<0.4?p*2.5:Math.max(0,1-(p-0.4)/0.6))*40;o.lean=p<0.4?p*12:12-((p-0.4)/0.6)*8;o.lAA=-0.3;o.rLS=p<0.4?p*8:0;}
-else if(a==="attack_heavy"){if(p<0.35){o.rAA=-1.6;o.lean=-8;o.hY=2;o.rLS=-6;}else{const ext=(p-0.35)/0.65;o.rAE=ext*48;o.lean=10+ext*4;o.lLS=-ext*6;o.rLS=ext*10;o.hY=-ext*3;}}
+else if(a==="attack_light"){
+  // 3-phase: anticipation (0-0.2), strike (0.2-0.55), recovery (0.55-1)
+  if(p<0.2){
+    // ANTICIPATION — shoulder loads, fist chambers at chin
+    const pp=p/0.2;
+    o.rAA=-0.4*pp;       // arm pulls back
+    o.rAE=-8*pp;         // fist retracts to chin
+    o.lean=-4*pp;        // body coils slightly
+    o.hY=pp*2;           // slight squat
+    o.rLS=-3*pp;         // rear foot loads
+  }else if(p<0.55){
+    // STRIKE — fist drives FORWARD, shoulder rotates in, body pushes
+    const sp=(p-0.2)/0.35;
+    o.rAE=sp*46;         // fist extends toward opponent
+    o.rAA=0.15;          // arm straight/slightly down
+    o.lean=-4+sp*16;     // body rotates into punch
+    o.hY=2-sp*3;         // rises from squat
+    o.rLS=-3+sp*10;      // rear foot pivots
+    o.lAA=-0.3;          // guard arm stays up
+  }else{
+    // RECOVERY — retract fist, body settles
+    const rp=(p-0.55)/0.45;
+    o.rAE=46-rp*40;
+    o.lean=12-rp*10;
+    o.hY=-1+rp;
+    o.lAA=-0.3+rp*0.3;
+    o.rLS=7-rp*7;
+  }
+}
+else if(a==="attack_heavy"){
+  // 3-phase: big windup (0-0.35), explosive strike (0.35-0.65), follow-through (0.65-1)
+  if(p<0.35){
+    // BIG WINDUP — fist behind head, body coils backward, deep squat
+    const pp=p/0.35;
+    o.rAA=-1.8*pp;       // arm pulls WAY back
+    o.rAE=-12*pp;        // fist goes behind head
+    o.lean=-14*pp;       // body coils away from target
+    o.hY=4*pp;           // drops into squat
+    o.rLS=-8*pp;         // rear foot loads weight
+    o.lAA=-0.4*pp;       // lead arm guards
+    o.lAE=6*pp;          // lead hand forward for guard
+  }else if(p<0.65){
+    // STRIKE — body UNCOILS, fist explodes forward, full hip rotation
+    const sp=(p-0.35)/0.3;
+    o.rAA=-1.8+sp*2.0;   // arm swings from behind to forward
+    o.rAE=-12+sp*60;     // massive extension
+    o.lean=-14+sp*32;    // full body rotation through
+    o.hY=4-sp*7;         // rises explosively from squat
+    o.rLS=-8+sp*18;      // rear foot pivots hard
+    o.lLS=-sp*8;         // lead foot braces
+    o.lAA=-0.4+sp*0.2;
+    o.lAE=6-sp*4;
+  }else{
+    // FOLLOW-THROUGH — extended pose holds briefly, slow retract
+    const rp=(p-0.65)/0.35;
+    o.rAE=48-rp*38;
+    o.rAA=0.2-rp*0.2;
+    o.lean=18-rp*16;
+    o.hY=-3+rp*3;
+    o.rLS=10-rp*10;
+    o.lLS=-8+rp*8;
+    o.lAA=-0.2+rp*0.2;
+  }
+}
 else if(a==="hurt"){o.lean=-12;o.hY=6;o.lAA=0.5;o.rAA=0.5;o.lLS=-4;o.rLS=4;}
 else if(a==="jump"){o.lFL=16;o.rFL=18;o.hY=-6;o.lAA=-0.6;o.rAA=-0.6;o.lLS=-4;o.rLS=4;}
 else if(a==="block"){o.lAA=-1.4;o.rAA=-1.0;o.lean=-4;o.hY=2;o.lLS=-4;o.rLS=4;}
