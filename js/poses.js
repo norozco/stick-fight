@@ -1223,15 +1223,21 @@ function drawFighter(f) {
       }
     }
 
-    // Knockdown: flat on the ground, with gradual recovery tilt if getting up
+    // Knockdown: settle from impact rotation into flat, then recover to upright
     let knockdownRotation = 0;
     if(f.state === 'knockdown') {
-      // Start flat, then if hitStun is low, start tilting back upright (recovery)
-      if(f.hitStun > 8) {
+      const t = f.stateTime;
+      if(t < 6) {
+        // First 6 frames: settle from impact tumble into flat (~90°)
+        // Start at a full rotation (continuing throw spin) and decelerate to flat
+        const settleP = easeOutCubic(t / 6);
+        knockdownRotation = dir * lerp(Math.PI * 1.1, Math.PI / 2, settleP);
+      } else if(f.hitStun > 10) {
+        // Middle: stay flat on ground
         knockdownRotation = dir * Math.PI / 2;
       } else {
-        // Last 8 frames: tilt from flat back to upright
-        const recoverP = 1 - (f.hitStun / 8);
+        // Last 10 frames of hitStun: tilt from flat back to upright (getting up)
+        const recoverP = 1 - (f.hitStun / 10);
         knockdownRotation = dir * lerp(Math.PI / 2, 0, easeOutCubic(recoverP));
       }
     }
